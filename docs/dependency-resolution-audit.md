@@ -516,6 +516,63 @@ Verification:
 - `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
 - `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
 
+## WordGeni Local Shared UI Package Retirement
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Removed the stale WordGeni-local shared UI package from WordGeni workspace membership and retired the local copy after verification.
+- No root dependency install, root lockfile rewrite, backend/auth/database/payment/business-logic change, app route invention, root push, or WordGeni push was performed.
+- Root Git and WordGeni nested Git handling stayed separate.
+
+Preflight:
+- Root latest commit before this pass: `77f49fb docs: audit wordgeni stale shared ui copy`.
+- Root Git was clean before this documentation update.
+- Root `.gitignore` continues to ignore `apps/WordGeni`, so the nested app repo was not absorbed into the root baseline.
+- WordGeni latest commit before this pass: `257fbfd chore: align shared ui package resolution`.
+- Existing unrelated WordGeni dirty files were recorded before the retirement pass and were not staged as part of this cleanup.
+
+Workspace membership change:
+- Before: `apps/WordGeni/pnpm-workspace.yaml` included `packages/*`, so `packages/ecosystem-assistant-ui` was still a WordGeni workspace package.
+- After: `apps/WordGeni/pnpm-workspace.yaml` keeps the broad package workspace but explicitly excludes the stale local package with `!packages/ecosystem-assistant-ui`.
+- Before: `pnpm --filter @xflow-ecosystem/ecosystem-assistant-ui list --depth 0` resolved to `K:\XFlow-Ecosystem Workspace\apps\WordGeni\packages\ecosystem-assistant-ui`.
+- After: the same filter reports no matching WordGeni workspace project.
+
+Controlled pnpm command run:
+- From `apps/WordGeni`: `pnpm install --lockfile-only --ignore-scripts`.
+- Purpose: remove the stale local workspace importer from `apps/WordGeni/pnpm-lock.yaml` without running lifecycle scripts.
+- No broad install command, script-running install, root install, or package upgrade command was run.
+
+Lockfile result:
+- The `packages/ecosystem-assistant-ui` workspace importer was removed from `apps/WordGeni/pnpm-lock.yaml`.
+- The `apps/web` importer still points to the root shared UI file dependency: `file:../../../../packages/ecosystem-assistant-ui`.
+- Root file dependency package entries remain for `@xflow-ecosystem/ecosystem-assistant-ui@file:../../packages/ecosystem-assistant-ui`.
+- No manual lockfile editing was performed.
+
+Deletion:
+- Deleted exact target only: `K:\XFlow-Ecosystem Workspace\apps\WordGeni\packages\ecosystem-assistant-ui`.
+- The resolved deletion target was confirmed to be inside `K:\XFlow-Ecosystem Workspace\apps\WordGeni` and exactly equal to the intended stale package path before recursive removal.
+- Post-deletion check confirmed `apps/WordGeni/packages/ecosystem-assistant-ui` no longer exists.
+- No generated evidence, root package, app runtime source outside the stale local package, `node_modules`, env file, or hosted-service configuration was deleted.
+
+Post-deletion verification:
+- `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
+- `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
+- `npm --prefix apps/WordGeni run typecheck`: passed.
+- `npm --prefix apps/WordGeni test`: passed.
+- `npm --prefix apps/WordGeni run build`: passed.
+
+Git handling:
+- Root intended change: this documentation update only.
+- WordGeni intended changes: `pnpm-workspace.yaml`, `pnpm-lock.yaml`, and tracked deletions under `packages/ecosystem-assistant-ui`.
+- Existing unrelated WordGeni working-tree files under `apps/web` remained separate and should not be included in the local package retirement commit.
+
+Remaining risks and follow-up:
+- The stale WordGeni-local shared UI package copy is retired, but WordGeni still has unrelated pre-existing navigation/shared-package dirty files that should be reviewed in a separate pass.
+- Root dependency/lockfile cleanup can proceed to the next app only after confirming no downstream docs still refer to the retired local package as active.
+- Recommended next cleanup target: review the remaining WordGeni navigation/shared-package dirty set, or move to the next app-level shared package resolution audit if those files are intentional in the nested repo.
+
 ## Root Git Baseline Staging Review - No Commit Yet
 
 Date:
