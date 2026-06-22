@@ -96,6 +96,52 @@ export type EcosystemAssistantPromptPack = {
   footerText: string;
 };
 
+export type EcosystemAssistantToolLink = {
+  label: string;
+  href: string;
+  description: string;
+  status?: "ready" | "setup" | "review" | "locked";
+};
+
+const APP_COPILOT_TOOLS: Record<EcosystemAppSlug, EcosystemAssistantToolLink[]> = {
+  xflow: [
+    { label: "Command center", href: "/dashboard", description: "Workspace health, connected apps, and next actions.", status: "ready" },
+    { label: "Copilot console", href: "/copilot", description: "Ask questions across portfolio, incidents, apps, and evidence.", status: "ready" },
+    { label: "App directory", href: "/apps", description: "Connect, inspect, and route ecosystem apps.", status: "review" },
+    { label: "Chronicle", href: "/tools/chronicle", description: "Workspace memory, events, and assistant-ready history.", status: "setup" },
+  ],
+  verixet: [
+    { label: "Billing dashboard", href: "/dashboard", description: "Plan access, entitlements, usage, and readiness.", status: "ready" },
+    { label: "Vera Copilot", href: "/dashboard/assistant", description: "Full billing, governance, and access assistant workspace.", status: "ready" },
+    { label: "Keys and access", href: "/dashboard/keys", description: "API keys, control-plane credentials, and app access.", status: "review" },
+    { label: "Workspace setup", href: "/dashboard/workspace", description: "Organization, apps, roles, and launch requirements.", status: "setup" },
+  ],
+  audaix: [
+    { label: "Audit dashboard", href: "/dashboard", description: "Audit queue, site status, findings, and reports.", status: "ready" },
+    { label: "Workspace copilot", href: "/workspace-copilot", description: "Explain audits, prioritize findings, and plan fixes.", status: "ready" },
+    { label: "Architecture doctor", href: "/architecture-doctor", description: "Deeper remediation guidance and system analysis.", status: "review" },
+    { label: "Sites and reports", href: "/sites", description: "Connected sites, audit history, and report exports.", status: "setup" },
+  ],
+  rataify: [
+    { label: "Trust dashboard", href: "/dashboard", description: "Trust score, verification state, profile, and reputation work.", status: "ready" },
+    { label: "Verification center", href: "/verification", description: "Identity, business, claims, and compliance checks.", status: "review" },
+    { label: "Profile setup", href: "/profile", description: "Public profile, trust proof, and review readiness.", status: "setup" },
+    { label: "Compliance insights", href: "/compliance-insights", description: "Risk guidance, proofs, and reputation recommendations.", status: "ready" },
+  ],
+  wordgeni: [
+    { label: "Workspace dashboard", href: "/dashboard", description: "Projects, memory, source readiness, and writing signals.", status: "ready" },
+    { label: "Geni studio", href: "/dashboard/copilot", description: "Full writing copilot with modes, threads, and tools.", status: "ready" },
+    { label: "Projects", href: "/dashboard/projects", description: "Create, draft, verify, and export writing workspaces.", status: "setup" },
+    { label: "Memory", href: "/dashboard/memory", description: "Voice, style, source memory, and workspace context.", status: "review" },
+  ],
+  crevux: [
+    { label: "Creative dashboard", href: "/dashboard", description: "Projects, credits, generations, and asset health.", status: "ready" },
+    { label: "Studio copilot", href: "/studio", description: "Prompt, asset, storyboard, and video production support.", status: "ready" },
+    { label: "Projects", href: "/projects", description: "Campaign workspaces, briefs, assets, and outputs.", status: "setup" },
+    { label: "Exports", href: "/exports", description: "Review-ready assets, packages, and delivery state.", status: "review" },
+  ],
+};
+
 export const ECOSYSTEM_ASSISTANT_STATE_COPY = {
   loading: "Checking the right ecosystem context...",
   unavailable: "I couldn't reach the assistant right now. Try again, or contact support.",
@@ -247,6 +293,7 @@ export type EcosystemAssistantBubbleProps = {
   footerText?: string;
   welcomeMessage?: string;
   quickPrompts?: string[];
+  toolLinks?: EcosystemAssistantToolLink[];
   promptPack?: EcosystemAssistantPromptPack;
   assistantContext?: EcosystemAssistantContextSeed;
   loadingText?: string;
@@ -296,6 +343,23 @@ const DEFAULT_PROMPTS = [
   "I need support",
 ];
 
+const TOOL_STATUS_LABEL: Record<NonNullable<EcosystemAssistantToolLink["status"]>, string> = {
+  ready: "Ready",
+  setup: "Setup",
+  review: "Review",
+  locked: "Locked",
+};
+
+function statusStyle(
+  styles: Record<string, React.CSSProperties>,
+  status: EcosystemAssistantToolLink["status"],
+): React.CSSProperties {
+  if (status === "ready") return styles.toolStatusReady ?? {};
+  if (status === "setup") return styles.toolStatusSetup ?? {};
+  if (status === "locked") return styles.toolStatusLocked ?? {};
+  return styles.toolStatusReview ?? {};
+}
+
 const DEFAULT_THEME: EcosystemAssistantBubbleTheme = {
   accent: "#22d3ee",
   accentText: "#06111f",
@@ -336,6 +400,10 @@ export function EcosystemAssistantBubble(props: EcosystemAssistantBubbleProps): 
   const promptPack = props.promptPack ?? ECOSYSTEM_ASSISTANT_PROMPT_PACKS[props.appSlug];
   const contextSeed = props.assistantContext;
   const quickPrompts = props.quickPrompts ?? promptPack?.suggestedPrompts ?? DEFAULT_PROMPTS;
+  const toolLinks = props.toolLinks ?? APP_COPILOT_TOOLS[props.appSlug] ?? [];
+  const setupPrompts = promptPack?.setupPrompts ?? [];
+  const troubleshootingPrompts = promptPack?.troubleshootingPrompts ?? [];
+  const billingAccessPrompts = promptPack?.billingAccessPrompts ?? [];
   const statusLabel = props.statusLabel ?? "Connected";
   const footerText = props.footerText ?? promptPack?.footerText ?? "Uses ecosystem context through the app's secure assistant route.";
   const loadingText = props.loadingText ?? ECOSYSTEM_ASSISTANT_STATE_COPY.loading;
@@ -579,9 +647,67 @@ export function EcosystemAssistantBubble(props: EcosystemAssistantBubbleProps): 
               </div>
             </div>
             <button type="button" onClick={() => setOpen(false)} style={styles.iconButton} aria-label="Close assistant">
-              ×
+              &times;
             </button>
           </header>
+
+          <div style={styles.workspaceSummary}>
+            <div style={styles.summaryCard}>
+              <span style={styles.summaryLabel}>Workspace</span>
+              <strong style={styles.summaryValue}>{props.workspaceLabel ?? (props.metadata?.surface === "authenticated_app" ? "Current workspace" : "Public visitor")}</strong>
+              <span style={styles.summaryDetail}>{feedbackWorkspaceId ? `Connected as ${feedbackWorkspaceId}` : statusLabel}</span>
+            </div>
+            <div style={styles.summaryCard}>
+              <span style={styles.summaryLabel}>Context</span>
+              <strong style={styles.summaryValue}>{contextSeed?.pageTitle ?? promptPack?.appName ?? props.appName}</strong>
+              <span style={styles.summaryDetail}>{contextSeed?.toolStatus ?? "Ready for workspace-aware questions and actions."}</span>
+            </div>
+          </div>
+
+          {toolLinks.length ? (
+            <div style={styles.toolsSection}>
+              <div style={styles.sectionHeader}>
+                <div>
+                  <p style={styles.sectionEyebrow}>Copilot tools</p>
+                  <p style={styles.sectionHint}>Jump into the connected workspace areas this assistant can explain or help operate.</p>
+                </div>
+              </div>
+              <div style={styles.toolGrid}>
+                {toolLinks.map((tool) => (
+                  <a key={`${tool.label}-${tool.href}`} href={tool.href} style={styles.toolCard}>
+                    <span style={styles.toolTopLine}>
+                      <strong style={styles.toolLabel}>{tool.label}</strong>
+                      <span style={{ ...styles.toolStatus, ...statusStyle(styles, tool.status) }}>
+                        {TOOL_STATUS_LABEL[tool.status ?? "review"]}
+                      </span>
+                    </span>
+                    <span style={styles.toolDescription}>{tool.description}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
+          <div style={styles.intentSection}>
+            <p style={styles.sectionEyebrow}>Guided help</p>
+            <div style={styles.intentGroups}>
+              {setupPrompts.slice(0, 3).map((prompt) => (
+                <button key={`setup-${prompt}`} type="button" onClick={() => void sendMessage(prompt)} style={styles.intentButton}>
+                  {prompt}
+                </button>
+              ))}
+              {troubleshootingPrompts.slice(0, 3).map((prompt) => (
+                <button key={`troubleshooting-${prompt}`} type="button" onClick={() => void sendMessage(prompt)} style={styles.intentButton}>
+                  {prompt}
+                </button>
+              ))}
+              {billingAccessPrompts.slice(0, 2).map((prompt) => (
+                <button key={`billing-${prompt}`} type="button" onClick={() => void sendMessage(prompt)} style={styles.intentButton}>
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div ref={transcriptRef} style={styles.transcript}>
             {messages.map((message) => (
@@ -600,7 +726,7 @@ export function EcosystemAssistantBubble(props: EcosystemAssistantBubbleProps): 
                   <div style={styles.linkRow}>
                     {message.suggestedLinks.slice(0, 4).map((link) => (
                       <a key={`${link.label}-${link.href}`} href={link.href} style={styles.suggestedLink}>
-                        {link.label} →
+                        {link.label} &rarr;
                       </a>
                     ))}
                   </div>
@@ -725,7 +851,7 @@ export function EcosystemAssistantBubble(props: EcosystemAssistantBubbleProps): 
                 style={styles.textarea}
               />
               <button type="button" onClick={() => void sendMessage(draft)} disabled={loading || !draft.trim()} style={styles.sendButton} aria-label="Send message">
-                →
+                &rarr;
               </button>
             </div>
             <p style={styles.footerText}>{footerText}</p>
@@ -775,16 +901,22 @@ function createStyles(theme: EcosystemAssistantBubbleTheme): Record<string, Reac
     },
     launcherLabel: { fontSize: "14px" },
     panel: {
-      width: "min(390px, calc(100vw - 24px))",
-      maxHeight: "82vh",
+      position: "fixed",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      width: "min(520px, calc(100vw - 12px))",
+      height: "100dvh",
+      maxHeight: "100dvh",
       display: "flex",
       flexDirection: "column",
       overflow: "hidden",
       border: `1px solid ${theme.border}`,
-      borderRadius: "22px",
+      borderRight: 0,
+      borderRadius: "24px 0 0 24px",
       background: theme.panel,
       color: theme.text,
-      boxShadow: "0 24px 70px rgba(0, 0, 0, 0.56)",
+      boxShadow: "-28px 0 80px rgba(0, 0, 0, 0.5)",
     },
     header: {
       display: "flex",
@@ -849,14 +981,157 @@ function createStyles(theme: EcosystemAssistantBubbleTheme): Record<string, Reac
       fontSize: "22px",
       lineHeight: "26px",
     },
+    workspaceSummary: {
+      display: "grid",
+      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+      gap: "10px",
+      padding: "14px 16px 0",
+    },
+    summaryCard: {
+      border: `1px solid ${theme.border}`,
+      borderRadius: "16px",
+      background: "rgba(255,255,255,0.035)",
+      padding: "12px",
+      display: "grid",
+      gap: "5px",
+      minWidth: 0,
+    },
+    summaryLabel: {
+      color: theme.muted,
+      fontSize: "10px",
+      fontWeight: 800,
+      letterSpacing: "0.12em",
+      textTransform: "uppercase",
+    },
+    summaryValue: {
+      color: theme.text,
+      fontSize: "13px",
+      lineHeight: 1.25,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+    },
+    summaryDetail: {
+      color: theme.muted,
+      fontSize: "11px",
+      lineHeight: 1.35,
+    },
+    toolsSection: {
+      padding: "14px 16px 0",
+      display: "grid",
+      gap: "10px",
+    },
+    sectionHeader: {
+      display: "flex",
+      justifyContent: "space-between",
+      gap: "12px",
+      alignItems: "flex-start",
+    },
+    sectionEyebrow: {
+      margin: 0,
+      color: theme.accent,
+      fontSize: "10px",
+      fontWeight: 900,
+      letterSpacing: "0.16em",
+      textTransform: "uppercase",
+    },
+    sectionHint: {
+      margin: "4px 0 0",
+      color: theme.muted,
+      fontSize: "12px",
+      lineHeight: 1.4,
+    },
+    toolGrid: {
+      display: "grid",
+      gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+      gap: "10px",
+    },
+    toolCard: {
+      border: `1px solid ${theme.border}`,
+      borderRadius: "16px",
+      background: theme.panelAlt,
+      color: theme.text,
+      padding: "12px",
+      textDecoration: "none",
+      display: "grid",
+      gap: "8px",
+      minHeight: "92px",
+    },
+    toolTopLine: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: "8px",
+    },
+    toolLabel: {
+      fontSize: "13px",
+      lineHeight: 1.2,
+    },
+    toolDescription: {
+      color: theme.muted,
+      fontSize: "11px",
+      lineHeight: 1.4,
+    },
+    toolStatus: {
+      borderRadius: "999px",
+      padding: "3px 7px",
+      fontSize: "9px",
+      fontWeight: 900,
+      letterSpacing: "0.08em",
+      textTransform: "uppercase",
+      flex: "0 0 auto",
+    },
+    toolStatusReady: {
+      border: "1px solid rgba(52, 211, 153, 0.35)",
+      background: "rgba(52, 211, 153, 0.12)",
+      color: "#86efac",
+    },
+    toolStatusSetup: {
+      border: "1px solid rgba(245, 158, 11, 0.35)",
+      background: "rgba(245, 158, 11, 0.12)",
+      color: "#fcd34d",
+    },
+    toolStatusReview: {
+      border: `1px solid ${theme.border}`,
+      background: "rgba(255,255,255,0.06)",
+      color: theme.muted,
+    },
+    toolStatusLocked: {
+      border: "1px solid rgba(148, 163, 184, 0.28)",
+      background: "rgba(15, 23, 42, 0.38)",
+      color: "#94a3b8",
+    },
+    intentSection: {
+      padding: "14px 16px 0",
+      display: "grid",
+      gap: "10px",
+    },
+    intentGroups: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: "8px",
+    },
+    intentButton: {
+      border: `1px solid ${theme.border}`,
+      borderRadius: "999px",
+      background: "rgba(255,255,255,0.04)",
+      color: theme.text,
+      padding: "8px 10px",
+      fontSize: "12px",
+      lineHeight: 1.2,
+      cursor: "pointer",
+      textAlign: "left",
+    },
     transcript: {
-      maxHeight: "430px",
-      minHeight: "180px",
+      flex: "1 1 auto",
+      minHeight: "160px",
       overflowY: "auto",
       padding: "16px",
       display: "flex",
       flexDirection: "column",
       gap: "12px",
+      borderTop: `1px solid ${theme.border}`,
+      marginTop: "14px",
     },
     assistantMessage: {
       marginRight: "28px",
