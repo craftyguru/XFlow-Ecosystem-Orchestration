@@ -765,3 +765,55 @@ Verification results:
 
 Next recommended action:
 - If safe checks pass but WordGeni reports lockfile or installed-link mismatch, run a dedicated WordGeni controlled pnpm lockfile update pass before deleting stale local package copies.
+
+## WordGeni Controlled pnpm Lockfile Update and Junction Verification
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Ran a controlled WordGeni pnpm lockfile and installed-link update for the repaired root shared UI package dependency.
+- No root install, npm install inside WordGeni, root lockfile change, stale local package-copy deletion, backend/auth/database/payment/business-logic change, push, or cross-app runtime edit was performed.
+- WordGeni remains an independent nested repo under `apps/WordGeni`.
+
+Before state:
+- `apps/web/package.json` already pointed `@xflow-ecosystem/ecosystem-assistant-ui` to `file:../../../../packages/ecosystem-assistant-ui`.
+- `pnpm-lock.yaml` still recorded `specifier: file:../../packages/ecosystem-assistant-ui` and `version: link:../../packages/ecosystem-assistant-ui`.
+- `apps/web/node_modules/@xflow-ecosystem/ecosystem-assistant-ui` was a junction to `K:\XFlow-Ecosystem Workspace\apps\WordGeni\packages\ecosystem-assistant-ui`.
+- `pnpm list @xflow-ecosystem/ecosystem-assistant-ui --filter @wordgeni/web --depth 0` reported `link:../../packages/ecosystem-assistant-ui`.
+
+pnpm commands run:
+- `pnpm install --lockfile-only --ignore-scripts`.
+- `pnpm --filter @wordgeni/web install --ignore-scripts --offline`.
+
+Lockfile changes summary:
+- `apps/web` importer now records `specifier: file:../../../../packages/ecosystem-assistant-ui`.
+- `apps/web` importer now records `version: file:../../packages/ecosystem-assistant-ui(react@19.2.5)`.
+- New package/snapshot entries were added for `@xflow-ecosystem/ecosystem-assistant-ui@file:../../packages/ecosystem-assistant-ui` and `@xflow-ecosystem/ecosystem-assistant@file:../../packages/ecosystem-assistant`.
+- No dependency version upgrades were intentionally performed.
+
+After state:
+- `pnpm list @xflow-ecosystem/ecosystem-assistant-ui --filter @wordgeni/web --depth 0` reports `file:../../packages/ecosystem-assistant-ui(react@19.2.5)`.
+- `apps/web/node_modules/@xflow-ecosystem/ecosystem-assistant-ui` now points through pnpm's virtual store path for `@xflow-ecosystem+ecosystem-assistant-ui@file+..+..+packages+ecosystem-assistant-ui_react@19.2.5`.
+- The installed package metadata matches the root shared UI package metadata, including `test`, `sideEffects`, and `files`, rather than the stale WordGeni-local copy.
+- Next runtime alias, Vitest alias, and TypeScript path continue to target the root shared UI package build under `K:\XFlow-Ecosystem Workspace\packages\ecosystem-assistant-ui\dist\index.js`.
+
+Stale local package copy status:
+- `apps/WordGeni/packages/ecosystem-assistant-ui` remains present.
+- It was not deleted, copied into, staged, or intentionally modified in this pass.
+- WordGeni Turbo still sees the local workspace package as a workspace member, so removing or retiring it needs a separate workspace cleanup pass.
+
+Verification results:
+- `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
+- `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
+- `npm --prefix apps/WordGeni run typecheck`: passed.
+- `npm --prefix apps/WordGeni test`: passed.
+- `npm --prefix apps/WordGeni run build`: passed.
+
+Git handling:
+- Root docs were updated separately in this root repository.
+- WordGeni intended nested-repo files for this pass are `apps/web/package.json`, `apps/web/next.config.mjs`, `apps/web/vitest.config.mjs`, and `pnpm-lock.yaml`.
+- Existing prior WordGeni navigation/shared-package changes remain separate and should not be conflated with the lockfile/link update commit.
+
+Next cleanup target:
+- WordGeni stale local shared package workspace cleanup: audit whether `apps/WordGeni/packages/ecosystem-assistant-ui` can be removed from the pnpm workspace without breaking Turbo tasks or accepted navigation behavior.
