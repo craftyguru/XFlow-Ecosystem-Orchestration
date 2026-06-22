@@ -724,6 +724,61 @@ Remaining risks:
 - npm reported existing audit vulnerabilities during the controlled install; this pass did not run `npm audit fix` or dependency upgrades.
 - Recommended next prompt: `RatAiFy Remaining Shared Navigation and Local QA Dirty Set Review`.
 
+## RatAiFy Remaining Dirty Set Review
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Reviewed the remaining RatAiFy nested-repo dirty files after shared UI package-resolution repair.
+- Committed accepted shared navigation shell work only.
+- Deferred local disposable/browser QA harness changes because they touch login fallback, demo seeding, and local smoke-server behavior and need their own focused backend/auth/data-safety review.
+- No dependency install, lockfile rewrite, audit fix, backend/auth/database/payment change, cross-app runtime edit, or push was performed in this review pass.
+
+Preflight:
+- Root latest commit before this review: `a5d77c1 docs: record rataify shared ui link refresh`.
+- Root Git was clean before this documentation update.
+- Root `.gitignore` continues to ignore `apps/RatAiFy`.
+- RatAiFy latest commit before this review: `a5fed67 chore: align shared ui package resolution`.
+
+Files reviewed and classification:
+
+| File | Classification | Decision |
+| --- | --- | --- |
+| `client/src/features/trustDashboard/components/RataifyTrustShell.tsx` | Accepted shared navigation shell work | Committed. Wires RatAiFy desktop/mobile shell surfaces to shared `SidebarNav`, `MobileNavDrawer`, and `NavigationShellStyles` while preserving app-owned selected-site, billing, platform, scan, and account/logout controls. |
+| `client/src/components/layout/rataify-navigation-shell-config.tsx` | Accepted shared navigation adapter | Committed. Maps RatAiFy trust-shell groups into shared navigation config and preserves badges, disabled setup semantics, external links, platform control-plane visibility, and route-active quirks. |
+| `client/src/index.css` | Accepted shared navigation styling support | Committed. Adds account/action layout styles used by the app-owned RatAiFy sidebar footer around the shared route renderer. |
+| `tests/rataify-navigation-shell-config.node.test.ts` | Accepted shared navigation test coverage | Committed. Covers badges, disabled setup items, external links, route-active behavior, role visibility, desktop/mobile section parity, and app-owned slot boundaries. |
+| `tests/trust-dashboard-rendering.node.test.ts` | Accepted shared navigation regression update | Committed. Updates assertions to verify shared sidebar rendering, shared active-state accessibility, disabled item accessibility, and adapter-owned setup badge behavior. |
+| `client/src/App.tsx` | Local disposable/browser QA harness work | Deferred. Adds a development-only demo-login path and should be reviewed with the local QA harness because it touches login routing. |
+| `scripts/dev/start-smoke-server.mjs` | Local disposable/browser QA harness work | Deferred. Changes demo seed behavior and smoke database safety checks; needs focused local-QA review. |
+| `server/lib/reservedPathFallback.ts` | Local disposable/browser QA harness work / risky auth-adjacent surface | Deferred. Allows local demo login to bypass central auth redirect only under development/demo conditions; needs focused auth-safety review. |
+| `server/services/demoSeeder.ts` | Local disposable/browser QA harness work / data-seeding surface | Deferred. Adds existing demo org repair and legal-consent seeding; needs focused data-safety review. |
+| `tests/reserved-demo-login.node.test.ts` | Local disposable/browser QA harness test | Deferred with its corresponding runtime guard change. |
+| `tests/start-smoke-server.node.test.ts` | Local disposable/browser QA harness test | Deferred with its corresponding smoke-server change. |
+
+Verification before commit:
+- `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
+- `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
+- `npm --prefix apps/RatAiFy run typecheck`: passed.
+- `npm --prefix apps/RatAiFy test`: passed, 381 tests.
+- `npm --prefix apps/RatAiFy run build`: passed.
+
+Commit decision:
+- RatAiFy shared navigation commit: `e65566b chore: commit shared navigation shell updates`.
+- No local QA harness files, auth-adjacent files, demo-seeding files, package-resolution files, generated files, or unrelated files were included in that commit.
+
+Remaining dirty files in RatAiFy:
+- `client/src/App.tsx`.
+- `scripts/dev/start-smoke-server.mjs`.
+- `server/lib/reservedPathFallback.ts`.
+- `server/services/demoSeeder.ts`.
+- `tests/reserved-demo-login.node.test.ts`.
+- `tests/start-smoke-server.node.test.ts`.
+
+Recommended next prompt:
+- `RatAiFy Local Disposable Browser QA Harness Safety Review`.
+
 ## WordGeni Local Shared UI Package Retirement
 
 Date:
