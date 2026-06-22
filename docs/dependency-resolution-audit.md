@@ -779,6 +779,60 @@ Remaining dirty files in RatAiFy:
 Recommended next prompt:
 - `RatAiFy Local Disposable Browser QA Harness Safety Review`.
 
+## RatAiFy Local Disposable Browser QA Harness Safety Review
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Reviewed the six RatAiFy local disposable/browser QA harness files that were deferred from the shared navigation dirty-set commit.
+- Applied safety tightening only to local QA harness surfaces: development demo login routing, reserved-path fallback, smoke server seed gating, demo seed target validation, and source tests.
+- No dependency install, lockfile rewrite, audit fix, push, cross-app runtime edit, production auth behavior change, payment change, migration, or hosted DB operation was performed.
+
+Preflight:
+- Root latest commit before this review: `e3bfb43 docs: record rataify remaining dirty set review`.
+- Root Git was clean before this documentation update.
+- Root `.gitignore` continues to ignore `apps/RatAiFy`.
+- RatAiFy latest commit before this review: `e65566b chore: commit shared navigation shell updates`.
+
+Files reviewed and classification:
+
+| File | Classification | Decision |
+| --- | --- | --- |
+| `client/src/App.tsx` | Local disposable browser QA harness | Committed. Adds a non-production `/login?demo=1` route path to the existing local login page while production keeps central auth redirect behavior. |
+| `scripts/dev/start-smoke-server.mjs` | Local disposable smoke harness | Committed with tightening. Demo seeding is no longer passed through or defaulted blindly; it is enabled only for local disposable DB names or an explicit non-production remote seed confirmation. |
+| `server/lib/reservedPathFallback.ts` | Auth-adjacent local fallback guard | Committed. Allows `/login?demo=1` through only outside production and only when `DEMO_MODE` or `SEED_DEMO_DATA` is truthy; normal `/login` still redirects to central auth. |
+| `server/services/demoSeeder.ts` | Data-seeding surface | Committed with tightening. Seeder now refuses to run unless `DATABASE_URL` is a local disposable target or the operator provides explicit non-production remote seed confirmation before any DB writes. Existing demo org repair and legal-consent seeding remain scoped to the deterministic demo IDs. |
+| `tests/reserved-demo-login.node.test.ts` | Harness guard coverage | Committed. Covers local demo pass-through, normal central-auth redirect, missing demo-env denial, and production denial. |
+| `tests/start-smoke-server.node.test.ts` | Harness seed-safety coverage | Committed. Covers source-level guards for smoke server seed gating and demo seeder database-target refusal. |
+
+Safety gates confirmed:
+- Production `/login` behavior remains a central auth redirect.
+- Local demo login requires `?demo=1` plus non-production runtime; server fallback also requires `DEMO_MODE` or `SEED_DEMO_DATA`.
+- Smoke server no longer fabricates a placeholder `DATABASE_URL`.
+- Smoke server no longer forwards arbitrary `SEED_DEMO_DATA` as an unconditional seed shortcut.
+- Demo seeding refuses hosted or ambiguous database targets unless `RATAIFY_ALLOW_REMOTE_SMOKE_SEED` is truthy and `RATAIFY_CONFIRM_REMOTE_SMOKE_SEED` equals `I_UNDERSTAND_THIS_CAN_SEED_REMOTE_DB` in a non-production process.
+- No hosted database was touched.
+
+Verification:
+- `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
+- `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
+- `npm --prefix apps/RatAiFy run typecheck`: passed.
+- `npm --prefix apps/RatAiFy test`: passed, 381 tests.
+- `npm --prefix apps/RatAiFy run build`: passed.
+
+Commit decision:
+- RatAiFy local QA harness commit: `33a231c test: add local disposable navigation qa harness`.
+- Staged RatAiFy files were limited to the six reviewed harness files.
+- No generated files, `node_modules`, env files, output/evidence files, package files, lockfiles, or unrelated runtime files were staged.
+
+After state:
+- RatAiFy nested repo was clean after the harness commit.
+- Root repo remained separate; `apps/RatAiFy` was not staged in root.
+
+Recommended next prompt:
+- `RatAiFy Local Disposable Browser QA Harness Run`.
+
 ## WordGeni Local Shared UI Package Retirement
 
 Date:
