@@ -586,3 +586,130 @@ Next pass:
 - Review `git diff --cached --name-only`.
 - If the staged set is still clean, create the initial root commit only.
 - Do not add root lockfiles, nested apps, generated outputs, or dependency cleanup changes in the initial commit.
+
+## Root Lockfile and Package Manager Ownership Review
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Read-only review of the remaining untracked root/package lockfiles after the initial root baseline commit `fe103fc chore: establish root orchestration baseline`.
+- No dependency install, npm install, pnpm install, lockfile rewrite, lockfile deletion, lockfile staging, commit, push, app runtime code change, backend/auth/database/payment/business-logic change, or `apps/` edit was performed.
+
+### Root ownership decision
+
+Root package-manager ownership recommendation:
+- Treat the root orchestration layer as npm-owned for CI/proof scripts unless a future deliberate workspace migration is approved.
+
+Evidence:
+- Root `.github/workflows/ecosystem-proof.yml` uses `actions/setup-node` with `cache: npm` and runs `npm ci --ignore-scripts`.
+- Root `package.json` has no `packageManager` field and no workspace declaration.
+- Root scripts use npm for shared package orchestration, for example `npm --prefix packages/ecosystem-assistant-ui ...`.
+- Root `package-lock.json` is npm lockfile v3 and records only the root `supabase` devDependency from `package.json`.
+- No root `pnpm-workspace.yaml`, `.npmrc`, or `.pnpmrc` exists.
+- Root `pnpm-lock.yaml` has lockfile version `9.0` and an empty root importer (`.: {}`), so it does not currently describe the root `supabase` devDependency or the `packages/*` shared packages.
+- `docs/ecosystem-root-runbook.md` states that the root is a parent/orchestration folder, not a unified package workspace. This remains compatible with npm-owned root CI and package-local npm commands.
+
+Interpretation:
+- Root is not a pnpm workspace today.
+- Root `package-lock.json` appears current enough to support the existing CI shape, but it should stay untracked until root lockfile policy is explicitly approved.
+- Root `pnpm-lock.yaml` appears stale or vestigial at the root. It should not be staged as an authoritative root lockfile. Delete it only in a separate approved cleanup pass after confirming no root workflow depends on it.
+
+### Package-level lockfile table
+
+| Path | Owner | Package manager | Current status | Should stage later? | Should ignore? | Should delete later? | Risk | Recommended next action |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `package-lock.json` | Root orchestration CI/proof layer | npm | Lockfile v3. Root entry has `devDependencies.supabase: ^2.98.2`, matching root `package.json`. | Yes, but only after approving npm as the root owner. | No, if npm remains root owner. | No, unless root CI is intentionally migrated away from npm. | Low/medium: staging it establishes npm as root owner and may constrain future pnpm migration. | Keep untracked for now; stage in a focused "root npm lockfile baseline" pass if npm ownership is approved. |
+| `pnpm-lock.yaml` | No clear current owner | pnpm | Lockfile v9 with an empty root importer and no root package dependencies. No root `pnpm-workspace.yaml` exists. | No. | Yes, or leave untracked until deletion is approved. | Yes, likely, but only after an explicit cleanup approval. | Medium: keeping it visible perpetuates mixed root ownership; staging it would misrepresent root dependency state. | Do not stage. Add to ignore or delete in a later root lockfile cleanup pass after approval. |
+| `packages/ecosystem-assistant/package-lock.json` | `@xflow-ecosystem/ecosystem-assistant` package | npm | Lockfile v3. Name/version match package `0.1.0`; only `typescript` devDependency. | Yes, if package-local npm lockfiles are approved. | No, if packages remain independently installable npm packages. | No. | Low: independent package lock is coherent, but root is not a workspace. | Keep untracked for now; later stage with package-local npm lockfile policy. |
+| `packages/ecosystem-assistant-ui/package-lock.json` | `@xflow-ecosystem/ecosystem-assistant-ui` package | npm | Lockfile v3. Name/version match package `0.1.0`; records `file:../ecosystem-assistant`, React peer, TypeScript and React type devDeps. | Yes, if package-local npm lockfiles are approved. | No, if packages remain independently installable npm packages. | No. | Low/medium: includes a package-local file link and peer-resolved React metadata; useful for current test/typecheck workflow. | Keep untracked for now; later stage with package-local npm lockfile policy. |
+| `packages/ecosystem-contracts/package-lock.json` | `@xflow-ecosystem/contracts` package | npm | Lockfile v3. Name/version match package `0.1.0`; only `typescript` devDependency. | Yes, if package-local npm lockfiles are approved. | No, if packages remain independently installable npm packages. | No. | Low: independent package lock is coherent. | Keep untracked for now; later stage with package-local npm lockfile policy. |
+| `packages/ecosystem-supabase/package-lock.json` | `@xflow-ecosystem/supabase` package | npm | Lockfile v3. Name/version match package `0.1.0`; records `@supabase/supabase-js` dev/peer dependency and TypeScript. | Yes, if package-local npm lockfiles are approved. | No, if packages remain independently installable npm packages. | No. | Medium: Supabase package dependency graph is larger; still coherent with package metadata. | Keep untracked for now; later stage with package-local npm lockfile policy. |
+
+### Package classification
+
+| Package | Classification | Reason |
+| --- | --- | --- |
+| `packages/ecosystem-assistant` | Independent npm package | Has its own `package.json`, build/typecheck scripts, npm lockfile v3, no root workspace owner. |
+| `packages/ecosystem-assistant-ui` | Independent npm package | Has package-local build/typecheck/test scripts, npm lockfile v3, and current verification is invoked through `npm --prefix`. |
+| `packages/ecosystem-contracts` | Independent npm package | Has package-local TypeScript build/typecheck scripts and npm lockfile v3. |
+| `packages/ecosystem-supabase` | Independent npm package | Has package-local TypeScript build/typecheck scripts and npm lockfile v3 with Supabase peer/dev dependency. |
+| `packages/ecosystem-showcase` | Separate nested Git repo / excluded root package | Root `.gitignore` excludes it from the root baseline; do not include its lockfile policy in the root package decision. |
+
+### Mixed npm/pnpm risk
+
+- Root npm ownership is supported by CI and root scripts.
+- Root pnpm ownership is not supported by a root workspace file or by the current root pnpm lock contents.
+- WordGeni and Crevux remain pnpm-owned app workspaces under ignored `apps/` and are outside this root lockfile pass.
+- XFlow/RatAiFy/Verixet/AudAiX app-level lockfile cleanup remains separate because `apps/` is ignored from the root baseline.
+- The highest immediate root risk is accidentally staging both root lockfiles and making mixed ownership look intentional.
+
+### Lockfile disposition recommendation
+
+Lockfiles to keep untracked for now:
+- `package-lock.json`.
+- `packages/ecosystem-assistant/package-lock.json`.
+- `packages/ecosystem-assistant-ui/package-lock.json`.
+- `packages/ecosystem-contracts/package-lock.json`.
+- `packages/ecosystem-supabase/package-lock.json`.
+
+Lockfiles to stage later only after approval:
+- The npm lockfiles above, as a focused root/package npm lockfile baseline.
+
+Lockfiles to ignore or delete later only after approval:
+- `pnpm-lock.yaml`, because the root is not a pnpm workspace and the lockfile has an empty root importer.
+
+Commands explicitly not run:
+- `npm install`.
+- `pnpm install`.
+- `npm ci`.
+- `npm install --package-lock-only`.
+- `pnpm install --lockfile-only`.
+- Any lockfile rewrite/regeneration command.
+- `git add` for lockfiles.
+- `git commit`.
+- `git push`.
+
+Next recommended prompt:
+- `Root Git Baseline - Stage Approved npm Lockfiles and Ignore Stale Root pnpm Lockfile`
+
+## npm Lockfile Baseline and Stale pnpm Ignore
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Baseline the approved npm lockfiles after the root/package manager ownership review.
+- Keep the stale root `pnpm-lock.yaml` out of root Git tracking with an explicit root-only ignore rule.
+- No dependency install, npm install, pnpm install, lockfile rewrite, lockfile deletion, app runtime code change, backend/auth/database/payment/business-logic change, `apps/` edit, push, or production-service operation was performed.
+
+Staged npm lockfiles:
+- `package-lock.json`.
+- `packages/ecosystem-assistant/package-lock.json`.
+- `packages/ecosystem-assistant-ui/package-lock.json`.
+- `packages/ecosystem-contracts/package-lock.json`.
+- `packages/ecosystem-supabase/package-lock.json`.
+
+Staged supporting files:
+- `.gitignore`, adding `/pnpm-lock.yaml` as a root-only ignore rule.
+- `docs/dependency-resolution-audit.md`, recording this baseline decision.
+
+Stale pnpm decision:
+- `pnpm-lock.yaml` remains on disk but is not staged.
+- The root is currently npm-owned for CI/proof orchestration, and there is no root `pnpm-workspace.yaml`.
+- The root pnpm lock has an empty importer and does not describe the root `supabase` devDependency, so it should remain ignored unless a future approved pass intentionally migrates root ownership to pnpm.
+
+Validation results:
+- `git check-ignore -v pnpm-lock.yaml` confirms the root-only ignore rule applies.
+- Staged paths contain no `apps/`, `node_modules/`, `.env*`, `output/`, evidence, generated build output, or `pnpm-lock.yaml`.
+- Only approved npm lockfiles, `.gitignore`, and this audit document are intended for the lockfile baseline commit.
+
+Verification results:
+- `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
+- `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
+
+Commit plan:
+- If validation and verification pass, commit with `chore: baseline npm lockfiles`.
+
+Next recommended cleanup target:
+- Shared package resolution cleanup, starting with WordGeni split resolution and stale local package copies.

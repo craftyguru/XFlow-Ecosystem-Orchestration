@@ -4,6 +4,9 @@
 node_modules/
 **/node_modules/
 
+# Stale root pnpm metadata; root orchestration is npm-owned.
+/pnpm-lock.yaml
+
 # Env and secrets
 .env
 .env.*
