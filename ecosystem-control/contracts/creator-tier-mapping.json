@@ -1,0 +1,338 @@
+{
+  "version": "2026-05-04.creator-safeguards-wordgeni-balanced-enforced",
+  "billing_authority": "verixet",
+  "auth_control_authority": "xflow",
+  "apps": {
+    "wordgeni": {
+      "local_tiers_found": [
+        "free",
+        "pro",
+        "studio",
+        "enterprise"
+      ],
+      "public_tiers": {
+        "starter": {
+          "public_plan_slugs": [
+            "wordgeni_starter",
+            "creator_starter",
+            "ecosystem_starter"
+          ],
+          "local_tier_equivalent": "pro",
+          "feature_keys": [
+            "wordgeni.ai_generation",
+            "wordgeni.ai_touchup_prompt",
+            "wordgeni.ai_onboarding_seed",
+            "wordgeni.ai_verify",
+            "wordgeni.ai_collaborate",
+            "wordgeni.ai_simulate",
+            "wordgeni.ai_publish_package",
+            "wordgeni.ai_tasks",
+            "wordgeni.genie_suggestions",
+            "wordgeni.genie_chat",
+            "wordgeni.voice_draft_transcribe",
+            "wordgeni.voice_draft_structure",
+            "wordgeni.exports",
+            "wordgeni.source_memory",
+            "wordgeni.visual_companion",
+            "wordgeni.visual_companion_storyboard"
+          ],
+          "enforce_now": true,
+          "review_required": false,
+          "notes": "Gap closure enforces active paid WordGeni entitlement before the high-confidence provider-backed AI, draft task enqueue, Genie, voice draft, primary and Cursor integration export creation, shared memory persistence, and visual companion handoff paths. Verixet public Starter slugs now resolve to local pro from Stripe Price metadata plan_slug/public_plan_slug/verixet_plan_slug/app_plan_slug. Balanced tier-specific source memory, export, and active-project limits are now enforced in WordGeni API.",
+          "enforced_limits": {
+            "ai_usage": {
+              "monthly_workspace_tokens": 2000000,
+              "daily_user_tokens": 400000,
+              "max_output_tokens": 1800,
+              "max_request_cost_cents": 40
+            },
+            "voice_draft": {
+              "monthly_transcription_seconds": 3600
+            },
+            "genie_realtime": {
+              "monthly_session_starts": 60
+            },
+            "cursor_draft_tasks": {
+              "max_queued_or_running": 20,
+              "max_credits_per_draft_task": 50
+            },
+            "exports": {
+              "paid_gate": true,
+              "cursor_integration_paid_gate": true,
+              "per_month": 25,
+              "status": "already_enforced"
+            },
+            "source_memory": {
+              "paid_gate": true,
+              "active_sources_or_memory_items": 10,
+              "counting": "source rows plus voiceDraftSnapshots in workspace copilotContext",
+              "status": "already_enforced"
+            },
+            "projects": {
+              "active_projects": 5,
+              "counting": "non-archived projects in workspace",
+              "status": "already_enforced"
+            }
+          }
+        },
+        "pro": {
+          "public_plan_slugs": [
+            "wordgeni_pro",
+            "creator_pro",
+            "ecosystem_pro"
+          ],
+          "local_tier_equivalent": "studio",
+          "feature_keys": [
+            "wordgeni.ai_generation",
+            "wordgeni.ai_touchup_prompt",
+            "wordgeni.ai_onboarding_seed",
+            "wordgeni.ai_verify",
+            "wordgeni.ai_collaborate",
+            "wordgeni.ai_simulate",
+            "wordgeni.ai_publish_package",
+            "wordgeni.ai_tasks",
+            "wordgeni.genie_suggestions",
+            "wordgeni.genie_chat",
+            "wordgeni.voice_draft_transcribe",
+            "wordgeni.voice_draft_structure",
+            "wordgeni.exports",
+            "wordgeni.source_memory",
+            "wordgeni.visual_companion",
+            "wordgeni.visual_companion_storyboard",
+            "wordgeni.memory_sources_exports"
+          ],
+          "enforce_now": true,
+          "review_required": false,
+          "notes": "Core paid provider-backed actions, draft task enqueue, primary and Cursor integration export creation, and shared memory persistence are now fail-closed. Verixet public Pro slugs now resolve to local studio from Stripe Price metadata plan_slug/public_plan_slug/verixet_plan_slug/app_plan_slug. Balanced tier-specific source memory, export, and active-project limits are now enforced in WordGeni API.",
+          "enforced_limits": {
+            "ai_usage": {
+              "monthly_workspace_tokens": 10000000,
+              "daily_user_tokens": 1500000,
+              "max_output_tokens": 3200,
+              "max_request_cost_cents": 120
+            },
+            "voice_draft": {
+              "monthly_transcription_seconds": 18000
+            },
+            "genie_realtime": {
+              "monthly_session_starts": 800
+            },
+            "cursor_draft_tasks": {
+              "max_queued_or_running": 40,
+              "max_credits_per_draft_task": 50
+            },
+            "exports": {
+              "paid_gate": true,
+              "cursor_integration_paid_gate": true,
+              "per_month": 250,
+              "status": "already_enforced"
+            },
+            "source_memory": {
+              "paid_gate": true,
+              "active_sources_or_memory_items": 100,
+              "counting": "source rows plus voiceDraftSnapshots in workspace copilotContext",
+              "status": "already_enforced"
+            },
+            "projects": {
+              "active_projects": 50,
+              "counting": "non-archived projects in workspace",
+              "status": "already_enforced"
+            }
+          }
+        },
+        "elite": {
+          "public_plan_slugs": [
+            "wordgeni_elite",
+            "creator_elite",
+            "ecosystem_elite"
+          ],
+          "local_tier_equivalent": "enterprise",
+          "feature_keys": [
+            "wordgeni.ai_generation",
+            "wordgeni.ai_touchup_prompt",
+            "wordgeni.ai_onboarding_seed",
+            "wordgeni.ai_verify",
+            "wordgeni.ai_collaborate",
+            "wordgeni.ai_simulate",
+            "wordgeni.ai_publish_package",
+            "wordgeni.ai_tasks",
+            "wordgeni.genie_suggestions",
+            "wordgeni.genie_chat",
+            "wordgeni.voice_draft_transcribe",
+            "wordgeni.voice_draft_structure",
+            "wordgeni.exports",
+            "wordgeni.source_memory",
+            "wordgeni.visual_companion",
+            "wordgeni.visual_companion_storyboard",
+            "wordgeni.memory_sources_exports"
+          ],
+          "enforce_now": true,
+          "review_required": false,
+          "notes": "Core paid provider-backed actions, draft task enqueue, primary and Cursor integration export creation, and shared memory persistence are now fail-closed. Verixet public Elite slugs now resolve to local enterprise from Stripe Price metadata plan_slug/public_plan_slug/verixet_plan_slug/app_plan_slug. Balanced tier-specific source memory, export, and active-project limits are now enforced in WordGeni API.",
+          "enforced_limits": {
+            "ai_usage": {
+              "monthly_workspace_tokens": 50000000,
+              "daily_user_tokens": 5000000,
+              "max_output_tokens": 6400,
+              "max_request_cost_cents": 500
+            },
+            "voice_draft": {
+              "monthly_transcription_seconds": 864000
+            },
+            "genie_realtime": {
+              "monthly_session_starts": 100000
+            },
+            "cursor_draft_tasks": {
+              "max_queued_or_running": 100,
+              "max_credits_per_draft_task": 50
+            },
+            "exports": {
+              "paid_gate": true,
+              "cursor_integration_paid_gate": true,
+              "per_month": null,
+              "status": "already_enforced"
+            },
+            "source_memory": {
+              "paid_gate": true,
+              "active_sources_or_memory_items": null,
+              "counting": "source rows plus voiceDraftSnapshots in workspace copilotContext",
+              "status": "already_enforced"
+            },
+            "projects": {
+              "active_projects": null,
+              "counting": "non-archived projects in workspace",
+              "status": "already_enforced"
+            }
+          }
+        }
+      }
+    },
+    "crevux": {
+      "local_tiers_found": [
+        "free",
+        "pro",
+        "public_pro",
+        "elite"
+      ],
+      "public_tiers": {
+        "starter": {
+          "public_plan_slugs": [
+            "crevux_starter",
+            "creator_starter",
+            "ecosystem_starter"
+          ],
+          "local_tier_equivalent": "pro",
+          "credit_cap_equivalent": "4000 credits per period; 400 image/prompt requests per day; 80 video/lipsync/extend requests per day",
+          "feature_keys": [
+            "openai_generate_image",
+            "openai_create_prompt_fix",
+            "video_generate",
+            "audio_generate_voice",
+            "source_enhance_job",
+            "images_edit",
+            "images_restore_classical"
+          ],
+          "enforce_now": true,
+          "review_required": false,
+          "notes": "Public Crevux Starter maps conservatively to local Pro. Stripe subscription tier resolution now accepts crevux_starter, creator_starter, and ecosystem_starter from Price metadata plan_slug/public_plan_slug/verixet_plan_slug/app_plan_slug. Asset export preflight, TTS preview admission, video prompt-enhancement admission, and credit debit are server-enforced through the local Pro policy. Storage caps are now server-enforced on project creation, asset upload, and audio upload with soft upgrade hints.",
+          "storage_equivalent": "120 assets, 40 audio uploads, 8 active projects, 2 GB tracked asset storage"
+        },
+        "pro": {
+          "public_plan_slugs": [
+            "crevux_pro",
+            "creator_pro",
+            "ecosystem_pro"
+          ],
+          "local_tier_equivalent": "public_pro",
+          "credit_cap_equivalent": "8000 credits per period via public Pro plan slug metadata fallback; 800 image/prompt requests per day; 200 video/lipsync/extend requests per day; 4K export through public_pro export policy",
+          "feature_keys": [
+            "openai_generate_image",
+            "openai_create_prompt_fix",
+            "video_generate",
+            "audio_generate_voice",
+            "source_enhance_job",
+            "studio_export_1080p",
+            "studio_timeline_multitrack",
+            "studio_auto_score_basic",
+            "studio_audio_generate_music",
+            "studio_export_4k"
+          ],
+          "enforce_now": true,
+          "review_required": false,
+          "notes": "Public Crevux Pro now resolves to local runtime tier public_pro for crevux_pro, creator_pro, and ecosystem_pro. This distinguishes Pro from Starter for SaaS daily caps and entitlement policy while preserving checkout and plan slugs. public_pro now maps to a distinct internal export plan with 4K max video resolution without Elite-only commercial metadata. Invoice credit fallback now grants 8,000 credits for public Pro plan slugs when explicit ai_credits/ai_credits_per_period metadata is absent. Storage caps are now server-enforced on project creation, asset upload, and audio upload with soft upgrade hints.",
+          "storage_equivalent": "500 assets, 150 audio uploads, 30 active projects, 10 GB tracked asset storage"
+        },
+        "elite": {
+          "public_plan_slugs": [
+            "crevux_elite",
+            "creator_elite",
+            "ecosystem_elite"
+          ],
+          "local_tier_equivalent": "elite",
+          "credit_cap_equivalent": "14000 credits per period; 5000 image/prompt requests per day; 500 video/lipsync/extend requests per day",
+          "feature_keys": [
+            "openai_generate_image",
+            "openai_create_prompt_fix",
+            "video_generate",
+            "audio_generate_voice",
+            "source_enhance_job",
+            "studio_export_4k",
+            "studio_render_priority",
+            "studio_batch_render"
+          ],
+          "enforce_now": true,
+          "review_required": false,
+          "notes": "Local elite has the strongest existing policy enforcement, including 4K export policy where enabled and higher export limits. Stripe subscription tier resolution now accepts crevux_elite, creator_elite, and ecosystem_elite from Price metadata plan_slug/public_plan_slug/verixet_plan_slug/app_plan_slug. Storage caps are now server-enforced on project creation, asset upload, and audio upload with soft upgrade hints.",
+          "storage_equivalent": "2,000 assets, 500 audio uploads, 100 active projects, 50 GB tracked asset storage"
+        }
+      },
+      "resolved_gaps": [
+        {
+          "route": "/api/internal/video/plan",
+          "feature_area": "video_planning",
+          "feature_key": "video_generate",
+          "status": "server_enforced",
+          "notes": "Runs existing video_generate SaaS admission before OpenAI planning with creditCost 0. Full video generation continues to perform the upfront credit debit separately."
+        },
+        {
+          "route": "/api/video/generate",
+          "feature_area": "video_prompt_enhancement",
+          "feature_key": "openai_create_prompt_fix",
+          "status": "server_enforced",
+          "notes": "Optional OpenAI prompt enhancement now runs existing openai_create_prompt_fix metered admission before provider work with creditCost 0. Full video generation continues to perform the upfront video credit debit separately."
+        },
+        {
+          "route": "Stripe subscription tier resolution / SaaS entitlement policy",
+          "feature_area": "public_pro_runtime_policy",
+          "feature_key": "crevux_pro_public_tier_overlay",
+          "status": "server_enforced",
+          "notes": "crevux_pro, creator_pro, and ecosystem_pro now resolve to public_pro. public_pro allows the same paid feature set as local Pro, with higher daily caps than Starter/local Pro for image, prompt, video, TTS, planning, source enhancement, image edit/restore, studio scoring/music, comic mutation, and copilot features."
+        },
+        {
+          "route": "Asset export preflight / Studio render entitlement",
+          "feature_area": "public_pro_export_quality",
+          "feature_key": "studio_export_4k",
+          "status": "server_enforced",
+          "notes": "public_pro now allows studio_export_4k and maps to a distinct export plan with 4K max video resolution. Existing Pro remains 2K/native-4K blocked except explicit upscale behavior; Elite retains commercial metadata and highest policy."
+        },
+        {
+          "route": "Stripe invoice credit grant fallback",
+          "feature_area": "public_pro_credit_grant",
+          "feature_key": "crevux_public_pro_credits",
+          "status": "server_enforced",
+          "notes": "When Stripe Price metadata omits ai_credits/ai_credits_per_period, Crevux now uses public plan slug metadata to grant 8,000 credits for crevux_pro, creator_pro, and ecosystem_pro before falling back to legacy price-id catalog credits."
+        },
+        {
+          "route": "POST /api/projects, POST /api/assets/upload, POST /api/audio/upload",
+          "feature_area": "creator_storage_caps",
+          "feature_key": "creator_storage_limits",
+          "status": "server_enforced",
+          "notes": "Count-based and tracked-byte storage caps are enforced by tier. Free is intentionally narrow to encourage conversion. Error payloads include nextTier, upgradeUrl, and subtle upgradeHint copy."
+        }
+      ],
+      "remaining_gaps": [],
+      "confidence": "medium-high",
+      "public_copy_caveat": "Storage claims cover tracked media storage: assets plus generated images with recorded sizeBytes; 3D provider media bytes are included by probe or conservative estimate."
+    }
+  }
+}

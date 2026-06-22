@@ -1,0 +1,110 @@
+name: Ecosystem Proof
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+    inputs:
+      run_http_smoke:
+        description: Run protected non-mutating HTTP smoke checks
+        required: true
+        type: boolean
+        default: false
+      environment:
+        description: Non-production proof environment
+        required: true
+        type: choice
+        options:
+          - staging
+          - review
+          - production
+        default: staging
+
+jobs:
+  static-proof:
+    name: Static ecosystem proof
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run proof helper tests
+        run: npm run test:proof-scanner
+
+      - name: Validate ecosystem contract JSON
+        run: node -e "JSON.parse(require('fs').readFileSync('ecosystem-contracts/routes.json','utf8')); JSON.parse(require('fs').readFileSync('ecosystem-contracts/env-contract.json','utf8')); console.log('contracts ok')"
+
+      - name: Run public brand casing audit
+        run: npm run public:brand-casing:audit
+
+      - name: Run static ecosystem proof
+        run: npm run proof:ecosystem:static
+
+      - name: Upload proof reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecosystem-proof-static
+          path: |
+            output/phase17-ecosystem-proof-report.json
+            output/phase17-ecosystem-proof-report.md
+          if-no-files-found: warn
+
+  protected-http-smoke:
+    name: Protected HTTP smoke
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && inputs.run_http_smoke
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Refuse production HTTP smoke
+        run: |
+          if [ "${{ inputs.environment }}" = "production" ]; then
+            echo "HTTP smoke is disabled for production environments."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Run protected non-mutating HTTP proof
+        env:
+          XFLOW_PROOF_BASE_URL: ${{ vars.XFLOW_PROOF_BASE_URL }}
+          VERIXET_PROOF_BASE_URL: ${{ vars.VERIXET_PROOF_BASE_URL }}
+          RATAIFY_PROOF_BASE_URL: ${{ vars.RATAIFY_PROOF_BASE_URL }}
+          AUDAIX_PROOF_BASE_URL: ${{ vars.AUDAIX_PROOF_BASE_URL }}
+          WORDGENI_PROOF_BASE_URL: ${{ vars.WORDGENI_PROOF_BASE_URL }}
+          CREVUX_PROOF_BASE_URL: ${{ vars.CREVUX_PROOF_BASE_URL }}
+          VERIXET_ECOSYSTEM_STATUS_SERVICE_TOKEN: ${{ secrets.VERIXET_ECOSYSTEM_STATUS_SERVICE_TOKEN }}
+          VERIXET_PROOF_WORKSPACE_ID: ${{ vars.VERIXET_PROOF_WORKSPACE_ID }}
+        run: npm run proof:ecosystem:http
+
+      - name: Upload HTTP proof reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ecosystem-proof-http-${{ inputs.environment }}
+          path: |
+            output/phase17-ecosystem-proof-report.json
+            output/phase17-ecosystem-proof-report.md
+          if-no-files-found: warn

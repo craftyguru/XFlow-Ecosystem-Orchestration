@@ -1,0 +1,27 @@
+{
+  "name": "main6-www-redirector",
+  "main": "index.js",
+  "compatibility_date": "2026-05-13",
+  "routes": [
+    {
+      "pattern": "www.xflowx.com/*",
+      "zone_name": "xflowx.com"
+    },
+    {
+      "pattern": "www.rataify.com/*",
+      "zone_name": "rataify.com"
+    },
+    {
+      "pattern": "www.audaix.com/*",
+      "zone_name": "audaix.com"
+    },
+    {
+      "pattern": "www.wordgeni.com/*",
+      "zone_name": "wordgeni.com"
+    },
+    {
+      "pattern": "www.crevux.com/*",
+      "zone_name": "crevux.com"
+    }
+  ]
+}

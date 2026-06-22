@@ -1,0 +1,583 @@
+{
+  "version": "2026-05-04.creator-tier-policy-options.wordgeni-balanced-enforced",
+  "scope": [
+    "wordgeni",
+    "crevux",
+    "creator_bundle",
+    "full_ecosystem_bundle"
+  ],
+  "constraints": {
+    "pricing_changes": false,
+    "stripe_changes": false,
+    "checkout_changes": false,
+    "plan_slug_changes": false,
+    "public_ui_changes": false,
+    "code_changes_in_this_artifact": false
+  },
+  "status_values": [
+    "already_enforced",
+    "needs_enforcement",
+    "copy_only",
+    "not_recommended"
+  ],
+  "recommended_option": "balanced",
+  "wordgeni": {
+    "current_public_to_local_mapping": {
+      "starter": "pro",
+      "pro": "studio",
+      "elite": "enterprise"
+    },
+    "already_enforced_context": {
+      "starter": {
+        "ai_usage": {
+          "monthly_workspace_tokens": 2000000,
+          "daily_user_tokens": 400000,
+          "max_output_tokens": 1800,
+          "max_request_cost_cents": 40,
+          "status": "already_enforced"
+        },
+        "voice_draft_monthly_transcription_seconds": {
+          "value": 3600,
+          "status": "already_enforced"
+        },
+        "genie_realtime_monthly_session_starts": {
+          "value": 60,
+          "status": "already_enforced"
+        },
+        "cursor_draft_tasks": {
+          "max_queued_or_running": 20,
+          "max_credits_per_draft_task": 50,
+          "status": "already_enforced"
+        }
+      },
+      "pro": {
+        "ai_usage": {
+          "monthly_workspace_tokens": 10000000,
+          "daily_user_tokens": 1500000,
+          "max_output_tokens": 3200,
+          "max_request_cost_cents": 120,
+          "status": "already_enforced"
+        },
+        "voice_draft_monthly_transcription_seconds": {
+          "value": 18000,
+          "status": "already_enforced"
+        },
+        "genie_realtime_monthly_session_starts": {
+          "value": 800,
+          "status": "already_enforced"
+        },
+        "cursor_draft_tasks": {
+          "max_queued_or_running": 40,
+          "max_credits_per_draft_task": 50,
+          "status": "already_enforced"
+        }
+      },
+      "elite": {
+        "ai_usage": {
+          "monthly_workspace_tokens": 50000000,
+          "daily_user_tokens": 5000000,
+          "max_output_tokens": 6400,
+          "max_request_cost_cents": 500,
+          "status": "already_enforced"
+        },
+        "voice_draft_monthly_transcription_seconds": {
+          "value": 864000,
+          "status": "already_enforced"
+        },
+        "genie_realtime_monthly_session_starts": {
+          "value": 100000,
+          "status": "already_enforced"
+        },
+        "cursor_draft_tasks": {
+          "max_queued_or_running": 100,
+          "max_credits_per_draft_task": 50,
+          "status": "already_enforced"
+        }
+      }
+    },
+    "policy_options": {
+      "conservative": {
+        "summary": "Keep WordGeni public tiers differentiated mostly by already-enforced AI, voice, realtime, and draft-task budgets. Source memory and exports remain paid-gated but not tier-capped.",
+        "tiers": {
+          "starter": {
+            "source_memory": {
+              "limit": "paid access; no tier-specific cap",
+              "status": "copy_only"
+            },
+            "exports_per_month": {
+              "limit": "paid access; no tier-specific cap",
+              "status": "copy_only"
+            },
+            "documents_or_projects": {
+              "limit": "no public cap",
+              "status": "copy_only"
+            }
+          },
+          "pro": {
+            "source_memory": {
+              "limit": "paid access; no tier-specific cap",
+              "status": "copy_only"
+            },
+            "exports_per_month": {
+              "limit": "paid access; no tier-specific cap",
+              "status": "copy_only"
+            },
+            "documents_or_projects": {
+              "limit": "no public cap",
+              "status": "copy_only"
+            }
+          },
+          "elite": {
+            "source_memory": {
+              "limit": "paid access; no tier-specific cap",
+              "status": "copy_only"
+            },
+            "exports_per_month": {
+              "limit": "paid access; no tier-specific cap",
+              "status": "copy_only"
+            },
+            "documents_or_projects": {
+              "limit": "no public cap",
+              "status": "copy_only"
+            }
+          }
+        },
+        "implementation_notes": "No new enforcement needed, but public copy must avoid claiming different source memory or export caps by tier."
+      },
+      "balanced": {
+        "summary": "Use already-enforced AI budgets for main differentiation, then add moderate source memory, export, and project caps that fit Starter / Pro / Elite expectations.",
+        "tiers": {
+          "starter": {
+            "source_memory": {
+              "limit": "10 active sources or memory items per workspace",
+              "status": "already_enforced"
+            },
+            "exports_per_month": {
+              "limit": 25,
+              "status": "already_enforced"
+            },
+            "documents_or_projects": {
+              "limit": "5 active projects",
+              "status": "already_enforced"
+            }
+          },
+          "pro": {
+            "source_memory": {
+              "limit": "100 active sources or memory items per workspace",
+              "status": "already_enforced"
+            },
+            "exports_per_month": {
+              "limit": 250,
+              "status": "already_enforced"
+            },
+            "documents_or_projects": {
+              "limit": "50 active projects",
+              "status": "already_enforced"
+            }
+          },
+          "elite": {
+            "source_memory": {
+              "limit": "unlimited, subject to abuse and operational policy",
+              "status": "already_enforced"
+            },
+            "exports_per_month": {
+              "limit": "unlimited, subject to abuse and operational policy",
+              "status": "already_enforced"
+            },
+            "documents_or_projects": {
+              "limit": "unlimited, subject to abuse and operational policy",
+              "status": "already_enforced"
+            }
+          }
+        },
+        "implementation_notes": "Implemented in WordGeni API through creator-tier-policy constants and admission checks on source uploads, note sources, memory-hub updates, primary exports, Cursor exports, and project creation."
+      },
+      "aggressive": {
+        "summary": "Make WordGeni tiers sharply separated with low Starter caps and high Pro / Elite ceilings. This is stronger commercially but has more enforcement and support risk.",
+        "tiers": {
+          "starter": {
+            "source_memory": {
+              "limit": "3 active sources or memory items per workspace",
+              "status": "needs_enforcement"
+            },
+            "exports_per_month": {
+              "limit": 10,
+              "status": "needs_enforcement"
+            },
+            "documents_or_projects": {
+              "limit": "3 active projects",
+              "status": "needs_enforcement"
+            }
+          },
+          "pro": {
+            "source_memory": {
+              "limit": "250 active sources or memory items per workspace",
+              "status": "needs_enforcement"
+            },
+            "exports_per_month": {
+              "limit": 1000,
+              "status": "needs_enforcement"
+            },
+            "documents_or_projects": {
+              "limit": "150 active projects",
+              "status": "needs_enforcement"
+            }
+          },
+          "elite": {
+            "source_memory": {
+              "limit": "unlimited plus priority ingestion policy",
+              "status": "needs_enforcement"
+            },
+            "exports_per_month": {
+              "limit": "unlimited plus bulk export policy",
+              "status": "needs_enforcement"
+            },
+            "documents_or_projects": {
+              "limit": "unlimited plus workspace governance policy",
+              "status": "needs_enforcement"
+            }
+          }
+        },
+        "implementation_notes": "Not recommended until support, billing, and abuse handling are ready for strong usage cliffs."
+      }
+    },
+    "selected_option": "balanced",
+    "implementation_status": {
+      "balanced_source_memory_exports_projects": "already_enforced",
+      "source_memory_counting": "counts source rows plus voiceDraftSnapshots in workspace copilotContext",
+      "exports_counting": "counts document export records created in the current UTC month",
+      "projects_counting": "counts non-archived projects in the workspace"
+    }
+  },
+  "crevux": {
+    "current_public_to_local_mapping": {
+      "starter": "pro",
+      "pro": "public_pro",
+      "elite": "elite"
+    },
+    "already_enforced_context": {
+      "local_pro": {
+        "included_credits_per_period": 4000,
+        "image_or_prompt_requests_per_day": 400,
+        "video_lipsync_or_extend_requests_per_day": 80,
+        "export_quality": "1080p where the studio export feature is enabled",
+        "status": "already_enforced"
+      },
+      "local_elite": {
+        "included_credits_per_period": 14000,
+        "image_or_prompt_requests_per_day": 5000,
+        "video_lipsync_or_extend_requests_per_day": 500,
+        "export_quality": "4K where the studio export feature is enabled",
+        "status": "already_enforced"
+      },
+      "public_pro": {
+        "included_credits_per_period": "8000 via public Pro plan slug metadata fallback or explicit ai_credits_per_period metadata",
+        "image_or_prompt_requests_per_day": 800,
+        "video_lipsync_or_extend_requests_per_day": 200,
+        "export_quality": "4K through public_pro export policy; no Elite-only commercial metadata",
+        "status": "already_enforced"
+      },
+      "free_storage": {
+        "limit": "12 assets, 3 audio uploads, 1 active project, 150 MB tracked asset storage",
+        "status": "already_enforced"
+      },
+      "starter_storage": {
+        "limit": "120 assets, 40 audio uploads, 8 active projects, 2 GB tracked asset storage",
+        "status": "already_enforced"
+      },
+      "public_pro_storage": {
+        "limit": "500 assets, 150 audio uploads, 30 active projects, 10 GB tracked asset storage",
+        "status": "already_enforced"
+      },
+      "elite_storage": {
+        "limit": "2,000 assets, 500 audio uploads, 100 active projects, 50 GB tracked asset storage",
+        "status": "already_enforced"
+      }
+    },
+    "policy_options": {
+      "conservative": {
+        "summary": "Keep public Starter and Pro mapped to local Pro. Differentiate Pro mostly with copy around workflow fit, not hard limits.",
+        "tiers": {
+          "starter": {
+            "image_credits": {
+              "limit": "4000 included credits per period",
+              "status": "already_enforced"
+            },
+            "video_credits": {
+              "limit": "drawn from same included credit balance; 80 video/lipsync/extend requests per day",
+              "status": "already_enforced"
+            },
+            "export_quality": {
+              "limit": "1080p where export is enabled",
+              "status": "already_enforced"
+            },
+            "storage": {
+              "limit": "no public tier-specific storage cap",
+              "status": "copy_only"
+            },
+            "prompt_enhancement_and_planning": {
+              "limit": "available under existing local Pro policy",
+              "status": "already_enforced"
+            }
+          },
+          "pro": {
+            "image_credits": {
+              "limit": "4000 included credits per period",
+              "status": "already_enforced"
+            },
+            "video_credits": {
+              "limit": "drawn from same included credit balance; 80 video/lipsync/extend requests per day",
+              "status": "already_enforced"
+            },
+            "export_quality": {
+              "limit": "1080p where export is enabled",
+              "status": "already_enforced"
+            },
+            "storage": {
+              "limit": "no public tier-specific storage cap",
+              "status": "copy_only"
+            },
+            "prompt_enhancement_and_planning": {
+              "limit": "available under existing local Pro policy",
+              "status": "already_enforced"
+            }
+          },
+          "elite": {
+            "image_credits": {
+              "limit": "14000 included credits per period",
+              "status": "already_enforced"
+            },
+            "video_credits": {
+              "limit": "drawn from same included credit balance; 500 video/lipsync/extend requests per day",
+              "status": "already_enforced"
+            },
+            "export_quality": {
+              "limit": "4K where export is enabled",
+              "status": "already_enforced"
+            },
+            "storage": {
+              "limit": "no public tier-specific storage cap",
+              "status": "copy_only"
+            },
+            "prompt_enhancement_and_planning": {
+              "limit": "available under existing local Elite policy",
+              "status": "already_enforced"
+            }
+          }
+        },
+        "implementation_notes": "No new enforcement needed, but public Pro cannot claim more credits, video volume, or export quality than Starter."
+      },
+      "balanced": {
+        "summary": "Introduce a real public Pro tier between Starter and Elite while preserving the existing local Elite ceiling.",
+        "tiers": {
+          "starter": {
+            "image_credits": {
+              "limit": "4000 included credits per period",
+              "status": "already_enforced"
+            },
+            "video_credits": {
+              "limit": "drawn from same included credit balance; 80 video/lipsync/extend requests per day",
+              "status": "already_enforced"
+            },
+            "export_quality": {
+              "limit": "1080p",
+              "status": "already_enforced"
+            },
+            "storage": {
+              "limit": "120 assets, 40 audio uploads, 8 active projects, 2 GB tracked asset storage",
+              "status": "already_enforced"
+            },
+            "prompt_enhancement_and_planning": {
+              "limit": "available",
+              "status": "already_enforced"
+            }
+          },
+          "pro": {
+            "image_credits": {
+              "limit": "8000 included credits per period via public Pro plan slug metadata fallback or explicit ai_credits_per_period metadata; runtime daily image/prompt cap is 800 requests",
+              "status": "already_enforced"
+            },
+            "video_credits": {
+              "limit": "drawn from same included credit balance; 200 video/lipsync/extend requests per day",
+              "status": "already_enforced"
+            },
+            "export_quality": {
+              "limit": "4K through public_pro export policy; Elite still retains highest/commercial export policy",
+              "status": "already_enforced"
+            },
+            "storage": {
+              "limit": "500 assets, 150 audio uploads, 30 active projects, 10 GB tracked asset storage",
+              "status": "already_enforced"
+            },
+            "prompt_enhancement_and_planning": {
+              "limit": "available with higher daily prompt/planning allowance under public_pro runtime policy",
+              "status": "already_enforced"
+            }
+          },
+          "elite": {
+            "image_credits": {
+              "limit": "14000 included credits per period",
+              "status": "already_enforced"
+            },
+            "video_credits": {
+              "limit": "drawn from same included credit balance; 500 video/lipsync/extend requests per day",
+              "status": "already_enforced"
+            },
+            "export_quality": {
+              "limit": "4K plus priority and batch render where enabled",
+              "status": "already_enforced"
+            },
+            "storage": {
+              "limit": "2,000 assets, 500 audio uploads, 100 active projects, 50 GB tracked asset storage",
+              "status": "already_enforced"
+            },
+            "prompt_enhancement_and_planning": {
+              "limit": "available with Elite daily prompt/planning allowance",
+              "status": "already_enforced"
+            }
+          }
+        },
+        "implementation_notes": "Implemented for runtime daily caps, Stripe public plan slug resolution, invoice credit fallback, public Pro 4K export quality, and conservative count-based storage caps. Free is intentionally narrow with subtle upgrade hints in limit responses."
+      },
+      "aggressive": {
+        "summary": "Make Starter a narrow creator entry point and push serious media work to Pro / Elite.",
+        "tiers": {
+          "starter": {
+            "image_credits": {
+              "limit": "2000 included credits per period",
+              "status": "needs_enforcement"
+            },
+            "video_credits": {
+              "limit": "limited video access; 25 video/lipsync/extend requests per day",
+              "status": "needs_enforcement"
+            },
+            "export_quality": {
+              "limit": "720p or watermark-safe preview only",
+              "status": "not_recommended"
+            },
+            "storage": {
+              "limit": "small project storage cap",
+              "status": "needs_enforcement"
+            },
+            "prompt_enhancement_and_planning": {
+              "limit": "limited daily prompt/planning allowance",
+              "status": "needs_enforcement"
+            }
+          },
+          "pro": {
+            "image_credits": {
+              "limit": "10000 included credits per period",
+              "status": "needs_enforcement"
+            },
+            "video_credits": {
+              "limit": "drawn from same included credit balance; 300 video/lipsync/extend requests per day",
+              "status": "needs_enforcement"
+            },
+            "export_quality": {
+              "limit": "4K",
+              "status": "needs_enforcement"
+            },
+            "storage": {
+              "limit": "large project storage cap",
+              "status": "needs_enforcement"
+            },
+            "prompt_enhancement_and_planning": {
+              "limit": "expanded prompt/planning allowance",
+              "status": "needs_enforcement"
+            }
+          },
+          "elite": {
+            "image_credits": {
+              "limit": "25000 included credits per period",
+              "status": "needs_enforcement"
+            },
+            "video_credits": {
+              "limit": "drawn from same included credit balance; 1000 video/lipsync/extend requests per day",
+              "status": "needs_enforcement"
+            },
+            "export_quality": {
+              "limit": "4K plus batch, priority, and highest render policy where enabled",
+              "status": "needs_enforcement"
+            },
+            "storage": {
+              "limit": "very high project storage cap",
+              "status": "needs_enforcement"
+            },
+            "prompt_enhancement_and_planning": {
+              "limit": "highest prompt/planning allowance",
+              "status": "needs_enforcement"
+            }
+          }
+        },
+        "implementation_notes": "Not recommended without cost modeling because it changes the economics of included credits and may require Stripe metadata, credit grant, quota, and UI copy updates later."
+      }
+    }
+  },
+  "creator_bundle": {
+    "included_apps": [
+      "wordgeni",
+      "crevux"
+    ],
+    "tier_grants": {
+      "starter": {
+        "wordgeni": "wordgeni starter policy selected by owner",
+        "crevux": "crevux starter policy selected by owner",
+        "status": "copy_only"
+      },
+      "pro": {
+        "wordgeni": "wordgeni pro policy selected by owner",
+        "crevux": "crevux pro policy selected by owner",
+        "status": "copy_only"
+      },
+      "elite": {
+        "wordgeni": "wordgeni elite policy selected by owner",
+        "crevux": "crevux elite policy selected by owner",
+        "status": "copy_only"
+      }
+    },
+    "safe_copy_after_options": {
+      "conservative": "Writing and creative media tools with paid access and conservative tier copy.",
+      "balanced": "Writing memory, exports, creative credits, and higher media workflows scale by tier after enforcement is added.",
+      "aggressive": "Strong tier separation for high-volume creators, not recommended until cost and enforcement are confirmed."
+    },
+    "confidence": "high",
+    "confidence_caveat": "Core Creator cost-bearing and tracked media storage safeguards are enforced."
+  },
+  "full_ecosystem_bundle_implications": {
+    "summary": "Creator policy decisions propagate into Full Ecosystem public claims because ecosystem_starter, ecosystem_pro, and ecosystem_elite currently expand into WordGeni and Crevux tier access.",
+    "safe_claims_now": [
+      {
+        "claim": "Includes WordGeni and Crevux under the ecosystem billing and entitlement model.",
+        "status": "copy_only"
+      },
+      {
+        "claim": "Core WordGeni provider-backed paid actions and Crevux cost-bearing media actions fail closed.",
+        "status": "already_enforced"
+      }
+    ],
+    "claims_blocked_until_policy_choice": [
+      {
+        "claim": "Specific source memory or export limits by ecosystem tier.",
+        "status": "already_enforced",
+        "notes": "Implemented in WordGeni API through the selected Balanced creator policy."
+      },
+      {
+        "claim": "Specific Crevux Pro uplift over Starter.",
+        "status": "needs_enforcement"
+      },
+      {
+        "claim": "Specific Crevux export-quality differences between Starter and Pro.",
+        "status": "needs_enforcement"
+      }
+    ],
+    "creator_capability_confidence": "high for Creator capabilities and tracked media storage safeguards"
+  },
+  "owner_decisions_needed": [
+    "Choose conservative, balanced, or aggressive WordGeni source memory/export/project policy.",
+    "Choose conservative, balanced, or aggressive Crevux public Starter/Pro/Elite credit and export-quality policy.",
+    "Decide whether Creator Bundle tiers inherit exact single-app tier limits or receive bundle-specific uplift.",
+    "Decide whether Full Ecosystem tiers inherit Creator limits exactly or receive ecosystem-specific uplift.",
+    "Approve whether public pricing pages may show numeric WordGeni source/export/project limits after enforcement is implemented.",
+    "Approve whether public pricing pages may show numeric Crevux credit/export-quality differences after enforcement is implemented."
+  ]
+}

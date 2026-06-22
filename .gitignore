@@ -1,0 +1,86 @@
+# Root Git baseline safety ignores
+
+# Dependency folders
+node_modules/
+**/node_modules/
+
+# Env and secrets
+.env
+.env.*
+**/.env
+**/.env.*
+*.pem
+*.key
+*.p12
+*.jks
+
+# Build and cache output
+dist/
+build/
+out/
+.next/
+.turbo/
+.vite/
+coverage/
+playwright-report/
+test-results/
+**/dist/
+**/build/
+**/out/
+**/.next/
+**/.turbo/
+**/.vite/
+**/coverage/
+**/playwright-report/
+**/test-results/
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+console.log*
+
+# Local QA and evidence
+output/
+output/playwright/
+**/playwright/.cache/
+
+# Local databases and generated data
+pgdata/
+**/pgdata/
+tmp/
+**/tmp/
+tmp-*
+*.tmp.txt
+xflow-test-output*.txt
+supabase/.branches/
+supabase/.temp/
+
+# Local tool workspaces and smoke folders
+.agents/
+.codex-lander-smoke/
+.playwright-cli/
+.tmp-public-smoke/
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Root Git metadata archive
+.git.empty-backup-*/
+
+# Nested app repositories intentionally stay independent
+apps/
+apps/WordGeni/
+apps/XFlow/
+apps/RatAiFy/
+apps/CreVux/
+apps/Verixet/
+apps/AudAix/
+apps/PitStrike/
+apps/XFlow/vendor/ecosystem-showcase/
+packages/ecosystem-showcase/
+xflow-ecosystem-ops/

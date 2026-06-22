@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "canonicalSlugs": ["xflow", "verixet", "audaix", "rataify", "wordgeni", "crevux"],
+  "apps": [
+    {
+      "slug": "xflow",
+      "displayName": "XFlow",
+      "folderName": "apps/XFlow",
+      "domain": "control-plane.identity.xflow",
+      "role": "Ecosystem control plane, OAuth identity authority, app hub, UCL routing, event routing",
+      "ownsIdentity": true,
+      "ownsBilling": false,
+      "ownsEntitlements": false,
+      "ownsUsageMetering": false,
+      "dependsOn": ["verixet"],
+      "legacyAliases": ["XFlow", "XFlowX"]
+    },
+    {
+      "slug": "verixet",
+      "displayName": "Verixet",
+      "folderName": "apps/Verixet",
+      "domain": "billing.governance.verixet",
+      "role": "Billing, governance, Stripe, entitlement, workspace billing, and usage authority",
+      "ownsIdentity": false,
+      "ownsBilling": true,
+      "ownsEntitlements": true,
+      "ownsUsageMetering": true,
+      "dependsOn": ["xflow"],
+      "legacyAliases": ["Verixet"]
+    },
+    {
+      "slug": "audaix",
+      "displayName": "AudAiX",
+      "folderName": "apps/AudAix",
+      "domain": "audit.monitoring.audaix",
+      "role": "Audit, monitoring, improvement workflows",
+      "ownsIdentity": false,
+      "ownsBilling": false,
+      "ownsEntitlements": false,
+      "ownsUsageMetering": false,
+      "dependsOn": ["xflow", "verixet"],
+      "legacyAliases": ["AudAiX", "AudAix", "audaix"]
+    },
+    {
+      "slug": "rataify",
+      "displayName": "Rataify",
+      "folderName": "apps/RatAiFy",
+      "domain": "trust.reviews.rataify",
+      "role": "Trust, reviews, risk, privacy, reputation workflows",
+      "ownsIdentity": false,
+      "ownsBilling": false,
+      "ownsEntitlements": false,
+      "ownsUsageMetering": false,
+      "dependsOn": ["xflow", "verixet"],
+      "legacyAliases": ["RatAiFy", "Rataify", "rest-express"]
+    },
+    {
+      "slug": "wordgeni",
+      "displayName": "WordGeni",
+      "folderName": "apps/WordGeni",
+      "domain": "writing.intelligence.wordgeni",
+      "role": "Writing intelligence workflows and Crevux companion requests",
+      "ownsIdentity": false,
+      "ownsBilling": false,
+      "ownsEntitlements": false,
+      "ownsUsageMetering": false,
+      "dependsOn": ["xflow", "verixet", "crevux"],
+      "legacyAliases": ["WordGeni", "wordgeni", "writexet", "@writexet/*"]
+    },
+    {
+      "slug": "crevux",
+      "displayName": "Crevux",
+      "folderName": "apps/CreVux",
+      "domain": "ai.media.crevux",
+      "role": "AI media studio and media generation workflows",
+      "ownsIdentity": false,
+      "ownsBilling": false,
+      "ownsEntitlements": false,
+      "ownsUsageMetering": false,
+      "dependsOn": ["xflow", "verixet", "wordgeni"],
+      "legacyAliases": ["CreVux", "Crevux", "workspace", "@workspace/*"]
+    }
+  ]
+}

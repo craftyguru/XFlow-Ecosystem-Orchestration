@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "tokenTypes": [
+    {
+      "id": "control_plane_service_token",
+      "owner": "xflow",
+      "allowedConsumers": ["verixet", "audaix", "rataify", "wordgeni", "crevux"],
+      "allowedUse": "Server-to-server control-plane bootstrap, configuration, and administrative service calls.",
+      "forbiddenUse": "Browser exposure, user session auth, UCL per-connection events, usage ingestion.",
+      "exampleHeaderName": "Authorization",
+      "shouldBeAppScoped": true,
+      "shouldBeWorkspaceScoped": false,
+      "rotationNotes": "Rotate per consuming app and update Railway/server secret managers together."
+    },
+    {
+      "id": "ucl_connection_token",
+      "owner": "xflow",
+      "allowedConsumers": ["verixet", "audaix", "rataify", "wordgeni", "crevux"],
+      "allowedUse": "Per-workspace or per-connection UCL link, status, and event calls.",
+      "forbiddenUse": "Global bootstrap, browser exposure, Verixet usage ingestion, Stripe operations.",
+      "exampleHeaderName": "Authorization",
+      "shouldBeAppScoped": true,
+      "shouldBeWorkspaceScoped": true,
+      "rotationNotes": "Rotate when a workspace app connection is revoked or repaired."
+    },
+    {
+      "id": "verixet_usage_ingest_token",
+      "owner": "verixet",
+      "allowedConsumers": ["xflow", "audaix", "rataify", "wordgeni", "crevux"],
+      "allowedUse": "App-scoped server usage event ingestion into Verixet.",
+      "forbiddenUse": "Browser exposure, entitlement evaluation as a user, Stripe operations, XFlow UCL events.",
+      "exampleHeaderName": "Authorization",
+      "shouldBeAppScoped": true,
+      "shouldBeWorkspaceScoped": false,
+      "rotationNotes": "Rotate per app and preserve idempotency/replay logs during cutover."
+    },
+    {
+      "id": "oauth_access_token",
+      "owner": "xflow",
+      "allowedConsumers": ["verixet", "audaix", "rataify", "wordgeni", "crevux"],
+      "allowedUse": "OAuth user/session authorization and userinfo access.",
+      "forbiddenUse": "Service bootstrap, billing webhooks, Stripe API access, DB access.",
+      "exampleHeaderName": "Authorization",
+      "shouldBeAppScoped": true,
+      "shouldBeWorkspaceScoped": false,
+      "rotationNotes": "Use normal OAuth expiry/refresh handling; do not store as service secret."
+    },
+    {
+      "id": "oauth_client_secret",
+      "owner": "xflow",
+      "allowedConsumers": ["verixet", "audaix", "rataify", "wordgeni", "crevux"],
+      "allowedUse": "Server-side OAuth client authentication.",
+      "forbiddenUse": "Browser exposure, API bearer auth, unrelated service calls.",
+      "exampleHeaderName": "none",
+      "shouldBeAppScoped": true,
+      "shouldBeWorkspaceScoped": false,
+      "rotationNotes": "Rotate through OAuth client dashboard and Railway vars."
+    },
+    {
+      "id": "stripe_secret_key",
+      "owner": "verixet",
+      "allowedConsumers": ["verixet"],
+      "allowedUse": "Stripe API calls owned by Verixet billing authority.",
+      "forbiddenUse": "Browser exposure or consumer-app billing authority unless a documented legacy/local mode is active.",
+      "exampleHeaderName": "none",
+      "shouldBeAppScoped": false,
+      "shouldBeWorkspaceScoped": false,
+      "rotationNotes": "Rotate in Stripe and Verixet Railway together; verify webhooks after rotation."
+    },
+    {
+      "id": "stripe_webhook_secret",
+      "owner": "verixet",
+      "allowedConsumers": ["verixet"],
+      "allowedUse": "Verify Stripe webhook signatures.",
+      "forbiddenUse": "Browser exposure, outbound Stripe API auth, non-webhook routes.",
+      "exampleHeaderName": "Stripe-Signature",
+      "shouldBeAppScoped": false,
+      "shouldBeWorkspaceScoped": false,
+      "rotationNotes": "Rotate webhook endpoints one environment at a time."
+    },
+    {
+      "id": "turnstile_secret_key",
+      "owner": "cloudflare",
+      "allowedConsumers": ["verixet", "audaix", "rataify"],
+      "allowedUse": "Server-side Cloudflare Turnstile Siteverify validation.",
+      "forbiddenUse": "Browser exposure, public site key configuration.",
+      "exampleHeaderName": "none",
+      "shouldBeAppScoped": true,
+      "shouldBeWorkspaceScoped": false,
+      "rotationNotes": "Rotate in Cloudflare and app Railway environments; test keys/mock validation only outside production."
+    },
+    {
+      "id": "sendgrid_api_key",
+      "owner": "sendgrid",
+      "allowedConsumers": ["xflow", "verixet", "audaix", "rataify"],
+      "allowedUse": "Server-side transactional email.",
+      "forbiddenUse": "Browser exposure or unrelated API bearer auth.",
+      "exampleHeaderName": "Authorization",
+      "shouldBeAppScoped": true,
+      "shouldBeWorkspaceScoped": false,
+      "rotationNotes": "Rotate with from-address/domain verification checks."
+    },
+    {
+      "id": "db_connection_string",
+      "owner": "database-provider",
+      "allowedConsumers": ["xflow", "verixet", "audaix", "rataify", "wordgeni", "crevux"],
+      "allowedUse": "Server-side database access for the owning app database.",
+      "forbiddenUse": "Browser exposure, cross-app authority writes outside documented mirror/cache rules.",
+      "exampleHeaderName": "none",
+      "shouldBeAppScoped": true,
+      "shouldBeWorkspaceScoped": false,
+      "rotationNotes": "Rotate through provider; verify migrations and connection pools."
+    },
+    {
+      "id": "sentry_dsn",
+      "owner": "sentry",
+      "allowedConsumers": ["xflow", "verixet", "wordgeni", "crevux"],
+      "allowedUse": "Telemetry DSN where configured.",
+      "forbiddenUse": "Secret auth, DB/API access, raw secret logging.",
+      "exampleHeaderName": "none",
+      "shouldBeAppScoped": true,
+      "shouldBeWorkspaceScoped": false,
+      "rotationNotes": "Treat browser DSNs as public identifiers; keep auth tokens out of app env."
+    },
+    {
+      "id": "media_download_signing_secret",
+      "owner": "crevux",
+      "allowedConsumers": ["crevux"],
+      "allowedUse": "Server-side signed media download URL generation/verification.",
+      "forbiddenUse": "Browser exposure, user auth, billing auth.",
+      "exampleHeaderName": "none",
+      "shouldBeAppScoped": true,
+      "shouldBeWorkspaceScoped": false,
+      "rotationNotes": "Rotate with short overlap for existing signed URLs if needed."
+    },
+    {
+      "id": "jwt_secret",
+      "owner": "crevux",
+      "allowedConsumers": ["crevux"],
+      "allowedUse": "Server-side JWT/session signing where local app auth remains active.",
+      "forbiddenUse": "Browser exposure, cross-app service tokens, Stripe/OAuth secrets.",
+      "exampleHeaderName": "none",
+      "shouldBeAppScoped": true,
+      "shouldBeWorkspaceScoped": false,
+      "rotationNotes": "Rotate with session invalidation plan."
+    }
+  ]
+}
