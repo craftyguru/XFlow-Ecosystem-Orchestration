@@ -713,3 +713,55 @@ Commit plan:
 
 Next recommended cleanup target:
 - Shared package resolution cleanup, starting with WordGeni split resolution and stale local package copies.
+
+## WordGeni Shared Package Resolution Review
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Audited and repaired WordGeni shared UI package resolution so package/runtime/type/test config targets the root shared UI package instead of the WordGeni-local copy.
+- No dependency install, pnpm install, npm install, lockfile rewrite, local package-copy deletion, backend/auth/database/payment/business-logic change, root push, or WordGeni push was performed.
+- WordGeni remains an independent nested Git repo under `apps/WordGeni`; root Git continues to ignore `apps/`.
+
+Preflight:
+- Root latest commit: `ae897a8 chore: baseline npm lockfiles`.
+- Root working tree was clean before this pass.
+- Root `.gitignore` ignores `apps/WordGeni` and `apps/WordGeni/package.json`.
+- WordGeni nested repo top: `K:/XFlow-Ecosystem Workspace/apps/WordGeni`.
+- WordGeni branch: `main`.
+- WordGeni remote: `https://github.com/craftyguru/WordGeni.git`.
+- WordGeni already had existing dirty shared-navigation/shared-package files from prior work; this pass did not revert or absorb them into root Git.
+
+### Before/after resolution table
+
+| Resolution surface | Before | After | Notes |
+| --- | --- | --- | --- |
+| Web package dependency | `apps/web/package.json` used `file:../../packages/ecosystem-assistant-ui`, which resolves to `apps/WordGeni/packages/ecosystem-assistant-ui`. | `file:../../../../packages/ecosystem-assistant-ui`, which resolves to the root shared package. | `pnpm-lock.yaml` still records the old local link and needs a later controlled lock update. |
+| TypeScript path | `apps/web/tsconfig.json` pointed to `../../../../packages/ecosystem-assistant-ui/dist/index`. | Unchanged; already pointed to the root shared package. | Type resolution was already root-owned. |
+| Next/runtime alias | No alias for `@xflow-ecosystem/ecosystem-assistant-ui`; webpack could follow `node_modules`, which currently points at the app-local package copy. | `apps/web/next.config.mjs` aliases `@xflow-ecosystem/ecosystem-assistant-ui` to the root shared package `dist/index.js`. | Runtime bundling no longer depends on the stale installed junction once the root package is built. |
+| Vitest/test alias | No alias for `@xflow-ecosystem/ecosystem-assistant-ui`. | `apps/web/vitest.config.mjs` aliases `@xflow-ecosystem/ecosystem-assistant-ui` to the root shared package `dist/index.js`. | Test resolution now matches runtime intent. |
+| Installed `node_modules` link | `apps/web/node_modules/@xflow-ecosystem/ecosystem-assistant-ui` is a junction to `apps/WordGeni/packages/ecosystem-assistant-ui`. | Unchanged on disk. | Requires controlled pnpm install/lockfile update later; no install was run in this pass. |
+| App-local package copy | Present at `apps/WordGeni/packages/ecosystem-assistant-ui`; source/dist were modified by earlier nav work but package metadata differs from root. | Left in place but no longer intended as the web app's package/runtime/type/test target. | Do not delete until a later stale-copy cleanup pass confirms no scripts/workspace packages still depend on it. |
+
+Files changed in this pass:
+- `apps/WordGeni/apps/web/package.json`.
+- `apps/WordGeni/apps/web/next.config.mjs`.
+- `apps/WordGeni/apps/web/vitest.config.mjs`.
+- `docs/dependency-resolution-audit.md`.
+
+Lockfile/install follow-up:
+- A controlled WordGeni pnpm lock update is required later because `apps/web/package.json` changed from a WordGeni-local `file:` dependency to a root `file:` dependency.
+- Do not manually hack `apps/WordGeni/pnpm-lock.yaml`.
+- Recommended later command, after reviewing WordGeni dirty state and with no production services involved: `pnpm --dir apps/WordGeni install --lockfile-only --ignore-scripts`.
+- Then review only the `@xflow-ecosystem/ecosystem-assistant-ui` lockfile diff, verify the `apps/web/node_modules` junction target, and run WordGeni typecheck/test/build.
+
+Verification results:
+- `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
+- `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
+- `npm --prefix apps/WordGeni run typecheck`: passed.
+- `npm --prefix apps/WordGeni test`: passed.
+- `npm --prefix apps/WordGeni run build`: passed.
+
+Next recommended action:
+- If safe checks pass but WordGeni reports lockfile or installed-link mismatch, run a dedicated WordGeni controlled pnpm lockfile update pass before deleting stale local package copies.
