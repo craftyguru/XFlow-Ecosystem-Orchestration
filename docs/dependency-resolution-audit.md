@@ -833,6 +833,98 @@ After state:
 Recommended next prompt:
 - `RatAiFy Local Disposable Browser QA Harness Run`.
 
+## RatAiFy Local Disposable Browser QA Harness Rerun
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Ran the committed RatAiFy local disposable browser QA harness after the shared UI resolution, shared navigation, and local QA safety commits.
+- Work used only a loopback PostgreSQL target and local app URL.
+- No app runtime code, package files, lockfiles, backend/auth/payment/business logic, dependency installs, audit fixes, hosted DBs, or pushes were changed or used.
+
+Preflight:
+- Root Git was clean before this documentation update.
+- Root `.gitignore` continues to ignore `apps/RatAiFy`.
+- RatAiFy nested repo was clean and latest commit was `33a231c test: add local disposable navigation qa harness`.
+- RatAiFy `package.json` points `@xflow-ecosystem/ecosystem-assistant-ui` at `file:../../packages/ecosystem-assistant-ui`.
+- `apps/RatAiFy/node_modules/@xflow-ecosystem/ecosystem-assistant-ui` targets `K:\XFlow-Ecosystem Workspace\packages\ecosystem-assistant-ui`.
+- `apps/RatAiFy/packages/ecosystem-assistant-ui` does not exist.
+
+Local disposable environment:
+- Evidence folder: `output/playwright/rataify-local-disposable-qa-rerun/`.
+- Local DB URL: `postgresql://postgres@127.0.0.1:55421/rataify_nav_qa_rerun`.
+- Local DB guard: `node scripts/assert-local-db.mjs --url ...` passed.
+- PostgreSQL data directory: `output/playwright/rataify-local-disposable-qa-rerun/pgdata`.
+- PostgreSQL was bound to `127.0.0.1:55421` only and stopped after browser QA.
+- The committed RatAiFy SQL migrations were applied directly to the disposable database, matching the prior accepted local QA approach because `db:migrate` remains blocked by the installed Drizzle package mismatch documented earlier.
+- Schema check after migrations: 83 public tables; `orgs`, `users`, and `user_legal_consents` existed.
+
+Local app flags:
+- Local URL: `http://127.0.0.1:5000`.
+- `DATABASE_URL=postgresql://postgres@127.0.0.1:55421/rataify_nav_qa_rerun`.
+- `NODE_ENV=development`.
+- `PORT=5000`.
+- `HOST=127.0.0.1`.
+- `DEMO_MODE=true`.
+- `SEED_DEMO_DATA=true`.
+- `RATAIFY_SECURITY_HARNESS=0`.
+- Local-only `SESSION_SECRET` and `APP_ENCRYPTION_KEY` values were used.
+- The demo seed created the deterministic demo user, org, and current legal consent rows in the disposable database.
+
+Browser QA result:
+- Result file: `output/playwright/rataify-local-disposable-qa-rerun/browser-qa-results.json`.
+- Pass: true.
+- Screenshots:
+  - `output/playwright/rataify-local-disposable-qa-rerun/desktop-dashboard.png`.
+  - `output/playwright/rataify-local-disposable-qa-rerun/desktop-sites-active.png`.
+  - `output/playwright/rataify-local-disposable-qa-rerun/mobile-dashboard-closed.png`.
+  - `output/playwright/rataify-local-disposable-qa-rerun/mobile-drawer-open.png`.
+- Logs:
+  - `output/playwright/rataify-local-disposable-qa-rerun/rataify-smoke.stdout.log`.
+  - `output/playwright/rataify-local-disposable-qa-rerun/rataify-smoke.stderr.log`.
+  - `output/playwright/rataify-local-disposable-qa-rerun/postgres.log`.
+  - `output/playwright/rataify-local-disposable-qa-rerun/postgres-stop.log`.
+  - `output/playwright/rataify-local-disposable-qa-rerun/migrations-0001-onward.log`.
+
+Routes and behaviors checked:
+- `/login?demo=1` reached `/dashboard` with the demo user.
+- Normal `/login` returned a 302 central-auth redirect and did not render the local login page.
+- Desktop `/dashboard`, `/sites`, `/issues`, and back to `/dashboard` route links worked.
+- Desktop shared `Rataify navigation` rendered once visibly.
+- Desktop mobile drawer DOM count was zero.
+- Active state worked for Dashboard and Sites.
+- Disabled setup items retained `aria-disabled`.
+- Community stayed an external link.
+- Selected-site selector rendered with `demo-marketing-site.com`.
+- Scan CTA rendered.
+- Account security and logout links rendered.
+- Platform-admin card stayed hidden for the demo user.
+- Demo user `/superadmin` access remained gated with a local redirect to `/login?returnTo=%2Fsuperadmin`.
+- Mobile closed and open drawer screenshots were captured.
+- Mobile drawer rendered once, locked body scroll, exposed active state, closed on route change, closed on Escape with focus returned to the hamburger, and closed on backdrop click.
+- No horizontal scroll was detected.
+- Browser network hosts were limited to `127.0.0.1:5000`, Google font hosts, and an empty internal entry; no hosted database host was contacted.
+
+Known non-blocking warnings:
+- Browser console captured Sentry ingest CSP blocks from existing app instrumentation.
+- Browser console captured existing local `400` responses from `/api/org/connected-apps`.
+- These were recorded in `rawConsoleErrors` and `knownNonBlockingConsoleWarnings` in the result JSON; filtered shared-nav console errors were empty.
+
+Verification:
+- `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
+- `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
+- `npm --prefix apps/RatAiFy run typecheck`: passed.
+- `npm --prefix apps/RatAiFy test`: passed, 381 tests.
+- `npm --prefix apps/RatAiFy run build`: passed.
+
+Commit decision:
+- No RatAiFy code changes were needed and no RatAiFy commit was made.
+- Only this root documentation section was changed.
+
+Recommended next prompt:
+- `Shared Package Resolution Cleanup - XFlow Lockfile Ownership and Stale Package Audit`.
+
 ## WordGeni Local Shared UI Package Retirement
 
 Date:
