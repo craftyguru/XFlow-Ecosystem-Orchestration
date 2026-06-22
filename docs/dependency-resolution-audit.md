@@ -723,6 +723,42 @@ Commands not run:
 Recommended next cleanup target:
 - Review and commit or fix the remaining XFlow shared navigation/local-QA dirty set, starting with the design-system violation in `src/components/layout/xflow-navigation-shell-config.tsx`.
 
+## Final Shared Package Resolution Cleanup Sweep
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Final stale shared-package/package-manager cleanup sweep for WordGeni, RatAiFy, XFlow, Crevux, Verixet, and AudAiX after the shared navigation/sidebar runtime work was closed out.
+- No root install, root lockfile rewrite, dependency audit fix, backend/auth/database/payment/business-logic change, push, cross-app runtime refactor, or new navigation feature work was performed.
+- Root Git and nested app Git handling stayed separate. Root docs were committed only in the root repo; app cleanup commits were made only in their owning nested repos.
+
+| App | Package manager ownership | Shared UI package target | Lockfile target | Installed `node_modules` target | Stale local copy status | Cleanup action taken | Verification result | Commit hash | Remaining blocker |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| WordGeni | pnpm workspace under `apps/WordGeni`. | Root shared UI via `file:../../../../packages/ecosystem-assistant-ui` from `apps/web`. | `apps/WordGeni/pnpm-lock.yaml` records root shared UI file dependency. | pnpm virtual store for the root shared UI file dependency. | Retired previously; `apps/WordGeni/packages/ecosystem-assistant-ui` was deleted. | No new action in this sweep; final status check only. | Previously passed shared UI checks plus WordGeni typecheck/test/build during cleanup. | `257fbfd`, `d1c44d1`, `265ccc3`. | None for shared package resolution. |
+| RatAiFy | npm app root. | Root shared UI via `file:../../packages/ecosystem-assistant-ui`. | `apps/RatAiFy/package-lock.json` records root shared UI file dependency. | `K:\XFlow-Ecosystem Workspace\packages\ecosystem-assistant-ui`. | Retired previously; `apps/RatAiFy/packages/ecosystem-assistant-ui` no longer exists. | No new action in this sweep; final status check only. | Previously passed shared UI checks plus RatAiFy typecheck/test/build and local disposable browser QA rerun. | `a5fed67`, `e65566b`, `33a231c`. | None for shared package resolution. |
+| XFlow | npm app root. | Root shared UI via `file:../../packages/ecosystem-assistant-ui`. | `apps/XFlow/package-lock.json` is canonical; stale `pnpm-lock.yaml` was retired in the previous pass. | `K:\XFlow-Ecosystem Workspace\packages\ecosystem-assistant-ui`. | No XFlow-local stale shared UI copy found. | No new action in this sweep; prior `pnpm-lock.yaml` retirement was confirmed. | Shared UI checks passed; XFlow typecheck/build passed; full XFlow test suite still has unrelated pre-existing failures documented in the previous section. | `f670174`. | Existing unrelated XFlow shared-nav/local-QA dirty set remains. |
+| Crevux | pnpm workspace under `apps/CreVux`; active app is `artifacts/image-gen`. | Active image-gen package uses root shared UI via `file:../../../../packages/ecosystem-assistant-ui`. | `apps/CreVux/pnpm-lock.yaml` records root shared UI file dependency for `artifacts/image-gen`, but also retains a `packages/ecosystem-assistant-ui` workspace importer. | pnpm virtual-store link for the root shared UI file dependency. | `apps/CreVux/packages/ecosystem-assistant-ui` still exists and remains included by `pnpm-workspace.yaml` via `packages/*`. | No deletion; blocked because the stale local copy is still an active workspace member. | Not rerun because no Crevux files were changed in this sweep. | None. | Remove or exclude `packages/ecosystem-assistant-ui` from Crevux workspace membership in a dedicated pass before deleting the stale copy. |
+| Verixet | npm app root. | Root shared UI via `file:../../packages/ecosystem-assistant-ui`. | `apps/Verixet/package-lock.json` now records root shared UI file dependency and root package entry. | `K:\XFlow-Ecosystem Workspace\packages\ecosystem-assistant-ui`. | Retired in this sweep; `apps/Verixet/packages/ecosystem-assistant-ui` was deleted after verification. | Ran app-local `npm install --ignore-scripts --no-audit --no-fund` to refresh the stale junction, then deleted the stale local copy and committed only package-resolution files/deletions. | Shared UI typecheck/test passed; Verixet typecheck/test passed before deletion; Verixet typecheck/test/build passed after deletion. Build emitted existing lint warnings only. | `b99f072`. | Existing unrelated Verixet runtime/nav/local-DB dirty set remains unstaged. |
+| AudAiX | npm root with npm-owned `dashboard` package. | Dashboard uses root shared UI via `file:../../../packages/ecosystem-assistant-ui`. | `apps/AudAix/dashboard/package-lock.json` now records root shared UI file dependency and root package entry. | `K:\XFlow-Ecosystem Workspace\packages\ecosystem-assistant-ui`. | Retired in this sweep; `apps/AudAix/packages/ecosystem-assistant-ui` was deleted after verification. | Ran dashboard-local `npm install --ignore-scripts --no-audit --no-fund` to refresh the stale junction, then deleted the stale local copy and committed only package-resolution files/deletions. | Shared UI typecheck/test passed; AudAiX dashboard typecheck/test passed before deletion; AudAiX dashboard typecheck/test/build passed after deletion. | `9eb94e72`. | Existing unrelated AudAiX studio/SitewideNav dirty set remains unstaged. |
+
+Commands not run:
+- Root `npm install`.
+- Root `pnpm install`.
+- Broad workspace installs.
+- `npm audit fix` or any audit-fix command.
+- Production, hosted, backend, auth, database, payment, or business-logic commands.
+- Any push command.
+
+App-local commands run in this sweep:
+- `npm install --ignore-scripts --no-audit --no-fund` in `apps/Verixet` to refresh a stale installed shared UI junction.
+- `npm install --ignore-scripts --no-audit --no-fund` in `apps/AudAix/dashboard` to refresh a stale installed shared UI junction.
+
+Final stop recommendation:
+- Stop shared package cleanup here for apps with clean root shared UI resolution.
+- Do not delete Crevux's stale local shared UI copy until a dedicated Crevux workspace-membership cleanup removes or excludes `packages/ecosystem-assistant-ui` from the pnpm workspace and updates the lockfile deliberately.
+- Treat remaining XFlow, Verixet, and AudAiX dirty files as separate shared-nav/local-QA follow-up work, not package-resolution cleanup.
+
 ## WordGeni Remaining Dirty Set Review
 
 Date:
