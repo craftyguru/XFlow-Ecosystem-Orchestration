@@ -642,6 +642,87 @@ Verification:
 - `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
 - `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
 
+## XFlow npm Lockfile Baseline and Stale pnpm Retirement
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Retired the stale XFlow `pnpm-lock.yaml` after the package-manager ownership audit concluded XFlow is npm-owned for now.
+- Work stayed inside `apps/XFlow` plus this root documentation update.
+- No dependency install, `npm install`, `pnpm install`, package-lock rewrite, runtime app code edit, backend/auth/database/payment/business-logic change, push, or cross-app runtime edit was performed.
+
+Preflight confirmation:
+- Root Git was clean before this documentation update.
+- Root `.gitignore` continues to ignore `apps/XFlow`, so the nested app repo was not absorbed by root Git.
+- XFlow latest commit before retirement: `dde8cf2 fix(auth): expose ecosystem MFA status`.
+- XFlow had a pre-existing dirty set before this pass; only `pnpm-lock.yaml` was staged for the cleanup commit.
+
+Cleanup performed:
+- Deleted `apps/XFlow/pnpm-lock.yaml`.
+- Kept `apps/XFlow/package-lock.json` as the canonical npm baseline.
+- Did not touch or regenerate `apps/XFlow/package-lock.json`.
+- `package-lock.json` SHA-256 before and after the pnpm lock deletion stayed `39B6F2EC286A204825C8A096ED587C8852580E236C1EDDE7C3ECAE5CBC268323`.
+
+npm/package-lock baseline confirmation:
+- XFlow Volta metadata pins npm `10.9.3`.
+- XFlow package scripts use npm/npx conventions.
+- XFlow CI and Docker build paths use `npm ci`.
+- No `pnpm-workspace.yaml`, `.pnpmrc`, or `.npmrc` was found at the XFlow app root.
+- `package-lock.json` is lockfile version 3 and records root package `xflow` version `3.4.1`.
+- `package-lock.json` records `@xflow-ecosystem/ecosystem-assistant-ui` as `file:../../packages/ecosystem-assistant-ui`.
+
+Shared UI link confirmation:
+- `apps/XFlow/node_modules/@xflow-ecosystem/ecosystem-assistant-ui` is a junction to `K:\XFlow-Ecosystem Workspace\packages\ecosystem-assistant-ui`.
+- No `apps/XFlow/packages/ecosystem-assistant-ui` stale local package copy exists.
+
+Verification results:
+- `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
+- `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
+- `npm --prefix apps/XFlow run typecheck`: passed.
+- `npm --prefix apps/XFlow test`: failed with 4 failures out of 2,652 tests.
+  - `tests/api/forum-ai-search.test.ts`: timeout in `parses public search filters and returns filtered browse results without q`.
+  - `tests/api/forum-analytics.test.ts`: timeout in `normalizes search analytics queries and detects secrets`.
+  - `tests/unit/assistant-e2e-workflow-validation.test.ts`: timeout in the full six-app assistant workflow validation.
+  - `tests/unit/design-system-discipline-contract.test.ts`: existing untracked `src/components/layout/xflow-navigation-shell-config.tsx` uses forbidden raw palette class `text-white`.
+- `npm --prefix apps/XFlow run build`: passed.
+  - Build emitted existing warnings in `src/components/chronicle/ChronicleSourcesClient.tsx` for `react-hooks/exhaustive-deps` and `<img>` usage.
+  - Build emitted webpack cache serialization warnings for large strings.
+
+XFlow commit:
+- `f670174 chore: retire stale pnpm lockfile`.
+
+Staged XFlow files:
+- `pnpm-lock.yaml` deletion only.
+
+Remaining unrelated XFlow dirty files after the cleanup commit:
+- `package-lock.json`.
+- `package.json`.
+- `scripts/seed-qa-account.ts`.
+- `src/components/layout/AppSidebar.tsx`.
+- `src/components/layout/MobileNav.tsx`.
+- `src/components/layout/SidebarNav.tsx`.
+- `src/lib/ecosystem/public-urls.ts`.
+- `src/lib/onboarding/profile-onboarding.ts`.
+- `tsconfig.json`.
+- `vitest.config.mts`.
+- `scripts/bootstrap-local-nav-qa-auth-schema.ts`.
+- `src/components/layout/xflow-navigation-shell-config.tsx`.
+- `src/lib/navigation/provider-app-stubs.ts`.
+- `tests/unit/shared-navigation-adapter.test.ts`.
+
+Commands not run:
+- `npm install`.
+- `pnpm install`.
+- `npm ci`.
+- `npm install --package-lock-only`.
+- `pnpm install --lockfile-only`.
+- Any lockfile rewrite command.
+- Any database, auth, backend, payment, hosted-service, or push command.
+
+Recommended next cleanup target:
+- Review and commit or fix the remaining XFlow shared navigation/local-QA dirty set, starting with the design-system violation in `src/components/layout/xflow-navigation-shell-config.tsx`.
+
 ## WordGeni Remaining Dirty Set Review
 
 Date:
