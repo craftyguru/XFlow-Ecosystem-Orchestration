@@ -516,6 +516,57 @@ Verification:
 - `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
 - `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
 
+## WordGeni Remaining Dirty Set Review
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Reviewed the remaining WordGeni nested-repo dirty files left after package-resolution cleanup and stale local shared UI package retirement.
+- Work stayed inside `apps/WordGeni` plus this root documentation update.
+- No dependency install, lockfile rewrite, backend/auth/database/payment/business-logic change, cross-app runtime edit, push, or root app staging was performed.
+
+Preflight:
+- Root Git was clean before this documentation update.
+- Root `.gitignore` still ignores `apps/WordGeni`.
+- WordGeni latest commit before this review: `d1c44d1 chore: retire local shared ui workspace package`.
+- WordGeni dirty files before classification:
+  - `apps/web/next-env.d.ts`.
+  - `apps/web/src/components/layout/app-sidebar-nav.tsx`.
+  - `apps/web/src/components/layout/mobile-nav-drawer.tsx`.
+  - `apps/web/k.includes('Nav')`.
+  - `apps/web/src/components/layout/wordgeni-navigation-config.test.ts`.
+  - `apps/web/src/components/layout/wordgeni-navigation-config.tsx`.
+
+Classification:
+
+| File | Classification | Decision |
+| --- | --- | --- |
+| `apps/web/src/components/layout/app-sidebar-nav.tsx` | Accepted shared navigation shell work | Committed. It adapts the existing WordGeni desktop nav to the shared `SidebarNav` while preserving WordGeni-specific cards, metadata, user/logout state, and existing shell context. |
+| `apps/web/src/components/layout/mobile-nav-drawer.tsx` | Accepted shared navigation shell work | Committed. It wires the existing WordGeni mobile drawer surface through the shared `MobileNavDrawer` while keeping the WordGeni-owned wrapper and route metadata intro. |
+| `apps/web/src/components/layout/wordgeni-navigation-config.tsx` | Accepted shared navigation adapter | Committed. It maps WordGeni `NavDef` groups into shared navigation section/item config. |
+| `apps/web/src/components/layout/wordgeni-navigation-config.test.ts` | Accepted adapter test coverage | Committed. It verifies section mapping plus external and disabled item semantics. |
+| `apps/web/next-env.d.ts` | Generated/unwanted for commit | Restored to HEAD and not committed. The dirty change only pointed Next's generated type reference at `.next-prod`. |
+| `apps/web/k.includes('Nav')` | Accidental/unwanted zero-byte file | Removed and not committed. |
+
+Verification before commit:
+- `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
+- `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
+- `npm --prefix apps/WordGeni run typecheck`: passed.
+- `npm --prefix apps/WordGeni test`: passed.
+- `npm --prefix apps/WordGeni run build`: passed.
+
+Commit decision:
+- The accepted shared navigation work was safe to commit as one nested WordGeni commit because all remaining meaningful dirty files belonged to the same WordGeni shared navigation adapter/wiring change.
+- WordGeni commit: `265ccc3 chore: commit shared navigation shell updates`.
+- No generated files, accidental files, dependency lockfiles, or unrelated app feature work were included in the commit.
+
+Post-review status:
+- WordGeni nested repo was clean after commit.
+- Root repo only contains this documentation update.
+- WordGeni stale local shared UI package retirement remains complete from commit `d1c44d1`.
+- Recommended next cleanup target: proceed to the next app-level shared package resolution/stale-copy audit, starting with RatAiFy unless a higher-priority app is selected.
+
 ## WordGeni Local Shared UI Package Retirement
 
 Date:
