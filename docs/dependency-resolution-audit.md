@@ -817,3 +817,92 @@ Git handling:
 
 Next cleanup target:
 - WordGeni stale local shared package workspace cleanup: audit whether `apps/WordGeni/packages/ecosystem-assistant-ui` can be removed from the pnpm workspace without breaking Turbo tasks or accepted navigation behavior.
+
+## WordGeni Stale Local Shared Package Copy Retirement Audit
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Audit-only review of whether `apps/WordGeni/packages/ecosystem-assistant-ui` can be safely retired after WordGeni web package/runtime/type/test resolution was aligned to the root shared UI package.
+- No package deletion, pnpm install, npm install, lockfile rewrite, runtime app code change, backend/auth/database/payment/business-logic change, root push, or WordGeni push was performed.
+
+Preflight:
+- Root latest commit before this audit: `f52ee14 docs: record wordgeni pnpm resolution update`.
+- Root Git was clean before the documentation update.
+- Root `.gitignore` continues to ignore `apps/WordGeni` and `apps/WordGeni/packages/ecosystem-assistant-ui`.
+- WordGeni latest commit: `257fbfd chore: align shared ui package resolution`.
+- WordGeni dirty files before audit were existing prior navigation/shared-package working-tree files; this audit did not stage or modify WordGeni files.
+
+### Reference inventory
+
+| Reference | Classification | Finding |
+| --- | --- | --- |
+| `apps/web/package.json` | Active root shared package reference | `@xflow-ecosystem/ecosystem-assistant-ui` points to `file:../../../../packages/ecosystem-assistant-ui`, which resolves to the root shared UI package. |
+| `apps/web/tsconfig.json` | Active root shared package reference | Path alias points to `../../../../packages/ecosystem-assistant-ui/dist/index`. |
+| `apps/web/next.config.mjs` | Active root shared package reference | Webpack alias points to the root shared UI package build. |
+| `apps/web/vitest.config.mjs` | Active root shared package reference | Vitest alias points to the root shared UI package build. |
+| Web imports in `apps/web/src/components/...` | Active package-name imports | Components import `@xflow-ecosystem/ecosystem-assistant-ui`; package/config resolution now routes those imports to the root shared package for web runtime/type/test surfaces. |
+| `apps/web/node_modules/@xflow-ecosystem/ecosystem-assistant-ui` | Generated installed link | Junction points through pnpm's virtual store for `@xflow-ecosystem+ecosystem-assistant-ui@file+..+..+packages+ecosystem-assistant-ui_react@19.2.5`, not directly to `apps/WordGeni/packages/ecosystem-assistant-ui`. |
+| `pnpm-lock.yaml` `apps/web` importer | Active root shared package lock entry | Records `specifier: file:../../../../packages/ecosystem-assistant-ui` and `version: file:../../packages/ecosystem-assistant-ui(react@19.2.5)`. No old `version: link:../../packages/ecosystem-assistant-ui` web dependency remains. |
+| `pnpm-lock.yaml` `packages/ecosystem-assistant-ui` importer | Workspace membership reference | The stale local package copy is still represented as a workspace importer because `pnpm-workspace.yaml` includes `packages/*`. |
+| `pnpm-workspace.yaml` | Workspace membership reference | Includes all `packages/*`, so `packages/ecosystem-assistant-ui` is still a first-class WordGeni workspace package. |
+| `turbo.json` | Workspace task implication | `build`, `typecheck`, and `test` run across workspace packages. As long as the local shared UI package remains in the workspace, Turbo can still include it in scoped runs. |
+| `packages/ecosystem-assistant-ui/package.json` | Stale local package metadata | Local copy still declares the same package name as the root package but lacks current root package metadata such as the `test` script, `sideEffects`, and `files`. |
+| `packages/ecosystem-assistant-ui/src/*` and `dist/*` | Stale local package implementation | Local source/dist files remain present and dirty from prior nav work. They are no longer the intended web app resolution target, but they still belong to a workspace package until membership is removed. |
+| `README.md` and `eslint.config.mjs` package globs | General workspace docs/config | References to `packages/*` are broad workspace references, not specific dependencies on the local shared UI copy. |
+
+### Workspace membership status
+
+- `pnpm-workspace.yaml` contains:
+  - `apps/*`.
+  - `packages/*`.
+- Because of the broad `packages/*` glob, `apps/WordGeni/packages/ecosystem-assistant-ui` is still a workspace package.
+- `pnpm --filter @xflow-ecosystem/ecosystem-assistant-ui list --depth 0` resolves to `K:\XFlow-Ecosystem Workspace\apps\WordGeni\packages\ecosystem-assistant-ui`.
+- WordGeni Turbo still includes `@xflow-ecosystem/ecosystem-assistant-ui` as a package in workspace-scoped typecheck/test/build output.
+
+### Lockfile status
+
+- The web app lock entry now points to the root shared package file dependency.
+- The stale local package copy still has a separate workspace importer at `packages/ecosystem-assistant-ui`.
+- That importer should disappear only after the local package is removed from workspace membership and a controlled pnpm lockfile update is run.
+- Do not manually edit `pnpm-lock.yaml`.
+
+### Node modules status
+
+- The web package `node_modules` link no longer points directly at `apps/WordGeni/packages/ecosystem-assistant-ui`.
+- The generated pnpm virtual-store path is consistent with the root file dependency and includes root package metadata.
+- Generated `node_modules` references are safe to ignore for retirement planning.
+
+### Retirement recommendation
+
+Recommendation:
+- Option B - first remove workspace membership.
+
+Reasoning:
+- No active web package/runtime/type/test references still require the local package copy.
+- However, `pnpm-workspace.yaml` still makes `packages/ecosystem-assistant-ui` a workspace member, and `pnpm-lock.yaml` still has a workspace importer for it.
+- Deleting the directory without first addressing workspace membership would create a package-manager/workspace diff that should be handled deliberately.
+
+Exact future prompt:
+- `WordGeni Stale Local Shared Package Copy - Remove Workspace Membership and Retire Copy Safely`
+
+Future pass should:
+- Narrow `pnpm-workspace.yaml` so `packages/ecosystem-assistant-ui` is no longer included, or move to explicit package globs that exclude it.
+- Run a controlled `pnpm install --lockfile-only --ignore-scripts` from `apps/WordGeni`.
+- Verify `pnpm --filter @xflow-ecosystem/ecosystem-assistant-ui` no longer resolves to the WordGeni-local package.
+- Verify WordGeni typecheck/test/build still pass.
+- Only then delete `apps/WordGeni/packages/ecosystem-assistant-ui` in the same reviewed nested-repo pass.
+
+Commands not run:
+- `pnpm install`.
+- `pnpm install --lockfile-only`.
+- `npm install`.
+- Any lockfile rewrite command.
+- Any deletion command.
+- Any app build/test command.
+- `git add`, `git commit`, or `git push` inside WordGeni.
+
+Verification:
+- `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
+- `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
