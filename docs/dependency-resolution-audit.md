@@ -516,6 +516,132 @@ Verification:
 - `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
 - `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
 
+## XFlow Lockfile Ownership and Shared Package Resolution Audit
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Audit-only review of `apps/XFlow` package-manager ownership, lockfile health, shared UI package resolution, installed link targets, and stale local shared package copy status.
+- No install command, lockfile rewrite, package deletion, runtime app code change, backend/auth/database/payment/business-logic change, XFlow staging, XFlow commit, root push, or app push was performed.
+
+Preflight:
+- Root Git was clean before this documentation update.
+- Root `.gitignore` continues to ignore `apps/XFlow`, so the nested app repo is not absorbed into the root baseline.
+- XFlow nested repo root: `K:\XFlow-Ecosystem Workspace\apps\XFlow`.
+- XFlow branch: `master`.
+- XFlow latest commit at audit time: `dde8cf2 fix(auth): expose ecosystem MFA status`.
+- XFlow had an existing dirty working tree before this audit, including package/lockfile changes, shared navigation shell files, local QA/auth helper files, and tests. Those existing changes were left untouched and unstaged.
+
+### Package-manager ownership signals
+
+| Signal | Finding | Implication |
+| --- | --- | --- |
+| `package.json` name/version | `xflow` / `3.4.1`. | Matches the root package metadata in `package-lock.json`. |
+| `packageManager` field | None. | Ownership must be inferred from scripts, lockfiles, CI, and tooling. |
+| Volta pins | `node: 22.18.0`, `npm: 10.9.3`. | Strong npm ownership signal. |
+| Local tool versions | npm `10.9.3`; pnpm `10.30.3` is installed on the machine. | pnpm availability alone does not establish app ownership. |
+| Root app scripts | Scripts use `npm run`, `npx tsx`, and npm-style lifecycle commands. | npm is the current script convention. |
+| CI workflows | `.github/workflows/ci.yml` and `.github/workflows/enterprise-quarterly.yml` run `npm ci` and `npm run ...`. | CI is npm-owned. |
+| Dockerfile | Copies `package.json package-lock.json` and runs `npm ci`, then `npm run build`. | Production build container is npm-owned. |
+| pnpm workspace config | No `pnpm-workspace.yaml`, `.pnpmrc`, or `.npmrc` found at the XFlow app root. | No active pnpm workspace ownership was found. |
+| Docs/scripts mentioning pnpm | `docs/env-doctor.md`, `docs/ecosystem-status.md`, and `scripts/generate.ts` contain pnpm command examples. | These are historical/stale docs or alternate command notes, not current lockfile ownership proof. |
+
+Ownership recommendation:
+- Treat XFlow as npm-owned for now.
+- The canonical lockfile should be `apps/XFlow/package-lock.json`.
+- `apps/XFlow/pnpm-lock.yaml` should be considered stale/vestigial until a dedicated cleanup pass removes or regenerates it with explicit approval.
+
+### Lockfile status
+
+| Path | Package manager | Current status | Risk | Recommended next action |
+| --- | --- | --- | --- | --- |
+| `apps/XFlow/package-lock.json` | npm, lockfile v3 | Matches `package.json` root metadata and records `@xflow-ecosystem/ecosystem-assistant-ui` as `file:../../packages/ecosystem-assistant-ui`. | Low. This is the lockfile used by CI and Docker. | Keep as canonical npm lockfile. |
+| `apps/XFlow/pnpm-lock.yaml` | pnpm, lockfile v9 | Has an importer for `.`, and records the shared UI dependency as `file:../../packages/ecosystem-assistant-ui`, but other dependency entries drift from `package.json` and `package-lock.json` such as older Sentry metadata. | Medium. Mixed npm/pnpm lock ownership can cause stale dependency review and package-resolution confusion. | Retire or regenerate only in a dedicated XFlow lockfile ownership cleanup pass. |
+| `apps/XFlow/agents/desktop-agent/package-lock.json` | npm nested package lockfile | Separate desktop-agent package lockfile found under a nested package. | Medium if conflated with the XFlow root app lockfile. | Treat as desktop-agent-owned and audit separately if desktop-agent dependency cleanup is needed. |
+
+No lockfile was staged, deleted, regenerated, or edited in this audit.
+
+### Shared UI package resolution
+
+| Surface | Current resolution | Classification |
+| --- | --- | --- |
+| `package.json` dependency | `@xflow-ecosystem/ecosystem-assistant-ui`: `file:../../packages/ecosystem-assistant-ui`. | Active root shared package reference. |
+| `package-lock.json` root dependency | Records `file:../../packages/ecosystem-assistant-ui`. | Active npm lock entry aligned with the root shared package. |
+| `package-lock.json` package entry | `../../packages/ecosystem-assistant-ui` has package name `@xflow-ecosystem/ecosystem-assistant-ui`, version `0.1.0`, and a root-neighbor assistant dependency. | Active root shared package lock metadata. |
+| `package-lock.json` node_modules entry | `node_modules/@xflow-ecosystem/ecosystem-assistant-ui` resolves to `../../packages/ecosystem-assistant-ui` with `link: true`. | Active npm installed-link metadata. |
+| `pnpm-lock.yaml` shared UI entry | Records `file:../../packages/ecosystem-assistant-ui`. | Points to the right root package, but lives in a stale/vestigial pnpm lockfile. |
+| `tsconfig.json` | Maps `@xflow-ecosystem/ecosystem-assistant-ui` to `../../packages/ecosystem-assistant-ui/dist/index`. | Active root TypeScript alias. |
+| `vitest.config.mts` | Maps `@xflow-ecosystem/ecosystem-assistant-ui` to `../../packages/ecosystem-assistant-ui/dist/index.js`. | Active root test/runtime alias. |
+| `next.config.ts` | No explicit shared UI alias found. | Runtime resolution relies on the package dependency and installed `node_modules` link. |
+| `node_modules/@xflow-ecosystem/ecosystem-assistant-ui` | Junction target is `K:\XFlow-Ecosystem Workspace\packages\ecosystem-assistant-ui`. | Installed link is aligned to the root shared UI package. |
+| `apps/XFlow/packages/ecosystem-assistant-ui` | Not present. | No stale XFlow-local shared UI package copy found. |
+
+### Reference classification
+
+Active root shared package references:
+- `apps/XFlow/package.json`.
+- `apps/XFlow/package-lock.json`.
+- `apps/XFlow/tsconfig.json`.
+- `apps/XFlow/vitest.config.mts`.
+- `apps/XFlow/src/components/layout/AppSidebar.tsx`.
+- `apps/XFlow/src/components/layout/MobileNav.tsx`.
+- `apps/XFlow/src/components/layout/SidebarNav.tsx`.
+- `apps/XFlow/src/components/layout/xflow-navigation-shell-config.tsx`.
+- `apps/XFlow/tests/unit/shared-navigation-adapter.test.ts`.
+
+Stale local shared package references:
+- None found.
+
+Generated or installed references:
+- `apps/XFlow/node_modules/@xflow-ecosystem/ecosystem-assistant-ui` is a junction to the root shared UI package.
+
+Historical or stale package-manager references:
+- `apps/XFlow/docs/env-doctor.md` includes pnpm command examples.
+- `apps/XFlow/docs/ecosystem-status.md` includes pnpm command examples.
+- `apps/XFlow/scripts/generate.ts` includes a comment mentioning `pnpm db:generate`.
+
+Workspace membership:
+- No XFlow pnpm workspace membership was found.
+- No XFlow-local `packages/ecosystem-assistant-ui` workspace package was found.
+
+### Decision
+
+Recommended option:
+- Option B - npm lock ownership cleanup needed.
+
+Reasoning:
+- XFlow's shared UI package resolution is already aligned to the root shared package across dependency metadata, npm lock metadata, TypeScript, Vitest, and the installed junction.
+- No stale local XFlow shared UI package copy exists.
+- The remaining risk is mixed npm/pnpm lockfile ownership, not shared UI resolution.
+- npm is the safer canonical owner because XFlow Volta, CI, Docker, scripts, and the current lockfile all point to npm.
+
+Future repair prompt:
+- `XFlow Lockfile Ownership Cleanup - Retire Stale pnpm Lock and Record npm Baseline`
+
+Future pass should:
+- Reconfirm XFlow nested dirty state before touching files.
+- Keep `apps/XFlow/package-lock.json` as the canonical lockfile unless a new ownership decision is made.
+- Remove, ignore, or explicitly archive `apps/XFlow/pnpm-lock.yaml` only after approval.
+- Update stale pnpm command references in XFlow docs only if they are no longer valid.
+- Run XFlow typecheck/test/build after any lockfile or package-manager ownership change.
+- Keep existing shared navigation/local-QA dirty files separate unless that pass explicitly includes them.
+
+Commands not run:
+- `npm install`.
+- `pnpm install`.
+- `npm ci`.
+- `npm install --package-lock-only`.
+- `pnpm install --lockfile-only`.
+- Any lockfile rewrite command.
+- Any app build/test/typecheck command.
+- Any database, auth, backend, payment, or hosted-service command.
+- `git add`, `git commit`, or `git push` inside XFlow.
+
+Verification:
+- `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
+- `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
+
 ## WordGeni Remaining Dirty Set Review
 
 Date:
