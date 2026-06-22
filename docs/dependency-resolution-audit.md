@@ -567,6 +567,96 @@ Post-review status:
 - WordGeni stale local shared UI package retirement remains complete from commit `d1c44d1`.
 - Recommended next cleanup target: proceed to the next app-level shared package resolution/stale-copy audit, starting with RatAiFy unless a higher-priority app is selected.
 
+## RatAiFy Shared Package Resolution Audit
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Audit-only review of RatAiFy shared package resolution and stale local shared UI package status.
+- No RatAiFy files were staged, committed, repaired, deleted, or reverted in this pass.
+- No dependency install, lockfile rewrite, backend/auth/database/payment/business-logic change, cross-app runtime edit, or push was performed.
+
+Preflight:
+- Root latest commit before this audit: `4f22787 docs: record wordgeni remaining dirty set review`.
+- Root Git was clean before this documentation update.
+- Root `.gitignore` continues to ignore `apps/RatAiFy`, so the nested app repo is not absorbed by the root baseline.
+- RatAiFy nested repo root: `K:\XFlow-Ecosystem Workspace\apps\RatAiFy`.
+- RatAiFy branch: `main`.
+- RatAiFy latest commit at audit time: `a2d85d3 fix(auth): disable local MFA endpoints under XFlow`.
+- RatAiFy had an existing dirty working tree before this audit, including package-resolution files, navigation shell files, local QA/server files, and tests. Those existing changes were left untouched.
+
+### Resolution Inventory
+
+| Surface | Current finding | Classification |
+| --- | --- | --- |
+| `package.json` dependency | Current working tree points `@xflow-ecosystem/ecosystem-assistant-ui` to `file:../../packages/ecosystem-assistant-ui`. Git diff shows this is an uncommitted change from the older `file:./packages/ecosystem-assistant-ui`. | Active root shared package reference, not yet committed in RatAiFy. |
+| `package-lock.json` root dependency | Current lockfile metadata points to `file:../../packages/ecosystem-assistant-ui`. Git diff shows this is an uncommitted change from the older local package path. | Active root shared package lock entry, not yet committed in RatAiFy. |
+| `package-lock.json` linked package entry | `node_modules/@xflow-ecosystem/ecosystem-assistant-ui` resolves to `../../packages/ecosystem-assistant-ui` in lockfile metadata. | Lockfile points root. |
+| `tsconfig.json` path alias | Current working tree maps `@xflow-ecosystem/ecosystem-assistant-ui` to `../../packages/ecosystem-assistant-ui/src/index`. Git diff shows this changed from the local package path. | Active root TypeScript alias, not yet committed in RatAiFy. |
+| `vite.config.ts` runtime alias | Current working tree maps `@xflow-ecosystem/ecosystem-assistant-ui` to `../../packages/ecosystem-assistant-ui/dist/index.js`. Git diff shows this changed from the local package path. | Active root Vite/runtime alias, not yet committed in RatAiFy. |
+| `vitest.config.ts` | Does not currently define an alias for `@xflow-ecosystem/ecosystem-assistant-ui`. Existing tests that need shared nav source use direct root file paths. | Test alias gap / needs review. |
+| `node_modules/@xflow-ecosystem/ecosystem-assistant-ui` | Actual installed junction still points to `K:\XFlow-Ecosystem Workspace\apps\RatAiFy\packages\ecosystem-assistant-ui`. | Stale local installed link. |
+| `packages/ecosystem-assistant-ui` | Local app copy exists and declares the same package name. Its package metadata lacks current root package fields such as `test`, `sideEffects`, and `files`. | Stale local package copy still present. |
+| `package.json` `build:packages` | Still runs `npm --prefix packages/ecosystem-assistant-ui run build`. | Active script reference to stale local package. |
+| Workspace membership | No `pnpm-workspace.yaml`, `packageManager`, or npm `workspaces` field was found for RatAiFy. | Not a package-manager workspace member, but still script/link referenced. |
+
+### Reference Classification
+
+Active root shared package references:
+- `package.json`: `file:../../packages/ecosystem-assistant-ui`.
+- `package-lock.json`: `resolved: ../../packages/ecosystem-assistant-ui`.
+- `tsconfig.json`: `../../packages/ecosystem-assistant-ui/src/index`.
+- `vite.config.ts`: `../../packages/ecosystem-assistant-ui/dist/index.js`.
+- `tests/trust-dashboard-rendering.node.test.ts`: direct root shared shell source path.
+- `tests/rataify-navigation-shell-config.node.test.ts`: direct root shared shell source path.
+
+Stale local package references:
+- `node_modules/@xflow-ecosystem/ecosystem-assistant-ui` junction target.
+- `packages/ecosystem-assistant-ui`.
+- `package.json` `build:packages` script.
+- `tests/rataify-ecosystem-assistant-integration.node.test.ts`, which reads `packages/ecosystem-assistant-ui/src/index.tsx`.
+
+Package-name import callsites:
+- `client/src/features/trustDashboard/components/RataifyTrustShell.tsx`.
+- `client/src/components/ecosystem-assistant/EcosystemAssistantBubbleMount.tsx`.
+- `client/src/components/layout/rataify-navigation-shell-config.tsx`.
+
+Generated or install-state references:
+- `node_modules/@xflow-ecosystem/ecosystem-assistant-ui` is generated install state and currently stale.
+- `package-lock.json` is root-oriented in the working tree but has not yet been reconciled with the actual junction target.
+
+### Decision
+
+Recommendation:
+- Option C - config repair needed, followed by a controlled link/lock refresh.
+
+Reasoning:
+- The main dependency, lockfile, TypeScript alias, and Vite alias already point to the root shared UI package in the current RatAiFy working tree, but those changes are uncommitted.
+- The actual installed `node_modules` junction still points to the stale local copy, so package-manager install state is inconsistent with current lockfile metadata.
+- `package.json` `build:packages` still builds `packages/ecosystem-assistant-ui`, and at least one test still reads the local package source path directly.
+- The stale local package is not a workspace member, but it cannot be safely retired until script/test references and installed link state are repaired and verified.
+
+Exact future repair prompt:
+- `RatAiFy Shared Package Resolution - Controlled Link Refresh and Local Package Copy Retirement Prep`
+
+Future pass should:
+- Review and commit the existing RatAiFy package-resolution changes separately from unrelated dirty files.
+- Update `build:packages` so shared UI build ownership is explicit and root-oriented, or document why RatAiFy should not build the shared root package.
+- Update stale local test/file references to root shared package paths or package-name imports.
+- Run a controlled npm package-lock-only/install-state refresh only after the staged config set is reviewed.
+- Verify the installed `node_modules/@xflow-ecosystem/ecosystem-assistant-ui` junction points to `K:\XFlow-Ecosystem Workspace\packages\ecosystem-assistant-ui`.
+- Only then audit whether `apps/RatAiFy/packages/ecosystem-assistant-ui` can be deleted in a later pass.
+
+Commands not run:
+- `npm install`.
+- `pnpm install`.
+- Any package-lock rewrite command.
+- Any dependency install or node_modules relink command.
+- Any deletion command.
+- Any RatAiFy build/test/typecheck command.
+- `git add`, `git commit`, or `git push` inside RatAiFy.
+
 ## WordGeni Local Shared UI Package Retirement
 
 Date:
