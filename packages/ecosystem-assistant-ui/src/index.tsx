@@ -868,7 +868,7 @@ function createStyles(theme: EcosystemAssistantBubbleTheme): Record<string, Reac
       position: "fixed",
       right: "20px",
       bottom: "20px",
-      zIndex: 50,
+      zIndex: 1000,
       fontFamily: "Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
     },
     launcher: {
