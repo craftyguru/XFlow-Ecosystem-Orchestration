@@ -657,6 +657,73 @@ Commands not run:
 - Any RatAiFy build/test/typecheck command.
 - `git add`, `git commit`, or `git push` inside RatAiFy.
 
+## RatAiFy Shared UI Link Refresh and Local Copy Retirement Prep
+
+Date:
+- 2026-06-21.
+
+Scope:
+- Completed RatAiFy's shared UI package-resolution repair and retired the stale app-local shared UI copy after verification.
+- Work stayed inside `apps/RatAiFy` plus this root documentation update.
+- No root install, pnpm install, backend/auth/database/payment/business-logic change, cross-app runtime edit, or push was performed.
+
+Before state:
+- RatAiFy `package.json`, `package-lock.json`, `tsconfig.json`, and `vite.config.ts` already had uncommitted working-tree changes pointing shared UI resolution to the root package.
+- Actual installed link was stale:
+  - `K:\XFlow-Ecosystem Workspace\apps\RatAiFy\node_modules\@xflow-ecosystem\ecosystem-assistant-ui`
+  - Target: `K:\XFlow-Ecosystem Workspace\apps\RatAiFy\packages\ecosystem-assistant-ui`.
+- Stale local package copy existed at `apps/RatAiFy/packages/ecosystem-assistant-ui`.
+- `package.json` `build:packages` still built `packages/ecosystem-assistant-ui`.
+- `tests/rataify-ecosystem-assistant-integration.node.test.ts` still read `packages/ecosystem-assistant-ui/src/index.tsx`.
+
+Changes made:
+- `package.json` dependency for `@xflow-ecosystem/ecosystem-assistant-ui` remains pointed at `file:../../packages/ecosystem-assistant-ui`.
+- `package.json` `build:packages` now builds the root shared UI package with `npm --prefix ../../packages/ecosystem-assistant-ui run build`.
+- `package-lock.json` now records the root file dependency package entry at `../../packages/ecosystem-assistant-ui` and no longer records the local `packages/ecosystem-assistant-ui` package entry.
+- `tsconfig.json` maps `@xflow-ecosystem/ecosystem-assistant-ui` to `../../packages/ecosystem-assistant-ui/src/index`.
+- `vite.config.ts` maps `@xflow-ecosystem/ecosystem-assistant-ui` to `../../packages/ecosystem-assistant-ui/dist/index.js`.
+- `tests/rataify-ecosystem-assistant-integration.node.test.ts` now reads the root shared UI source through a root-relative helper.
+- Deleted only the stale local package copy:
+  - `apps/RatAiFy/packages/ecosystem-assistant-ui/package.json`.
+  - `apps/RatAiFy/packages/ecosystem-assistant-ui/src/index.tsx`.
+  - `apps/RatAiFy/packages/ecosystem-assistant-ui/tsconfig.json`.
+
+npm command run:
+- From `apps/RatAiFy`: `npm install --ignore-scripts`.
+- Purpose: refresh the stale installed file-dependency junction after package metadata already pointed to the root shared UI package.
+- Result: npm removed one package, changed one package, and reported existing audit findings of 7 vulnerabilities, 1 low and 6 moderate.
+- No lifecycle scripts were run.
+- No root install was run.
+
+After state:
+- Installed link now points to the root package:
+  - `K:\XFlow-Ecosystem Workspace\apps\RatAiFy\node_modules\@xflow-ecosystem\ecosystem-assistant-ui`.
+  - Target: `K:\XFlow-Ecosystem Workspace\packages\ecosystem-assistant-ui`.
+- `Test-Path apps\RatAiFy\packages\ecosystem-assistant-ui`: false.
+- Reference search found root shared UI references only in config, lockfile, package dependency, build script, and tests; no active runtime/test/script reference remains to the deleted app-local copy.
+
+Verification:
+- Before deletion:
+  - `npm --prefix packages/ecosystem-assistant-ui run typecheck`: passed.
+  - `npm --prefix packages/ecosystem-assistant-ui test`: passed, 8 tests.
+  - `npm --prefix apps/RatAiFy run typecheck`: passed.
+  - `npm --prefix apps/RatAiFy test`: passed, 381 tests.
+  - `npm --prefix apps/RatAiFy run build`: passed.
+- After deletion:
+  - `npm --prefix apps/RatAiFy run typecheck`: passed.
+  - `npm --prefix apps/RatAiFy test`: passed, 381 tests.
+  - `npm --prefix apps/RatAiFy run build`: passed.
+
+Git handling:
+- RatAiFy nested commit: `a5fed67 chore: align shared ui package resolution`.
+- Staged RatAiFy files were limited to `package.json`, `package-lock.json`, `tsconfig.json`, `vite.config.ts`, `tests/rataify-ecosystem-assistant-integration.node.test.ts`, and the deleted stale local shared UI package files.
+- Existing RatAiFy navigation/local-QA dirty files remained unstaged and uncommitted.
+
+Remaining risks:
+- RatAiFy still has a separate dirty working set from prior shared navigation/local-QA work; it should be reviewed in its own pass before committing.
+- npm reported existing audit vulnerabilities during the controlled install; this pass did not run `npm audit fix` or dependency upgrades.
+- Recommended next prompt: `RatAiFy Remaining Shared Navigation and Local QA Dirty Set Review`.
+
 ## WordGeni Local Shared UI Package Retirement
 
 Date:
