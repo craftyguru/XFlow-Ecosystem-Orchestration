@@ -375,11 +375,16 @@ export type SupportConversation = TimestampedRecord &
     appSlug: EcosystemAppSlug;
     requestId: string | null;
     assistantConversationId: string | null;
+    assignedToUserId: string | null;
     requesterEmail: string | null;
     subject: string;
     status: SupportStatus;
     category: SupportCategory;
     priority: SupportPriority;
+    sourceUrl: string | null;
+    sourceType: "contact_form" | "help_page" | "assistant_escalation" | "admin_created" | "import" | "support_form";
+    identityTrust: "anonymous" | "verified" | "imported" | "system";
+    lastMessageAt: string | null;
     metadata: Metadata;
   };
 
@@ -399,6 +404,7 @@ export type SupportMessage = TimestampedRecord & {
     sizeBytes: number | null;
     metadata: Metadata;
   }>;
+  isInternalNote?: boolean;
   metadata: Metadata;
 };
 
@@ -421,6 +427,8 @@ export type SupportEvent = TimestampedRecord & {
   requestId: string | null;
   actorUserId: string | null;
   eventType: string;
+  before?: Metadata | null;
+  after?: Metadata | null;
   metadata: Metadata;
 };
 
