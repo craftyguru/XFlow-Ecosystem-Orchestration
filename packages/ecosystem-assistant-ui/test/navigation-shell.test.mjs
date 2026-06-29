@@ -92,6 +92,33 @@ test("passes configured data attributes to rendered links", () => {
   assert.equal(link.props["data-tour-target"], "nav-apps");
 });
 
+test("expands child routes only for the active parent item", () => {
+  const item = {
+    id: "tools",
+    label: "Tools",
+    href: "/tools",
+    children: [
+      { id: "tools-hub", label: "Tool Hub", href: "/tools" },
+      { id: "tools-admin", label: "Admin Ops", href: "/tools/groups/admin-ops" },
+    ],
+  };
+
+  const inactive = NavItem({
+    item,
+    currentPath: "/overview",
+    renderLink: (props) => ({ kind: "link", props }),
+  });
+  const active = NavItem({
+    item,
+    currentPath: "/tools/groups/admin-ops",
+    renderLink: (props) => ({ kind: "link", props }),
+  });
+
+  assert.equal(Boolean(inactive.props.children[1]), false);
+  assert.equal(active.props.children[1].type, "ul");
+  assert.equal(active.props.children[1].props.className, "xflow-nav-shell__children");
+});
+
 test("normalizes sections and children by visibility", () => {
   const sections = normalizeNavigationSections(
     [

@@ -173,15 +173,17 @@ export function NavigationShellStyles(): React.ReactElement {
 .xflow-nav-shell {
   --xnav-accent: #22d3ee;
   --xnav-accent-text: #06111f;
-  --xnav-sidebar-width: 17rem;
-  --xnav-sidebar-collapsed-width: 4.75rem;
+  --xnav-sidebar-width: 18.25rem;
+  --xnav-sidebar-collapsed-width: 5rem;
   --xnav-drawer-width: min(22rem, calc(100vw - 1rem));
   --xnav-header-height: 3.75rem;
-  --xnav-sidebar-gradient: linear-gradient(180deg, rgba(10, 18, 35, 0.98), rgba(3, 7, 18, 0.99));
+  --xnav-sidebar-gradient: radial-gradient(circle at 18% 0%, color-mix(in srgb, var(--xnav-accent) 18%, transparent), transparent 28%), linear-gradient(180deg, rgba(10, 18, 35, 0.98), rgba(3, 7, 18, 0.99));
   --xnav-border: rgba(255, 255, 255, 0.1);
   --xnav-glow: rgba(34, 211, 238, 0.35);
   --xnav-active-bg: rgba(34, 211, 238, 0.13);
   --xnav-icon-bg: rgba(255, 255, 255, 0.07);
+  --xnav-panel-bg: rgba(255, 255, 255, 0.045);
+  --xnav-panel-hover: rgba(255, 255, 255, 0.07);
   min-height: 100dvh;
   min-width: 0;
   color: #f8fafc;
@@ -194,6 +196,8 @@ export function NavigationShellStyles(): React.ReactElement {
   flex: 0 0 var(--xnav-sidebar-width); flex-direction: column; overflow: hidden;
   border-right: 1px solid var(--xnav-border); background: var(--xnav-sidebar-gradient);
   box-shadow: 20px 0 60px -48px var(--xnav-glow);
+  scrollbar-color: color-mix(in srgb, var(--xnav-accent) 48%, rgba(148, 163, 184, 0.55)) transparent;
+  scrollbar-width: thin;
 }
 .xflow-nav-shell[data-collapsed="true"] .xflow-nav-shell__sidebar {
   width: var(--xnav-sidebar-collapsed-width); flex-basis: var(--xnav-sidebar-collapsed-width);
@@ -207,29 +211,65 @@ export function NavigationShellStyles(): React.ReactElement {
 }
 .xflow-nav-shell__brand { display: flex; min-width: 0; align-items: center; gap: 0.7rem; color: inherit; text-decoration: none; }
 .xflow-nav-shell__brand-mark, .xflow-nav-shell__icon {
-  display: inline-flex; min-width: 2.5rem; width: 2.5rem; height: 2.5rem; align-items: center; justify-content: center;
-  overflow: hidden; border: 1px solid var(--xnav-border); border-radius: 0.75rem; background: var(--xnav-icon-bg);
+  display: inline-flex; min-width: 2.35rem; width: 2.35rem; height: 2.35rem; align-items: center; justify-content: center;
+  overflow: hidden; border: 1px solid var(--xnav-border); border-radius: 0.72rem; background: var(--xnav-icon-bg);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.07), 0 10px 26px -22px var(--xnav-glow);
 }
+.xflow-nav-shell__brand-mark { border-color: color-mix(in srgb, var(--xnav-accent) 36%, var(--xnav-border)); background: color-mix(in srgb, var(--xnav-accent) 12%, var(--xnav-icon-bg)); }
 .xflow-nav-shell__brand-text { min-width: 0; font-size: 1rem; font-weight: 800; line-height: 1.1; }
 .xflow-nav-shell__brand-subtext { display: block; color: rgba(226, 232, 240, 0.66); font-size: 0.72rem; font-weight: 600; }
 .xflow-nav-shell__panel { display: flex; min-height: 0; flex: 1; flex-direction: column; gap: 0.85rem; padding: 0.875rem; }
 .xflow-nav-shell__slot { flex: 0 0 auto; }
-.xflow-nav-shell__nav { min-height: 0; flex: 1; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; padding-right: 0.15rem; }
-.xflow-nav-shell__section { margin-bottom: 1rem; }
-.xflow-nav-shell__section-label { margin: 0 0 0.35rem; padding: 0 0.35rem; color: rgba(226, 232, 240, 0.52); font-size: 0.68rem; font-weight: 800; letter-spacing: 0.13em; text-transform: uppercase; }
-.xflow-nav-shell__list { display: flex; flex-direction: column; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
-.xflow-nav-shell__item {
-  display: flex; min-height: 44px; width: 100%; align-items: center; gap: 0.65rem; border: 1px solid transparent;
-  border-radius: 0.75rem; color: rgba(226, 232, 240, 0.76); padding: 0.45rem 0.55rem; text-decoration: none;
-  transition: background 150ms ease, border-color 150ms ease, color 150ms ease;
+.xflow-nav-shell__nav {
+  min-height: 0; flex: 1; overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain;
+  padding: 0 0.35rem 0.65rem 0; mask-image: linear-gradient(to bottom, transparent 0, #000 0.8rem, #000 calc(100% - 0.8rem), transparent 100%);
 }
-.xflow-nav-shell__item:hover, .xflow-nav-shell__item:focus-visible { border-color: var(--xnav-border); background: rgba(255, 255, 255, 0.06); color: #fff; outline: none; }
-.xflow-nav-shell__item--active { border-color: color-mix(in srgb, var(--xnav-accent) 42%, transparent); background: var(--xnav-active-bg); color: #fff; box-shadow: inset 3px 0 0 var(--xnav-accent); }
+.xflow-nav-shell__nav::-webkit-scrollbar { width: 0.45rem; }
+.xflow-nav-shell__nav::-webkit-scrollbar-track { background: transparent; }
+.xflow-nav-shell__nav::-webkit-scrollbar-thumb { border-radius: 999px; background: color-mix(in srgb, var(--xnav-accent) 38%, rgba(148, 163, 184, 0.48)); }
+.xflow-nav-shell__section { margin-bottom: 0.9rem; }
+.xflow-nav-shell__section-label {
+  display: flex; align-items: center; gap: 0.42rem; margin: 0 0 0.38rem; padding: 0 0.35rem;
+  color: rgba(226, 232, 240, 0.56); font-size: 0.65rem; font-weight: 900; letter-spacing: 0.12em; text-transform: uppercase;
+}
+.xflow-nav-shell__section-label::before {
+  content: ""; width: 0.42rem; height: 0.42rem; flex: 0 0 auto; border-radius: 999px;
+  background: color-mix(in srgb, var(--xnav-accent) 72%, white 8%); box-shadow: 0 0 16px color-mix(in srgb, var(--xnav-accent) 54%, transparent);
+}
+.xflow-nav-shell__list { display: flex; flex-direction: column; gap: 0.2rem; margin: 0; padding: 0; list-style: none; }
+.xflow-nav-shell__item {
+  position: relative; display: flex; min-height: 42px; width: 100%; align-items: center; gap: 0.62rem; border: 1px solid transparent;
+  border-radius: 0.78rem; color: rgba(226, 232, 240, 0.78); padding: 0.38rem 0.48rem; text-decoration: none;
+  transition: transform 150ms ease, background 150ms ease, border-color 150ms ease, color 150ms ease, box-shadow 150ms ease;
+}
+.xflow-nav-shell__item:hover, .xflow-nav-shell__item:focus-visible {
+  transform: translateX(1px); border-color: var(--xnav-border); background: var(--xnav-panel-hover); color: #fff; outline: none;
+  box-shadow: 0 10px 28px -24px rgba(0,0,0,0.8);
+}
+.xflow-nav-shell__item:focus-visible { box-shadow: 0 0 0 3px color-mix(in srgb, var(--xnav-accent) 25%, transparent); }
+.xflow-nav-shell__item--active {
+  border-color: color-mix(in srgb, var(--xnav-accent) 50%, transparent);
+  background: linear-gradient(135deg, color-mix(in srgb, var(--xnav-accent) 19%, transparent), rgba(255,255,255,0.035));
+  color: #fff; box-shadow: inset 3px 0 0 var(--xnav-accent), 0 14px 34px -28px var(--xnav-glow);
+}
 .xflow-nav-shell__item--disabled { cursor: not-allowed; opacity: 0.54; }
-.xflow-nav-shell__item-label { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.88rem; font-weight: 700; }
+.xflow-nav-shell__item--has-children::after {
+  content: ""; width: 0.42rem; height: 0.42rem; flex: 0 0 auto; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  opacity: 0.42; transform: rotate(-45deg); transition: transform 150ms ease, opacity 150ms ease;
+}
+.xflow-nav-shell__item--active.xflow-nav-shell__item--has-children::after { opacity: 0.76; transform: rotate(45deg); }
+.xflow-nav-shell__item-label { min-width: 0; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.84rem; font-weight: 760; }
 .xflow-nav-shell__badge { flex: 0 0 auto; border: 1px solid var(--xnav-border); border-radius: 999px; padding: 0.1rem 0.42rem; color: rgba(226, 232, 240, 0.78); font-size: 0.67rem; font-weight: 800; }
-.xflow-nav-shell__children { margin: 0.2rem 0 0.15rem 1.35rem; padding: 0; list-style: none; }
-.xflow-nav-shell__child .xflow-nav-shell__item { min-height: 38px; padding-left: 0.75rem; }
+.xflow-nav-shell__children {
+  position: relative; display: flex; flex-direction: column; gap: 0.14rem; margin: 0.18rem 0 0.28rem 1.1rem;
+  padding: 0.18rem 0 0.18rem 0.72rem; list-style: none; border-left: 1px solid color-mix(in srgb, var(--xnav-accent) 22%, var(--xnav-border));
+}
+.xflow-nav-shell__child .xflow-nav-shell__item { min-height: 34px; border-radius: 0.68rem; padding: 0.28rem 0.42rem; gap: 0.5rem; }
+.xflow-nav-shell__child .xflow-nav-shell__icon {
+  min-width: 1.78rem; width: 1.78rem; height: 1.78rem; border-radius: 0.6rem; background: rgba(255,255,255,0.045);
+}
+.xflow-nav-shell__child .xflow-nav-shell__item-label { font-size: 0.78rem; font-weight: 720; }
+.xflow-nav-shell__child .xflow-nav-shell__item--active { background: color-mix(in srgb, var(--xnav-accent) 17%, rgba(255,255,255,0.035)); }
 .xflow-nav-shell__action {
   display: inline-flex; min-height: 44px; width: 100%; align-items: center; justify-content: center; gap: 0.55rem;
   border: 1px solid color-mix(in srgb, var(--xnav-accent) 58%, transparent); border-radius: 0.85rem;
@@ -243,7 +283,8 @@ export function NavigationShellStyles(): React.ReactElement {
 .xflow-nav-shell__quick strong { display: block; color: #fff; font-size: 0.82rem; }
 .xflow-nav-shell__quick span { display: block; color: rgba(226,232,240,0.62); font-size: 0.74rem; }
 .xflow-nav-shell__user, .xflow-nav-shell__account {
-  border: 1px solid var(--xnav-border); border-radius: 0.95rem; background: rgba(255,255,255,0.045); padding: 0.75rem;
+  border: 1px solid var(--xnav-border); border-radius: 0.95rem; background: var(--xnav-panel-bg); padding: 0.75rem;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.055);
 }
 .xflow-nav-shell__user { display: flex; align-items: center; gap: 0.7rem; }
 .xflow-nav-shell__avatar { display: inline-flex; width: 2.25rem; height: 2.25rem; align-items: center; justify-content: center; border-radius: 999px; background: var(--xnav-accent); color: var(--xnav-accent-text); font-weight: 900; }
@@ -253,8 +294,10 @@ export function NavigationShellStyles(): React.ReactElement {
 .xflow-nav-shell__icon-button {
   display: inline-flex; min-width: 44px; min-height: 44px; align-items: center; justify-content: center;
   border: 1px solid var(--xnav-border); border-radius: 0.75rem; background: rgba(255,255,255,0.055); color: #fff;
+  transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
 }
-.xflow-nav-shell__collapse { position: absolute; right: -22px; top: 50%; transform: translateY(-50%); }
+.xflow-nav-shell__icon-button:hover, .xflow-nav-shell__icon-button:focus-visible { border-color: color-mix(in srgb, var(--xnav-accent) 40%, var(--xnav-border)); background: rgba(255,255,255,0.09); outline: none; }
+.xflow-nav-shell__collapse { position: absolute; right: -22px; top: 50%; transform: translateY(-50%); min-width: 38px; min-height: 38px; border-radius: 999px; }
 .xflow-nav-shell__drawer { position: fixed; inset: 0; z-index: 1000; display: none; }
 .xflow-nav-shell__drawer[data-open="true"] { display: block; }
 .xflow-nav-shell__scrim { position: absolute; inset: 0; border: 0; background: rgba(0,0,0,0.62); backdrop-filter: blur(4px); }
@@ -282,6 +325,8 @@ export function NavigationShellStyles(): React.ReactElement {
 .xflow-nav-shell.xflow-nav-shell__desktop[data-collapsed="true"] .xflow-nav-shell__item,
 .xflow-nav-shell[data-collapsed="true"] .xflow-nav-shell__desktop .xflow-nav-shell__brand,
 .xflow-nav-shell.xflow-nav-shell__desktop[data-collapsed="true"] .xflow-nav-shell__brand { justify-content: center; }
+.xflow-nav-shell[data-collapsed="true"] .xflow-nav-shell__desktop .xflow-nav-shell__item--has-children::after,
+.xflow-nav-shell.xflow-nav-shell__desktop[data-collapsed="true"] .xflow-nav-shell__item--has-children::after { display: none; }
 @media (min-width: 768px) {
   .xflow-nav-shell__sidebar { display: flex; }
   .xflow-nav-shell__mobile-header { display: none; }
@@ -410,6 +455,7 @@ export function NavItem({
     "xflow-nav-shell__item",
     active ? "xflow-nav-shell__item--active" : "",
     item.disabled ? "xflow-nav-shell__item--disabled" : "",
+    item.children?.length ? "xflow-nav-shell__item--has-children" : "",
   ].filter(Boolean).join(" ");
   const label = item.beta ? `${item.label} beta` : item.label;
   const title = item.disabled ? item.disabledReason ?? `${item.label} is unavailable` : item.description ?? item.label;
@@ -441,7 +487,7 @@ export function NavItem({
       ...item.dataAttributes,
     })
   );
-  const visibleChildren = item.children ?? [];
+  const visibleChildren = active ? item.children ?? [] : [];
   return (
     <li className={depth > 0 ? "xflow-nav-shell__child" : undefined}>
       {node}
