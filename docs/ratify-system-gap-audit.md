@@ -2602,6 +2602,621 @@ Recommended commit message:
 
 Recommended next phase: create a non-production authenticated browser/API fixture with seed data and session setup, then rerun the safe-action proof against actual local HTTP/browser flows without external services or production data.
 
+## Phase 5A Staging and Browser Proof Readiness
+
+Date: 2026-07-02
+
+Scope: attempted to prove RatAiFy hardened admin/superadmin safe-action surfaces in a real non-production staging/browser environment after the Phase 4G checkpoint. No feature, route, action family, migration, destructive behavior, export generation, export download, billing/entitlement behavior, tenant/org lifecycle behavior, API-key rotation, webhook retry, provider credential mutation, impersonation, deployment/control-plane action, or broad RBAC change was added.
+
+### Staging target decision
+
+The only explicitly safe target found in local env classification was the local security database configuration in `apps/RatAiFy/../../.env.security-local`, categorized as local. That database was not reachable during this run (`ECONNREFUSED` on the local target). Docker was installed but the Docker Desktop daemon was unavailable, so the existing disposable Postgres path could not be started.
+
+The app `.env` and shared env files contained external database/Supabase targets that were not explicitly marked staging, preview, dev, test, or local. Phase 5A did not connect to or write to those external unclassified targets because the instruction was to not run against production.
+
+Generated local readiness evidence, intentionally ignored by Git:
+
+- `apps/RatAiFy/.ratify-safe-action-proof/phase5a/summary.json`
+- `apps/RatAiFy/.ratify-safe-action-proof/phase5a/leak-scan.json`
+
+### Fixture status
+
+Required Phase 5A fixtures were not loaded because there was no reachable explicitly safe non-production database:
+
+- non-production database: blocked
+- non-production app URL: blocked
+- admin user: blocked
+- superadmin user: blocked
+- non-superadmin user: blocked
+- support thread fixture: blocked
+- feature flag fixture: blocked
+- contact submission fixture: blocked
+- export request fixture: blocked
+- developer API key/webhook fixture: blocked
+- scan/issue/evidence/proof fixture: blocked
+
+No production database, external unclassified database, or production credential was used.
+
+### Browser/API proof status
+
+Authenticated browser/API proof was not run for these required areas because safe fixtures could not be created or loaded:
+
+- SuperAdminRoute denied state
+- `/superadmin/support`
+- support assignment/internal note
+- feature flag create/toggle/archive/deprecate
+- contact status/archive/assign
+- report/export request tracking
+- developer/API-key one-time secret display
+- developer/webhook overview
+- superadmin scan/evidence explorer
+- audit logs with redacted metadata
+- legacy support route deprecation telemetry
+
+The Phase 4F local safe-action proof scripts were rerun and passed, but they remain local source/contract proof, not staging browser proof:
+
+- `npm exec -- tsx scripts/phase4f-safe-action-preflight.ts`: passed.
+- `npm exec -- tsx scripts/phase4f-safe-action-proof.ts`: passed.
+
+### Disabled actions confirmed
+
+The Phase 5A readiness evidence reconfirmed through the action registry that destructive/export/download and other unproven action families remain disabled or outside enabled scope:
+
+- support delete
+- feature flag delete
+- contact export, delete, and purge
+- report/export generation, download, scheduling, and purge
+- scanner/evidence trigger, rerun, delete, and export package
+- API-key rotation
+- webhook retry
+- webhook disable
+
+`contacts.delete_submission` has server-side code and exact-confirmation posture from prior readiness work, but it remains not enabled by the registry and the UI remains planned/disabled for this safe-action phase.
+
+### No secrets/private content
+
+Phase 5A generated evidence records only target categories, fixture blocked status, safe error codes, command status, registry action ids/statuses, and evidence path references. It does not include connection strings, auth headers, bearer values, cookies, API keys, webhook signing values, passwords, request bodies, response bodies, private/customer message bodies, raw scanner evidence, raw fixes, provider responses, stack traces, or production credentials.
+
+Generated evidence grep scan result: `Authorization` 0, `Bearer` 0, `apiKey` 0, `token` 0, `password` 0, `cookie` 0, `request_body` 0, `response_body` 0, `raw evidence` 0, `raw fix` 0, `provider response` 0, `stack trace` 0, `private message` 0, `customer content` 0, `access granted` 0, `production-ready` 0. The word `secret` appears once as contextual proof-area terminology, not as a secret value.
+
+### Validation results
+
+- `npm run verify:routes`: passed (`[verify-client-routes] OK: 105 unique paths, no duplicates.`).
+- `npm run typecheck`: passed.
+- `npm run lint`: passed with warnings only; no lint errors.
+- `npm run verify:security`: passed.
+- `npm run test:ops`: passed (385/385 tests).
+
+### Remaining production blockers
+
+- A reachable explicitly non-production database is required before Phase 5A fixture loading can proceed.
+- A non-production app URL with authenticated admin, superadmin, and non-superadmin fixtures is required before browser proof can proceed.
+- The required admin/superadmin safe-action proof areas remain unproven in real HTTP/browser flows until those fixtures exist.
+- External unclassified database/Supabase targets must not be used until they are explicitly identified as staging/non-production by environment naming or an operator-provided staging marker.
+
+## Phase 5B Staging Fixture Bootstrap and Rollout Preflight
+
+Date: 2026-07-02
+
+Scope: added the safe non-production staging preflight and fixture bootstrap path required before Phase 5C can run real authenticated browser/API proof. No new product feature, route family, production migration, action family, destructive cleanup, billing mutation, entitlement mutation, tenant/org lifecycle mutation, API-key rotation, webhook retry, provider credential mutation, impersonation, deployment/control-plane action, actual export/download execution, or broad RBAC rewrite was added.
+
+Files changed:
+
+- `apps/RatAiFy/.gitignore`
+- `apps/RatAiFy/package.json`
+- `apps/RatAiFy/scripts/staging-proof-safety.ts`
+- `apps/RatAiFy/scripts/preflight-staging-proof.ts`
+- `apps/RatAiFy/scripts/bootstrap-staging-proof-fixtures.ts`
+- `apps/RatAiFy/tests/phase5b-staging-proof-preflight.node.test.ts`
+- `docs/ratify-staging-proof-rollout.md`
+- `docs/ratify-system-gap-audit.md`
+
+Commands added:
+
+- `npm run preflight:staging-proof`
+- `npm run bootstrap:staging-proof-fixtures`
+
+Ignored staging proof evidence path:
+
+- `apps/RatAiFy/.ratify-staging-proof/`
+
+### Preflight behavior
+
+`npm run preflight:staging-proof` checks presence only and prints categories/status only. It refuses:
+
+- `NODE_ENV=production`
+- missing `RATAIFY_STAGING_BASE_URL`
+- missing `RATAIFY_STAGING_DATABASE_URL` or `RATAIFY_NON_PRODUCTION_DATABASE_URL`
+- missing admin, superadmin, or user fixture identities
+- missing admin, superadmin, or user fixture passwords
+- production-looking base URLs or database URLs
+- unclassified external base URLs
+- unclassified external database URLs unless `RATAIFY_APPROVED_NON_PRODUCTION_DATABASE_URL=1`
+
+It writes sanitized evidence to `.ratify-staging-proof/preflight-summary.json`.
+
+### Bootstrap behavior
+
+`npm run bootstrap:staging-proof-fixtures` first runs the same preflight and then refuses to continue unless `RATAIFY_ALLOW_STAGING_FIXTURE_BOOTSTRAP=1` is set. The bootstrap uses stable fixture ids, is idempotent, does not print secrets, does not delete records, does not purge records, does not truncate tables, does not generate production credentials, and refuses to reuse an existing non-fixture email address.
+
+Fixture coverage includes:
+
+- admin, superadmin, and non-superadmin users
+- org/workspace membership rows
+- fixture passkey markers for privileged users
+- support thread, support message, and internal-note target
+- active, archive-candidate, and delete-disabled feature flags
+- contact submission and assignable admin owner
+- metadata-only report/export request
+- developer API-key record with fingerprint-only evidence
+- developer webhook and delivery metadata with omitted response body
+- site, scan, page, issue, and summarized AudAiX proof
+- legacy support/contact telemetry markers
+
+The bootstrap writes sanitized evidence to `.ratify-staging-proof/fixture-summary.json`.
+
+### Current readiness status
+
+Phase 5B tooling is ready. Staging fixtures are still blocked in this local run because the required Phase 5B staging environment variables were not present in the current shell:
+
+- `RATAIFY_STAGING_BASE_URL`
+- `RATAIFY_STAGING_DATABASE_URL` or `RATAIFY_NON_PRODUCTION_DATABASE_URL`
+- `RATAIFY_E2E_ADMIN_EMAIL`
+- `RATAIFY_E2E_SUPERADMIN_EMAIL`
+- `RATAIFY_E2E_USER_EMAIL`
+- `RATAIFY_E2E_ADMIN_PASSWORD`
+- `RATAIFY_E2E_SUPERADMIN_PASSWORD`
+- `RATAIFY_E2E_USER_PASSWORD`
+
+No production target was used.
+
+Validation results for Phase 5B:
+
+- `npm run preflight:staging-proof`: blocked as expected in the current shell; wrote `.ratify-staging-proof/preflight-summary.json` with presence/status only.
+- `npm run bootstrap:staging-proof-fixtures`: blocked as expected in the current shell because preflight failed; wrote `.ratify-staging-proof/fixture-summary.json` with no target values.
+- Focused Phase 5B tests passed (5/5): `npx tsx --test tests/phase5b-staging-proof-preflight.node.test.ts`.
+- `npm run verify:routes`: passed (`[verify-client-routes] OK: 105 unique paths, no duplicates.`).
+- `npm run typecheck`: passed.
+- `npm run lint`: passed with warnings only; no lint errors.
+- `npm run verify:security`: passed.
+- `npm run test:ops`: passed (385/385 tests).
+- `git diff --check`: passed for `apps/RatAiFy`; Git reported existing LF-to-CRLF working-copy warnings only. Root doc diff check passed for `docs/ratify-system-gap-audit.md` and `docs/ratify-staging-proof-rollout.md`.
+- Targeted grep scan over new Phase 5B scripts, focused test, and generated `.ratify-staging-proof` evidence wrote `.ratify-staging-proof/leak-scan.json`. Matches are contextual variable names, fixture placeholders, and redaction/omission labels only: `apiKey` 3, `secret` 11, `token` 3, `password` 11, `response_body` 2, `customer content` 2. No credential values, URLs, auth headers, cookies, raw request/response payloads, provider responses, stack traces, private messages, production-ready claims, access-granted claims, force labels, or bypass labels were found.
+
+### Remaining Phase 5C blockers
+
+- Provide a safe non-production staging base URL.
+- Provide a safe non-production staging database URL.
+- Provide admin, superadmin, and user fixture identities and auth inputs.
+- Run `npm run preflight:staging-proof`.
+- Run `RATAIFY_ALLOW_STAGING_FIXTURE_BOOTSTRAP=1 npm run bootstrap:staging-proof-fixtures`.
+- Then run Phase 5C authenticated browser/API proof against those fixtures.
+
+## Phase 5C Staging Authenticated Browser/API Proof
+
+Date: 2026-07-02
+
+Scope: attempted the required hard-stop preflight for authenticated staging browser/API proof. No authenticated browser/API proof was run because preflight failed before a safe non-production target and fixture identities were available. No production target was used, no new action family was enabled, no destructive/export/download action was exercised, and no fixture bootstrap was run.
+
+### Preflight result
+
+`npm run preflight:staging-proof` failed as the required stop condition.
+
+Staging URL category:
+
+- App URL: missing
+- Database URL: missing
+
+Missing required staging inputs:
+
+- `RATAIFY_STAGING_BASE_URL`
+- `RATAIFY_STAGING_DATABASE_URL` or `RATAIFY_NON_PRODUCTION_DATABASE_URL`
+- `RATAIFY_E2E_ADMIN_EMAIL`
+- `RATAIFY_E2E_SUPERADMIN_EMAIL`
+- `RATAIFY_E2E_USER_EMAIL`
+- `RATAIFY_E2E_ADMIN_PASSWORD`
+- `RATAIFY_E2E_SUPERADMIN_PASSWORD`
+- `RATAIFY_E2E_USER_PASSWORD`
+
+The preflight output printed presence/status categories only. It did not print URLs, database connection strings, passwords, cookies, bearer values, service tokens, API keys, webhook secrets, request bodies, response bodies, private customer content, provider responses, stack traces, or raw proof payloads.
+
+### Fixture status
+
+Phase 5C staging fixture status: blocked.
+
+No Phase 5C authenticated staging fixture was loaded or exercised for:
+
+- admin user
+- superadmin user
+- non-superadmin user
+- support thread fixture
+- feature flag fixture
+- contact submission fixture
+- export request fixture
+- developer API-key/webhook fixture
+- scan/issue/evidence/proof fixture
+
+### Browser/API proof status
+
+Authenticated browser/API proof result: not run; blocked at preflight.
+
+Skipped proof areas:
+
+- SuperAdminRoute denied state
+- `/superadmin/support`
+- support assignment/internal note
+- feature flag create/toggle/archive/deprecate
+- contact status/archive/assign
+- report/export request tracking
+- developer/API-key one-time secret display
+- developer/webhook overview
+- superadmin scan/evidence explorer
+- audit logs with redacted metadata
+- legacy support route deprecation telemetry
+
+Disabled action confirmation for this run:
+
+- Destructive/export/download actions were not exercised.
+- No action family was newly enabled.
+- No production override or production target was used.
+- Actual export/download execution remains unproven and disabled for Phase 5C.
+
+### Evidence
+
+Sanitized evidence paths:
+
+- `apps/RatAiFy/.ratify-staging-proof/preflight-summary.json`
+- `apps/RatAiFy/.ratify-staging-proof/phase5c/preflight.json`
+- `apps/RatAiFy/.ratify-staging-proof/phase5c/summary.json`
+
+### Validation results
+
+- `npm run preflight:staging-proof`: failed as the Phase 5C hard stop; wrote sanitized preflight evidence.
+- Authenticated browser/smoke tests: skipped because preflight failed.
+- Safe-action proof scripts: skipped because preflight failed.
+- `npm run verify:routes`: skipped for Phase 5C because the instruction required stopping after preflight failure.
+- `npm run typecheck`: skipped for Phase 5C because the instruction required stopping after preflight failure.
+- `npm run lint`: skipped for Phase 5C because the instruction required stopping after preflight failure.
+- `npm run verify:security`: skipped for Phase 5C because the instruction required stopping after preflight failure.
+- `npm run test:ops`: skipped for Phase 5C because the instruction required stopping after preflight failure.
+- Grep scans for leaked secrets/private content: skipped for Phase 5C beyond the preflight artifact review because no authenticated proof artifacts were generated.
+
+### Remaining production blockers
+
+- Provide a verified non-production staging app URL.
+- Provide a verified non-production database URL.
+- Provide admin, superadmin, and non-superadmin fixture identities and passwords.
+- Run `npm run preflight:staging-proof` successfully without printing secrets.
+- Run fixture bootstrap only after successful preflight and explicit `RATAIFY_ALLOW_STAGING_FIXTURE_BOOTSTRAP=1`.
+- Re-run Phase 5C authenticated browser/API proof against the seeded non-production fixtures.
+- Capture browser/API evidence for every required proof area before any production-readiness claim.
+
+## Phase 5D Production Rollout Readiness Checklist
+
+Date: 2026-07-02
+
+Result: no-go; blocked by the Phase 5D stop condition because Phase 5C staging authenticated browser/API proof did not pass.
+
+Production readiness document:
+
+- `docs/ratify-production-rollout-readiness.md`
+
+Scope: created a documentation-only production rollout readiness record, blocker matrix, enabled action matrix, disabled/high-risk action matrix, migration/schema readiness summary, environment readiness classification, monitoring/logging readiness summary, rollback plan, and go/no-go checklist. No production deployment, production migration, new action family enablement, destructive cleanup, billing mutation, entitlement mutation, tenant/org lifecycle mutation, API-key rotation, webhook retry, provider credential mutation, impersonation, deployment/control-plane action, or actual export/download execution was performed.
+
+Go/no-go status: no-go.
+
+Primary blockers:
+
+- Phase 5C staging authenticated browser/API proof did not pass.
+- Non-production app URL and database URL were missing in Phase 5C.
+- Admin, superadmin, and non-superadmin E2E fixture credentials were missing in Phase 5C.
+- Required browser/API proof areas were skipped, including SuperAdminRoute denied state, `/superadmin/support`, support assignment/internal note, feature flag lifecycle, contact lifecycle, report/export tracking, developer API-key one-time display, webhook overview, scan/evidence explorer, audit logs, and legacy support route telemetry.
+- Migrations `0013_feature_flag_lifecycle.sql`, `0014_contact_admin_lifecycle.sql`, and `0015_report_export_request_tracking.sql` have not been proven applied in staging during this rollout sequence.
+- Production environment variable presence and target classification were not performed in this phase.
+- Rollback is documented but not rehearsed against staging.
+
+Enabled action readiness:
+
+- The action registry still identifies the previously locally proven safe/sensitive mutations: support reply/status/assignment/internal note, feature flag create/toggle/archive, contact status/archive/assign, developer API-key create, developer webhook delete, and report/export request tracking.
+- All listed enabled actions remain blocked for production rollout approval because staging HTTP/browser proof did not run.
+- Local Phase 4F proof remains useful source/contract evidence only.
+
+Disabled/high-risk action status:
+
+- Support delete/purge/export, feature flag delete, contact delete/purge/export, actual export generation/download, billing mutation, entitlement mutation, tenant/org lifecycle mutation, API-key rotation, webhook retry, provider credential mutation, impersonation, deployment/control-plane actions, data purge, and destructive actions remain disabled, planned, missing, or authority-owned outside RatAiFy.
+- No destructive/export/download action was exercised in Phase 5D.
+
+Validation status for Phase 5D:
+
+- Full validation commands were not run after the Phase 5D stop condition because Phase 5C did not pass.
+- Documentation checks and grep scans are recorded in the Phase 5D work summary.
+
+Remaining backlog:
+
+- Provision safe staging app and database targets.
+- Bootstrap Phase 5B fixtures after successful staging preflight.
+- Run Phase 5C authenticated browser/API proof end to end.
+- Apply and verify additive migrations in staging.
+- Complete presence-only production environment review without printing values.
+- Rehearse rollback and action-disable procedures in staging.
+- Re-run the Phase 5D go/no-go checklist after staging evidence exists.
+
+Recommended Phase 5E: Staging Environment Provisioning and Production Readiness Rehearsal.
+
+## Phase 5E Production Deployment Plan Approval
+
+Date: 2026-07-02
+
+Result: production deployment plan created; deployment recommendation remains no-go.
+
+Deployment plan:
+
+- `docs/ratify-production-deployment-plan.md`
+
+Scope: converted the Phase 5D production rollout readiness record into a concrete operator approval packet with deployment scope, exclusions, required approvals, production preflight, migration plan, deployment sequence, validation sequence, rollback sequence, monitoring sequence, observation window, owner sign-off placeholders, unresolved blockers, accepted-risk placeholder, and deferred items. No production deployment, production migration, production environment mutation, new action family enablement, destructive cleanup, billing mutation, entitlement mutation, tenant/org lifecycle mutation, API-key rotation, webhook retry, provider credential mutation, impersonation, deployment/control-plane action, actual export/download execution, broad RBAC rewrite, or fake data was added.
+
+Go/no-go status: no-go.
+
+Required approvals before any future go decision:
+
+- Engineering approval.
+- Product/owner approval.
+- Security approval.
+- Data/privacy approval for support/contact/export data.
+- Rollback owner assignment.
+- Monitoring owner assignment.
+- Final go/no-go approver.
+
+Production blockers:
+
+- Phase 5C staging authenticated browser/API proof did not pass.
+- Phase 5C staging app URL, database URL, and E2E fixture credentials were missing.
+- Production target classification is missing.
+- Production environment variable presence review is missing.
+- Staging application and verification of migrations `0013_feature_flag_lifecycle.sql`, `0014_contact_admin_lifecycle.sql`, and `0015_report_export_request_tracking.sql` are missing.
+- Runtime monitoring/audit capture is not proven in staging.
+- Rollback is documented but not rehearsed in staging.
+
+Action posture:
+
+- No new action family was enabled.
+- Destructive/export/download actions remain disabled, planned, missing, or separately unapproved.
+- Billing and entitlement mutation remain Verixet-authority blocked.
+- Deployment/control-plane mutation remains XFlow-authority blocked.
+
+Validation status for Phase 5E:
+
+- `npm run verify:routes`: passed (`[verify-client-routes] OK: 105 unique paths, no duplicates.`).
+- `npm run typecheck`: passed.
+- `npm run lint`: passed with warnings only; no lint errors.
+- `npm run verify:security`: passed (23/23 tests).
+- `npm run test:ops`: passed (385/385 tests).
+- Documentation diff check and grep scan are recorded in the Phase 5E work summary.
+
+Recommended Phase 5F: Staging Proof Completion and Deployment Approval Re-run.
+
+## Phase 5G Post-Rollout Observation and Backlog Triage
+
+Date: 2026-07-02
+
+Result: blocked pending rollout; observation plan only.
+
+Post-rollout observation document:
+
+- `docs/ratify-post-rollout-observation.md`
+
+Phase 5G preflight status:
+
+- Production rollout approved: no.
+- Production deployment performed: no.
+- Production migrations applied: no.
+- Production smoke checks passed: not run.
+- Monitoring window started: no.
+- Rollback triggered: no.
+
+Observation status: `blocked_pending_rollout`, `observation_plan_only`.
+
+Rollback status: not triggered because no production deployment occurred.
+
+Disabled action status:
+
+- No live production verification was run.
+- Existing Phase 5C evidence records `destructiveExportDownloadActionsExercised: false`.
+- Phase 5D/5E docs continue to record support delete/purge/export, feature flag delete, contact delete/purge/export, actual export generation/download, billing mutation, entitlement mutation, tenant/org lifecycle mutation, API-key rotation, webhook retry, provider credential mutation, impersonation, deployment/control-plane actions, data purge, and destructive actions as disabled, planned, missing, authority-owned, or separately unapproved.
+
+Redaction/security status:
+
+- No production logs or production evidence were reviewed because rollout did not occur.
+- Phase 5G generated only an observation plan and backlog triage document.
+
+Legacy route telemetry status:
+
+- Not observed in production because the monitoring window did not start.
+- Future rollout observation must classify legacy support/contact route hits before route removal or shim decisions.
+
+Remaining blockers:
+
+- Phase 5C staging authenticated browser/API proof did not pass.
+- Phase 5E deployment plan remains no-go.
+- Phase 5F production rollout did not execute.
+- Production target, monitoring access, owner assignments, backup/restore confirmation, and observation window are still missing.
+
+Backlog highlights:
+
+- Authenticated browser fixture hardening.
+- Staging/production parity checks.
+- Full export execution remains deferred.
+- Destructive support/contact/feature-flag actions remain deferred.
+- Webhook retry and API-key rotation remain deferred.
+- Verixet billing/entitlement and XFlow control-plane authority boundaries remain blocked from local mutation.
+- Legacy support/contact route removal requires telemetry.
+- Monitoring/alerting improvements require staging/prod access.
+
+Recommended Phase 5H: Staging Proof Completion and Rollout Re-entry.
+
+## Phase 5H Post-Rollout Backlog and Next-Major-Phase Decision
+
+Date: 2026-07-02
+
+Result: planning-only backlog triage complete.
+
+Backlog decision document:
+
+- `docs/ratify-post-rollout-backlog.md`
+
+Current rollout status: `blocked_pending_rollout`.
+
+Phase 6 decision: do not start Phase 6 yet; finish staging/production proof.
+
+Rationale:
+
+- Phase 5C staging authenticated browser/API proof did not pass.
+- Phase 5E deployment plan remained no-go.
+- Phase 5F did not execute a production rollout.
+- Phase 5G was observation-plan-only, not production observation.
+- Selected safe-action and hardening work has local/source proof, but real staging/browser and production rollout evidence is incomplete.
+
+Prioritized backlog areas:
+
+- Production/staging browser proof.
+- Browser fixture hardening.
+- Staging/production parity checks.
+- Production rollback drills.
+- Monitoring/alerting improvements.
+- Legacy support/contact telemetry and shim/removal decisions.
+- Report/export request tracking staging proof.
+- Report/export full execution and actual export/download remain deferred.
+- Support, feature flag, and contact destructive/export actions remain deferred.
+- Webhook retry and API-key rotation remain deferred.
+- Billing/entitlement integration remains Verixet-authority gated.
+- Tenant/org lifecycle and provider credential actions remain deferred.
+- Control-plane/deployment actions remain XFlow-authority gated.
+- Full data lifecycle policy remains partial.
+
+Recommended next phase: Phase 5H-A Staging Proof Recovery.
+
+## Phase 5H-A Staging Proof Recovery
+
+Date: 2026-07-02
+
+Result: staging proof remains blocked at preflight.
+
+Recovery checklist:
+
+- `docs/ratify-staging-proof-recovery.md`
+
+Command run from `apps/RatAiFy`:
+
+- `npm run preflight:staging-proof`
+
+Preflight result:
+
+- Passed: no.
+- Evidence path: `apps/RatAiFy/.ratify-staging-proof/preflight-summary.json`.
+- Values printed: no.
+- Production targets used: no.
+- Target category: app URL missing, database URL missing.
+
+Missing required staging inputs:
+
+- `RATAIFY_STAGING_BASE_URL`
+- `RATAIFY_STAGING_DATABASE_URL` or `RATAIFY_NON_PRODUCTION_DATABASE_URL`
+- `RATAIFY_E2E_ADMIN_EMAIL`
+- `RATAIFY_E2E_SUPERADMIN_EMAIL`
+- `RATAIFY_E2E_USER_EMAIL`
+- `RATAIFY_E2E_ADMIN_PASSWORD`
+- `RATAIFY_E2E_SUPERADMIN_PASSWORD`
+- `RATAIFY_E2E_USER_PASSWORD`
+
+Optional input not present:
+
+- `RATAIFY_STAGING_SERVICE_TOKEN` or secure test harness token.
+
+Fixture recovery requirement:
+
+- Non-production app URL.
+- Non-production database URL.
+- Admin, superadmin, and non-superadmin fixture users.
+- Support thread, feature flag, contact submission, export request, developer API-key/webhook, scan/issue/evidence/proof, and legacy route telemetry fixtures.
+
+Stop conditions remain:
+
+- Do not use production credentials.
+- Do not use production data.
+- Do not bootstrap fixtures unless preflight passes against an explicitly non-production target.
+- Do not enable new action families.
+- Do not run production migrations.
+- Do not execute destructive/export/download actions.
+
+Exact next operator action:
+
+1. Provide the missing non-production staging app URL, database URL, and fixture user credentials through a secret-safe environment path.
+2. Rerun `npm run preflight:staging-proof` from `apps/RatAiFy`.
+3. If preflight passes, run fixture bootstrap only with explicit `RATAIFY_ALLOW_STAGING_FIXTURE_BOOTSTRAP=1`.
+
+Phase 6 status: blocked. Do not start Phase 6 until Phase 5C staging/browser proof is recovered and the production rollout approval chain is re-run.
+
+## Phase 5H-B Local Disposable E2E Proof Recovery
+
+Date: 2026-07-02
+
+Result: local authenticated browser/API proof passed against a disposable loopback database. Staging proof remains blocked because no non-production staging URL, staging database URL, or staging fixture credentials have been provided.
+
+Local proof document:
+
+- `docs/ratify-local-e2e-proof.md`
+
+Commands run from `apps/RatAiFy`:
+
+- `npm run preflight:local-e2e-proof`: passed.
+- `npm run bootstrap:local-e2e-proof`: passed.
+- `npm run proof:local-e2e`: passed.
+- `npm run test:smoke:auth`: attempted against the disposable local database; did not complete within the command timeout, and Playwright snapshots showed the generic demo-login flow remained on `/login?demo=1`.
+
+Local target categories:
+
+- App URL: `local-loopback` on `127.0.0.1:3002`.
+- Database URL: `local-disposable` on loopback Postgres port `55433`, database name `rataify_local_e2e`.
+- Evidence path: `apps/RatAiFy/.ratify-local-e2e-proof/`, ignored by Git.
+
+Fixture status:
+
+- Disposable local database created and migrated.
+- Admin, superadmin, and non-superadmin fixture users seeded.
+- Support thread, feature flag, contact submission, report/export request, developer API-key/webhook, scan/issue/evidence/proof, current legal consent, and legacy telemetry marker fixtures seeded.
+
+Authenticated proof status:
+
+- SuperAdminRoute denied state: passed via non-superadmin API denial.
+- `/superadmin/support`: passed via authenticated browser-context proof and screenshot.
+- Support assignment/internal note: passed.
+- Feature flag create/toggle/archive/deprecate: passed.
+- Contact status/archive/assign: passed.
+- Report/export request tracking: passed as metadata-only request tracking.
+- Developer/API-key one-time secret display: credential mutation remained disabled in local proof.
+- Developer/webhook overview: passed; outbound webhook test remained disabled.
+- Superadmin scan/evidence explorer: passed.
+- Audit logs with redacted metadata: passed.
+- Legacy support/contact route telemetry paths: passed.
+
+Disabled action status:
+
+- No production or staging target was used.
+- No new action family was enabled.
+- No destructive support/contact/feature-flag action was executed.
+- No actual export file was generated.
+- No download action was executed.
+- Developer credential mutation, outbound webhook test, and data lifecycle export returned disabled responses in the local proof.
+
+Evidence:
+
+- `apps/RatAiFy/.ratify-local-e2e-proof/preflight-summary.json`
+- `apps/RatAiFy/.ratify-local-e2e-proof/bootstrap-summary.json`
+- `apps/RatAiFy/.ratify-local-e2e-proof/proof-summary.json`
+- `apps/RatAiFy/.ratify-local-e2e-proof/browser-superadmin-support.png`
+
+Phase 6 status: still blocked. Local proof improves confidence in the hardened flows, but it does not replace staging or production rollout evidence.
+
 ## Highest-Risk Gaps
 
 1. Ratify still contains local billing, Stripe, credit, plan, entitlement, and org/workspace mirror tables. Verixet and XFlow should remain the authorities; local state must be treated as cache/legacy unless specifically proven.
