@@ -1,0 +1,822 @@
+{
+  "schema_version": 1,
+  "generated_for_phase": "P3V-Local",
+  "scope": "classification-and-planning-only",
+  "local_proof_summary": {
+    "matrix_rows": 33,
+    "done": 27,
+    "partial": 0,
+    "blocked": 0,
+    "intentionally_unavailable": 5,
+    "not_applicable": 1,
+    "e2e_workflows": 9,
+    "route_visits": 123,
+    "assertions": 849,
+    "viewports": ["mobile", "desktop", "wide"],
+    "production_readiness_claimable": false
+  },
+  "classification_labels": [
+    "local-proof-complete",
+    "intentionally-unavailable-local",
+    "requires-staged-smoke",
+    "requires-external-authority-proof",
+    "requires-mutation-audit-proof",
+    "production-hard-stop",
+    "operator-approval-required"
+  ],
+  "rows": [
+    {
+      "id": "local.admin-surface-browser-proof",
+      "category": "local-proof-scope",
+      "surface": "Admin deployment, integration, overview, ecosystem, and system-status read UI",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "apps/XFlow/.xflow-local-browser-proof/admin-surface-evidence-matrix.json",
+        "apps/XFlow/.xflow-local-browser-proof/e2e/summary.json",
+        "apps/XFlow/.xflow-local-browser-proof/variants/<variant>/verification-summary.json"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": false,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local proof does not include external authority, production provider behavior, or mutation execution.",
+      "next_action": "Keep as local evidence only; do not label production-ready."
+    },
+    {
+      "id": "deployment.redeploy",
+      "category": "deployment-provider-execution",
+      "surface": "Redeploy action",
+      "current_status": "operator-approval-required",
+      "required_evidence": [
+        "staged sandbox target",
+        "explicit operator approval",
+        "permission and step-up proof",
+        "confirmation and reason capture",
+        "audit write proof",
+        "redacted provider result",
+        "rollback or safe failure state"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local proof intentionally keeps redeploy unavailable and never executes provider mutation.",
+      "next_action": "Plan sandbox-only staged smoke after approval; keep production blocked."
+    },
+    {
+      "id": "deployment.restart",
+      "category": "deployment-provider-execution",
+      "surface": "Restart action",
+      "current_status": "operator-approval-required",
+      "required_evidence": [
+        "staged sandbox target",
+        "explicit operator approval",
+        "permission and step-up proof",
+        "confirmation and reason capture",
+        "audit write proof",
+        "redacted provider result",
+        "safe failure state"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local proof intentionally keeps restart unavailable and never executes provider mutation.",
+      "next_action": "Plan sandbox-only staged smoke after approval; keep production blocked."
+    },
+    {
+      "id": "deployment.provider-refresh-sync",
+      "category": "deployment-provider-execution",
+      "surface": "Provider refresh, provider sync, and provider connect actions",
+      "current_status": "operator-approval-required",
+      "required_evidence": [
+        "sandbox provider connection",
+        "explicit operator approval",
+        "host allowlist",
+        "network guard",
+        "audit write proof",
+        "redacted request and response summaries"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local proof blocks external/provider network and sensitive actions.",
+      "next_action": "Design staged smoke without production credentials or production data."
+    },
+    {
+      "id": "deployment.provider-status-read",
+      "category": "deployment-provider-execution",
+      "surface": "Deployment status, log, and error pull",
+      "current_status": "requires-external-authority-proof",
+      "required_evidence": [
+        "read-only sandbox provider target",
+        "host allowlist",
+        "redacted provider IDs",
+        "redacted logs and errors",
+        "empty/error/degraded states",
+        "no production data"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local proof shows safe read UI but does not query real provider authority.",
+      "next_action": "Run read-only sandbox provider-status smoke only after approval."
+    },
+    {
+      "id": "deployment.environment-targeting",
+      "category": "deployment-provider-execution",
+      "surface": "Production/staging environment targeting and provider deployment ID handling",
+      "current_status": "production-hard-stop",
+      "required_evidence": [
+        "environment isolation proof",
+        "explicit target allowlist",
+        "provider ID redaction proof",
+        "operator approval",
+        "production switch disabled by default"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "No provider environment authority or production target safety proof exists.",
+      "next_action": "Prove staged isolation before considering any production target proof."
+    },
+    {
+      "id": "authority.railway-vercel",
+      "category": "external-provider-authority",
+      "surface": "Railway and Vercel authority",
+      "current_status": "requires-external-authority-proof",
+      "required_evidence": [
+        "sandbox project or app",
+        "read-only provider status proof",
+        "no production credentials",
+        "redacted provider identifiers",
+        "host allowlist"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local proof does not contact provider APIs.",
+      "next_action": "Prepare read-only sandbox proof plan; no mutation."
+    },
+    {
+      "id": "authority.supabase-neon",
+      "category": "external-provider-authority",
+      "surface": "Supabase and Neon authority",
+      "current_status": "requires-external-authority-proof",
+      "required_evidence": [
+        "sandbox database or project",
+        "no production data",
+        "schema/readiness proof",
+        "redacted connection metadata",
+        "cleanup proof"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "P3G-P3L use disposable loopback DB only.",
+      "next_action": "Use sandbox/staged DB only after approval."
+    },
+    {
+      "id": "authority.ai-email",
+      "category": "external-provider-authority",
+      "surface": "OpenAI/AI provider and email provider authority",
+      "current_status": "requires-external-authority-proof",
+      "required_evidence": [
+        "sandbox provider credentials",
+        "no private prompt or customer content",
+        "redacted provider responses",
+        "network allowlist",
+        "operator approval"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local proof does not call AI or email providers.",
+      "next_action": "Plan metadata-only sandbox proof."
+    },
+    {
+      "id": "authority.billing-entitlement",
+      "category": "external-provider-authority",
+      "surface": "Billing, subscription, and entitlement authority",
+      "current_status": "production-hard-stop",
+      "required_evidence": [
+        "Verixet authority boundary proof",
+        "sandbox billing fixtures",
+        "no billing mutation",
+        "entitlement read-only proof",
+        "redacted IDs and customer data"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "XFlow does not own billing or entitlement authority and local proof does not query external billing authority.",
+      "next_action": "Keep billing/entitlement claims blocked unless Verixet-backed sandbox evidence is available."
+    },
+    {
+      "id": "mutation.confirmation-reason",
+      "category": "mutation-and-audit-execution",
+      "surface": "Action confirmation and reason/category capture",
+      "current_status": "requires-mutation-audit-proof",
+      "required_evidence": [
+        "confirmation UI",
+        "reason/category field",
+        "server-side validation",
+        "permission denial proof",
+        "audit metadata redaction"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local proof validates actions are gated/unavailable; it does not execute high-risk actions.",
+      "next_action": "Use sandbox-only harmless action for future audit proof."
+    },
+    {
+      "id": "mutation.audit-log-write",
+      "category": "mutation-and-audit-execution",
+      "surface": "Audit log write, redaction, rollback, and safe failure state",
+      "current_status": "requires-mutation-audit-proof",
+      "required_evidence": [
+        "audit event persisted",
+        "actor/workspace/app scope",
+        "redacted metadata",
+        "failure state proof",
+        "rollback or no-op proof",
+        "deny coverage"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "High-risk mutation audit execution is outside local proof scope.",
+      "next_action": "Define safe sandbox/no-op mutation before execution."
+    },
+    {
+      "id": "mutation.local-audit-proof-boundary",
+      "category": "mutation-and-audit-execution",
+      "surface": "P4B local mutation audit proof register and verifier",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "docs/xflow-mutation-audit-proof.md",
+        "docs/xflow-mutation-audit-proof-register.json",
+        "apps/XFlow/scripts/verify-mutation-audit-proof.ts",
+        "apps/XFlow/tests/unit/mutation-audit-proof.test.ts",
+        "npm run verify:mutation-audit-proof"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": true,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "P4B is local proof only: it classifies gated, blocked, and unavailable high-risk actions without executing real mutations or proving production mutation safety.",
+      "next_action": "Use P4B to target remaining server-side confirmation, reason/category, audit, redaction, and safe-failure gaps before any future sandbox/no-op mutation proof."
+    },
+    {
+      "id": "mutation.deployment-action-server-contract",
+      "category": "mutation-and-audit-execution",
+      "surface": "P4C redeploy/restart server contract proof",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "src/app/api/deployments/[id]/redeploy/route.ts",
+        "src/app/api/deployments/[id]/restart/route.ts",
+        "src/lib/deployments/deployment-action-server-contract.ts",
+        "apps/XFlow/scripts/verify-deployment-action-server-contract.ts",
+        "apps/XFlow/tests/unit/deployment-action-server-contract.test.ts",
+        "npm run verify:deployment-action-server-contract"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": true,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "P4C proves local no-provider server contracts only; redeploy/restart still cannot execute provider mutations and this is not production mutation proof.",
+      "next_action": "Keep redeploy/restart blocked from provider execution until separate operator-approved sandbox/no-op mutation proof exists."
+    },
+    {
+      "id": "mutation.sandbox-noop-approval-gate",
+      "category": "mutation-and-audit-execution",
+      "surface": "P4D sandbox/no-op mutation approval packet and verifier",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "docs/xflow-sandbox-noop-mutation-approval-packet.md",
+        "docs/xflow-sandbox-noop-mutation-approval-register.json",
+        "apps/XFlow/scripts/verify-sandbox-noop-mutation-approval.ts",
+        "apps/XFlow/tests/unit/sandbox-noop-mutation-approval.test.ts",
+        "apps/XFlow/.xflow-local-browser-proof/sandbox-noop-mutation-approval/summary.json",
+        "npm run verify:sandbox-noop-mutation-approval"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": true,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "P4D is local approval-gate proof only: current approval is NO-GO and it authorizes 0 sandbox/no-op mutations, 0 real mutations, 0 provider executions, 0 external network calls, and 0 production-readiness claims.",
+      "next_action": "Fill the approval register with exact operator-approved sandbox/no-op values only if a future phase explicitly requests P4E execution."
+    },
+    {
+      "id": "auth.route-api-rbac",
+      "category": "auth-rbac-authority",
+      "surface": "Page auth matrix, API auth matrix, RBAC matrix",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "npm run verify:page-auth-matrix",
+        "npm run verify:api-auth-matrix",
+        "npm run verify:rbac-matrix",
+        "local denied browser proof"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": false,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Static/local proof is complete, but production identity authority is not proven.",
+      "next_action": "For staged proof, use fixture-only users and no production identity data."
+    },
+    {
+      "id": "auth.platform-superadmin-stepup",
+      "category": "auth-rbac-authority",
+      "surface": "Platform superadmin and step-up/MFA proof",
+      "current_status": "requires-staged-smoke",
+      "required_evidence": [
+        "sandbox platform admin fixture",
+        "viewer/member denied fixture",
+        "owner/admin fixture",
+        "step-up or MFA denial where policy applies",
+        "audit-safe auth logs"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local proof covers plain viewer denied and local admin access; production identity authority is not proven.",
+      "next_action": "Plan fixture-only staged auth smoke."
+    },
+    {
+      "id": "privacy.raw-logs-errors-secrets",
+      "category": "data-and-privacy",
+      "surface": "Private emails, customer content, raw logs, raw provider errors, stack traces, tokens, secrets, cookies",
+      "current_status": "production-hard-stop",
+      "required_evidence": [
+        "redaction tests",
+        "browser evidence scan",
+        "DTO field-picking proof",
+        "no raw reveal controls",
+        "operator approval for any sensitive diagnostic path"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Raw secret/log/error reveal must remain forbidden by default in all environments.",
+      "next_action": "Keep raw reveal disabled; prove redacted summaries only."
+    },
+    {
+      "id": "privacy.provider-deployment-trace-ids",
+      "category": "data-and-privacy",
+      "surface": "Provider IDs, deployment IDs, trace IDs, and evidence artifact redaction",
+      "current_status": "requires-external-authority-proof",
+      "required_evidence": [
+        "redacted DTO proof",
+        "artifact scan",
+        "sandbox provider ID handling",
+        "no raw IDs in screenshots or logs"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local fixture IDs are sanitized; real provider ID handling remains unproven.",
+      "next_action": "Use synthetic sandbox IDs and artifact scan in staged smoke."
+    },
+    {
+      "id": "staged.environment-isolation",
+      "category": "staged-nonproduction-readiness",
+      "surface": "Environment isolation, fake/sandbox credentials, no production data, fixture tenants/users/apps",
+      "current_status": "requires-staged-smoke",
+      "required_evidence": [
+        "non-production environment identifier",
+        "no production credentials",
+        "no production data",
+        "fixture tenant and users",
+        "host allowlist",
+        "network guard",
+        "cleanup proof"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "P3M defines but does not execute staged proof.",
+      "next_action": "Request explicit operator approval before any staged smoke."
+    },
+    {
+      "id": "staged.audit-capture-cleanup",
+      "category": "staged-nonproduction-readiness",
+      "surface": "Audit capture, cleanup, teardown, and stop conditions",
+      "current_status": "requires-staged-smoke",
+      "required_evidence": [
+        "audit capture path",
+        "redacted artifacts",
+        "teardown command",
+        "post-teardown verification",
+        "stop conditions"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Cleanup exists locally; staged cleanup remains planned only.",
+      "next_action": "Define staged teardown runbook before staged execution."
+    },
+    {
+      "id": "staged.dry-run-harness",
+      "category": "staged-nonproduction-readiness",
+      "surface": "P3N staged smoke dry-run harness",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "npm run proof:staged-smoke:dry-run",
+        "npm run verify:staged-smoke:dry-run",
+        "apps/XFlow/.xflow-local-browser-proof/staged-smoke-dry-run/summary.json",
+        "apps/XFlow/tests/unit/staged-smoke-dry-run.test.ts"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": false,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Dry-run validates staged-smoke safety configuration locally only; it does not contact providers or prove staged readiness.",
+      "next_action": "Keep dry-run as preflight evidence; require explicit operator approval and safe external configuration before live staged smoke."
+    },
+    {
+      "id": "staged.live-execution",
+      "category": "staged-nonproduction-readiness",
+      "surface": "Approved staged smoke execution",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "docs/xflow-staged-smoke-operator-approval-packet.md",
+        "npm run proof:staged-smoke:approved",
+        "npm run verify:staged-smoke:approved",
+        "apps/XFlow/.xflow-local-browser-proof/staged-smoke-approved/xflow-staged-smoke-run-20260704T103455Z/summary.json",
+        "apps/XFlow/.xflow-local-browser-proof/staged-smoke-approved/xflow-staged-smoke-run-20260704T103455Z/workflows.json",
+        "apps/XFlow/.xflow-local-browser-proof/staged-smoke-approved/xflow-staged-smoke-run-20260704T103455Z/cleanup.json"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": true,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "P3Q executes the approved no-network sandbox/fake staged smoke harness locally; it does not prove external provider authority or production readiness.",
+      "next_action": "Keep provider authority, mutation audit execution, and production readiness blocked until separate external proof exists."
+    },
+    {
+      "id": "staged.operator-approval-packet",
+      "category": "staged-nonproduction-readiness",
+      "surface": "P3O operator approval packet for future live staged smoke",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "docs/xflow-staged-smoke-operator-approval-packet.md",
+        "exact staged non-production environment identity",
+        "approved host allowlist",
+        "fake/sandbox credential proof",
+        "fixture tenant/app/user IDs",
+        "workflow and forbidden workflow lists",
+        "mutation approval boundaries",
+        "cleanup/teardown command",
+        "stop conditions",
+        "before/after evidence checklist",
+        "explicit go/no-go decision"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local packet verification is complete and authorizes a future staged non-production smoke run only; it does not execute staged smoke, contact providers, or prove production readiness.",
+      "next_action": "Use the verified packet as P3Q input only; keep production blocked."
+    },
+    {
+      "id": "staged.operator-approval-packet-verifier",
+      "category": "staged-nonproduction-readiness",
+      "surface": "P3P verifier for the operator approval packet",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "apps/XFlow/scripts/verify-staged-smoke-operator-approval-packet.ts",
+        "apps/XFlow/tests/unit/staged-smoke-operator-approval-packet.test.ts",
+        "npm run verify:staged-smoke-approval-packet",
+        "apps/XFlow/.xflow-local-browser-proof/staged-smoke-approval-packet-verification/summary.json"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": false,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local verifier proves the current packet is GO for future staged non-production smoke only; it does not execute staged smoke, contact providers, or prove production readiness.",
+      "next_action": "Use the verifier as a preflight before any P3Q execution step."
+    },
+    {
+      "id": "staged.host-allowlist-and-network-guard",
+      "category": "staged-nonproduction-readiness",
+      "surface": "Host allowlist and no-network dry-run guard",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "apps/XFlow/scripts/staged-smoke-config.ts",
+        "apps/XFlow/.xflow-local-browser-proof/staged-smoke-dry-run/host-allowlist.json",
+        "apps/XFlow/tests/unit/staged-smoke-dry-run.test.ts"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": false,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Dry-run host validation is local/inert only; no external host is contacted.",
+      "next_action": "Use as a preflight guard before approved staged smoke."
+    },
+    {
+      "id": "staged.fake-sandbox-credential-policy",
+      "category": "staged-nonproduction-readiness",
+      "surface": "Fake/sandbox credential policy and production credential rejection",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "apps/XFlow/scripts/staged-smoke-config.ts",
+        "apps/XFlow/.xflow-local-browser-proof/staged-smoke-dry-run/summary.json",
+        "apps/XFlow/tests/unit/staged-smoke-dry-run.test.ts"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": false,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Dry-run validates policy shape only, never prints raw credential values, and is not production proof.",
+      "next_action": "Require fake/sandbox credential proof before any live staged smoke."
+    },
+    {
+      "id": "staged.operator-approval-gate",
+      "category": "staged-nonproduction-readiness",
+      "surface": "Operator approval gate for staged live and mutation workflows",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "apps/XFlow/.xflow-local-browser-proof/staged-smoke-dry-run/operator-gates.json",
+        "apps/XFlow/tests/unit/staged-smoke-dry-run.test.ts"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": true,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Dry-run proves the gate is closed by default; it does not grant approval and is not production proof.",
+      "next_action": "Require explicit operator approval before live staged smoke or sandbox/no-op mutation proof."
+    },
+    {
+      "id": "provider.authority-readiness-packet",
+      "category": "external-provider-authority",
+      "surface": "P3R external provider authority readiness packet",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "docs/xflow-provider-authority-readiness-packet.md",
+        "docs/xflow-provider-authority-readiness-register.json",
+        "deployment, database/auth, AI/email, and billing/entitlement provider categories",
+        "authorizes_provider_calls false",
+        "authorizes_mutations false",
+        "authorizes_production_readiness false"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": false,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local packet proof defines requirements only; it does not contact providers or prove production readiness.",
+      "next_action": "Use the packet as input for a separate future read-only provider proof approval."
+    },
+    {
+      "id": "provider.authority-readiness-verifier",
+      "category": "external-provider-authority",
+      "surface": "P3R provider authority readiness verifier",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "apps/XFlow/scripts/verify-provider-authority-readiness.ts",
+        "apps/XFlow/tests/unit/provider-authority-readiness.test.ts",
+        "npm run verify:provider-authority-readiness",
+        "apps/XFlow/.xflow-local-browser-proof/provider-authority-readiness/summary.json"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": false,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local verifier checks packet completeness only; it does not authorize provider calls or prove production readiness.",
+      "next_action": "Run before any future read-only provider proof request."
+    },
+    {
+      "id": "provider.future-read-only-proof",
+      "category": "external-provider-authority",
+      "surface": "Future read-only external provider proof",
+      "current_status": "requires-external-authority-proof",
+      "required_evidence": [
+        "explicit operator approval for a named non-production provider",
+        "approved sandbox host allowlist",
+        "sandbox read-only credential source proof",
+        "network guard result",
+        "redacted provider status summary",
+        "artifact redaction scan"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "P3R only prepares requirements; no external provider authority has been queried.",
+      "next_action": "Request separate read-only provider proof approval and keep mutations blocked."
+    },
+    {
+      "id": "provider.future-mutation-proof",
+      "category": "mutation-and-audit-execution",
+      "surface": "Future provider mutation proof",
+      "current_status": "requires-mutation-audit-proof",
+      "required_evidence": [
+        "explicit operator approval naming the sandbox target",
+        "server-side permission proof",
+        "confirmation and reason capture",
+        "audit write proof",
+        "redacted provider response summary",
+        "rollback or safe failure proof"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Provider mutations are not authorized by P3R and remain outside local proof.",
+      "next_action": "Do not plan mutation execution until read-only authority and audit proof boundaries are complete."
+    },
+    {
+      "id": "provider.production-proof-hard-stop",
+      "category": "external-provider-authority",
+      "surface": "Production provider authority proof",
+      "current_status": "production-hard-stop",
+      "required_evidence": [
+        "all local proof complete",
+        "all staged non-production proof complete",
+        "all provider authority proof complete",
+        "all mutation audit proof complete",
+        "production operator approval",
+        "production redaction and rollback evidence"
+      ],
+      "allowed_next_environment": "production",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Production provider proof is blocked; P3R is local preparation only and production readiness remains unclaimable.",
+      "next_action": "Do not run production provider proof until every preceding hard stop is cleared with exact evidence."
+    },
+    {
+      "id": "provider.read-only-proof-runbook",
+      "category": "external-provider-authority",
+      "surface": "P3S read-only provider proof runbook",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "docs/xflow-read-only-provider-proof-runbook.md",
+        "docs/xflow-read-only-provider-proof-approval-register.json",
+        "GO/NO-GO checklist",
+        "current NO-GO result",
+        "no provider calls executed"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": false,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local runbook proof defines the approval gate only; it does not contact providers or prove production readiness.",
+      "next_action": "Use the runbook as input for a separate future operator-filled read-only provider proof approval."
+    },
+    {
+      "id": "provider.read-only-proof-approval-verifier",
+      "category": "external-provider-authority",
+      "surface": "P3S read-only provider proof approval verifier",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "apps/XFlow/scripts/verify-read-only-provider-proof-approval.ts",
+        "apps/XFlow/tests/unit/read-only-provider-proof-approval.test.ts",
+        "npm run verify:read-only-provider-proof-approval",
+        "apps/XFlow/.xflow-local-browser-proof/read-only-provider-proof-approval/summary.json"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": false,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local verifier proves the approval gate is closed as NO-GO; it does not authorize provider calls or prove production readiness.",
+      "next_action": "Rerun only after a human operator supplies exact sandbox values and explicit approval."
+    },
+    {
+      "id": "provider.operator-approved-read-only-proof-execution",
+      "category": "external-provider-authority",
+      "surface": "Future operator-approved read-only provider proof execution",
+      "current_status": "requires-external-authority-proof",
+      "required_evidence": [
+        "approval register status GO",
+        "explicit operator approval",
+        "exact sandbox environment and host",
+        "sandbox credential-source proof",
+        "network guard result",
+        "redacted provider summary",
+        "artifact redaction scan"
+      ],
+      "allowed_next_environment": "staged-nonproduction",
+      "operator_approval_required": true,
+      "can_execute_in_local": false,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "P3U executed only the local inert XFlow deployment abstraction proof; no external provider authority has been queried.",
+      "next_action": "Run real external provider authority proof only in a separate future phase with a non-inert sandbox host, explicit approval, and mutations/production blocked."
+    },
+    {
+      "id": "provider.single-provider-approval-fill",
+      "category": "external-provider-authority",
+      "surface": "P3T single-provider sandbox approval fill for readonly.xflow-deployment-abstraction",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "docs/xflow-read-only-provider-proof-approval-register.json",
+        "readonly.xflow-deployment-abstraction approval_status GO",
+        "exactly one read-only provider call authorization",
+        "apps/XFlow/.xflow-local-browser-proof/read-only-provider-proof-approval/summary.json",
+        "apps/XFlow/tests/unit/read-only-provider-proof-approval.test.ts"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": false,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local approval-fill proof authorizes only a future single-provider sandbox read; it does not contact providers or prove production readiness.",
+      "next_action": "P3U used this as input for local inert proof; keep all other provider rows NO-GO."
+    },
+    {
+      "id": "provider.single-provider-local-inert-proof",
+      "category": "external-provider-authority",
+      "surface": "P3U single-provider local inert read-only proof for readonly.xflow-deployment-abstraction",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "apps/XFlow/scripts/run-read-only-provider-proof.ts",
+        "apps/XFlow/scripts/verify-read-only-provider-proof.ts",
+        "npm run proof:read-only-provider",
+        "npm run verify:read-only-provider-proof",
+        "apps/XFlow/.xflow-local-browser-proof/read-only-provider-proof/readonly.xflow-deployment-abstraction/summary.json",
+        "apps/XFlow/tests/unit/read-only-provider-proof.test.ts"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": false,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Local inert proof checks approval, abstraction metadata, host policy, redaction, and mutation gates only; it does not contact external providers or prove production readiness.",
+      "next_action": "Keep external provider authority, provider mutations, and production readiness blocked until separate non-production external proof exists."
+    },
+    {
+      "id": "provider.real-provider-read-only-approval-packet",
+      "category": "external-provider-authority",
+      "surface": "P3V-Local paused real provider read-only proof track for readonly.vercel",
+      "current_status": "local-proof-complete",
+      "required_evidence": [
+        "docs/xflow-real-provider-read-only-approval-packet.md",
+        "docs/xflow-read-only-provider-proof-approval-register.json",
+        "readonly.vercel approval_status NO-GO",
+        "real provider proof intentionally paused",
+        "authorizes_real_provider_read_only_calls false",
+        "real provider authorization count 0",
+        "npm run verify:read-only-provider-proof-approval",
+        "apps/XFlow/tests/unit/read-only-provider-proof-approval.test.ts"
+      ],
+      "allowed_next_environment": "local",
+      "operator_approval_required": true,
+      "can_execute_in_local": true,
+      "can_execute_in_staging": false,
+      "can_execute_in_production": false,
+      "blocking_reason": "Real provider proof is intentionally paused; verified operator-supplied sandbox values are unavailable, example-derived values are rejected, and local proof is not production proof.",
+      "next_action": "Do not prepare or execute real provider proof until a future phase supplies new verified sandbox values and explicit operator approval."
+    }
+  ]
+}
