@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-07-06T01:00:00Z",
+  "generated_at": "2026-07-06T02:00:00Z",
   "scope": "six production app admin readiness audit",
   "target_apps": [
     "XFlow",
@@ -80,23 +80,29 @@
       "admin_route_page_path": "src/components/dashboard/*; superadmin/platform surfaces in dashboard modules",
       "api_admin_route_path": "control-plane and dashboard API routes under src/app/api",
       "existing_admin_proof_docs": [
+        "docs/admin/VERIXET_ADMIN_FINAL_CLOSEOUT.md",
+        "docs/admin/VERIXET_ADMIN_FINAL_CLOSEOUT.json",
         "docs/final-production-readiness-audit.md",
         "docs/READINESS_AUDIT.md",
         "docs/dashboard-audit.md"
       ],
-      "admin_surface_status": "partial",
-      "local_proof_status": "partial",
-      "auth_rbac_status": "partial",
-      "variant_state_status": "unknown",
-      "mutation_audit_status": "partial",
+      "admin_surface_status": "local-complete",
+      "local_proof_status": "local-complete",
+      "auth_rbac_status": "local-complete",
+      "variant_state_status": "local-complete",
+      "mutation_audit_status": "local-complete",
       "provider_proof_status": "blocked",
       "production_readiness_status": "blocked",
       "real_provider_calls_executed": false,
       "real_mutations_executed": false,
       "remaining_blockers": [
-        "no final admin closeout verifier using the shared status vocabulary",
-        "no six-state admin variant proof register found",
-        "provider/live/billing claims need app-specific admin proof classification before production readiness"
+        "production/staging proof was not run",
+        "provider proof was not run",
+        "billing provider proof was not run",
+        "real billing/provider mutation proof was not run",
+        "deploy/redeploy/restart/sync proof was not run",
+        "production credential and secret handling proof was not run",
+        "live operator approval evidence was not collected"
       ],
       "intentionally_unavailable": [
         "provider proof",
@@ -104,8 +110,8 @@
         "deploy/redeploy/restart",
         "billing/provider mutation"
       ],
-      "recommended_next_action": "create Verixet admin final closeout docs and verifier",
-      "commit_status": "no new changes in this audit"
+      "recommended_next_action": "stop_and_review",
+      "commit_status": "uncommitted"
     },
     {
       "app": "AudAix",
@@ -116,23 +122,29 @@
       "admin_route_page_path": "superadmin/operator dashboard routes and tests under src/routes and tests",
       "api_admin_route_path": "src/routes/superadmin-routes.ts; operator/system-health routes",
       "existing_admin_proof_docs": [
+        "docs/admin/AUDAIX_ADMIN_FINAL_CLOSEOUT.md",
+        "docs/admin/AUDAIX_ADMIN_FINAL_CLOSEOUT.json",
         "docs/audaix-superadmin-gap-audit.md",
         "docs/superadmin-role-assignment-policy.md",
         "docs/superadmin-backend-staging-enablement.md"
       ],
-      "admin_surface_status": "partial",
-      "local_proof_status": "partial",
-      "auth_rbac_status": "partial",
-      "variant_state_status": "unknown",
-      "mutation_audit_status": "partial",
+      "admin_surface_status": "local-complete",
+      "local_proof_status": "local-complete",
+      "auth_rbac_status": "local-complete",
+      "variant_state_status": "local-complete",
+      "mutation_audit_status": "local-complete",
       "provider_proof_status": "blocked",
       "production_readiness_status": "blocked",
       "real_provider_calls_executed": false,
       "real_mutations_executed": false,
       "remaining_blockers": [
-        "no final admin closeout verifier using the shared status vocabulary",
-        "local tests include fixture/log vocabulary, not production proof",
-        "staging superadmin mutation enablement remains separate and was not executed"
+        "production/staging proof was not run",
+        "provider proof was not run",
+        "live Supabase/provider proof was not run",
+        "superadmin staging mutation smoke was not run",
+        "real approval mutation execution proof was not run",
+        "billing provider proof was not run",
+        "deploy/redeploy/restart/sync proof was not run"
       ],
       "intentionally_unavailable": [
         "staging mutation route smoke",
@@ -140,8 +152,8 @@
         "live Supabase/provider proof",
         "deploy/redeploy/restart"
       ],
-      "recommended_next_action": "create AudAix admin final closeout docs and verifier",
-      "commit_status": "no new changes in this audit"
+      "recommended_next_action": "stop_and_review",
+      "commit_status": "uncommitted"
     },
     {
       "app": "WordGeni",
@@ -198,23 +210,29 @@
       "admin_route_page_path": "client/src/pages/superadmin/*",
       "api_admin_route_path": "server/routes/admin-tools.ts; server/routes/superadmin-*.ts",
       "existing_admin_proof_docs": [
+        "docs/admin/RATAIFY_ADMIN_FINAL_CLOSEOUT.md",
+        "docs/admin/RATAIFY_ADMIN_FINAL_CLOSEOUT.json",
         "docs/internal/RBAC_AUDIT_REPORT.md",
         "docs/internal/HARDENING_IMPLEMENTATION_STATUS.md",
         "docs/internal/PROFESSIONALIZATION_AUDIT.md"
       ],
-      "admin_surface_status": "partial",
-      "local_proof_status": "partial",
-      "auth_rbac_status": "partial",
-      "variant_state_status": "unknown",
-      "mutation_audit_status": "partial",
+      "admin_surface_status": "local-complete",
+      "local_proof_status": "local-complete",
+      "auth_rbac_status": "local-complete",
+      "variant_state_status": "local-complete",
+      "mutation_audit_status": "local-complete",
       "provider_proof_status": "blocked",
       "production_readiness_status": "blocked",
       "real_provider_calls_executed": false,
       "real_mutations_executed": false,
       "remaining_blockers": [
-        "no final admin closeout verifier using the shared status vocabulary",
-        "no provider proof register found for admin surfaces",
-        "no six-state admin variant proof register found"
+        "production/staging proof was not run",
+        "provider proof was not run",
+        "live control-plane proof was not run",
+        "live SEO/public proof was not run",
+        "billing provider proof was not run",
+        "real high-risk admin mutation execution proof was not run",
+        "deploy/redeploy/restart/sync proof was not run"
       ],
       "intentionally_unavailable": [
         "live SEO/control-plane proof",
@@ -222,8 +240,8 @@
         "provider/billing mutation",
         "deploy/redeploy/restart"
       ],
-      "recommended_next_action": "create RatAiFy admin final closeout docs and verifier",
-      "commit_status": "no new changes in this audit"
+      "recommended_next_action": "stop_and_review",
+      "commit_status": "uncommitted"
     },
     {
       "app": "CreVux",
@@ -295,6 +313,8 @@
     {
       "app": "Verixet",
       "commands": [
+        "npm run verify:verixet-admin-final-closeout",
+        "node ./node_modules/vitest/vitest.mjs run --configLoader runner src/admin-final-closeout.test.ts",
         "npm run check:app-routes",
         "npm run check:api-contracts",
         "npm run typecheck"
@@ -304,6 +324,8 @@
     {
       "app": "AudAix",
       "commands": [
+        "npm run verify:audaix-admin-final-closeout",
+        "npx vitest run tests/audaix-admin-final-closeout.test.ts",
         "npm run test:ci",
         "npm run typecheck"
       ],
@@ -328,6 +350,8 @@
     {
       "app": "RatAiFy",
       "commands": [
+        "npm run verify:rataify-admin-final-closeout",
+        "npm exec tsx -- --test tests/rataify-admin-final-closeout.node.test.ts",
         "npm run verify:routes",
         "npm run verify:security",
         "npm run typecheck"
