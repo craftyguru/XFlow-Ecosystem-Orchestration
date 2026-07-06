@@ -1,0 +1,351 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-06T01:00:00Z",
+  "scope": "six production app admin readiness audit",
+  "target_apps": [
+    "XFlow",
+    "Verixet",
+    "AudAix",
+    "WordGeni",
+    "RatAiFy",
+    "CreVux"
+  ],
+  "extra_app_directories": [
+    "ASO-Audit-Agent",
+    "PitStrike",
+    "xflow-master-release",
+    "XFlow-phase4b-pr",
+    "XFlow-push-through"
+  ],
+  "global_safety": {
+    "real_provider_calls_executed": false,
+    "real_mutations_executed": false,
+    "production_smoke_executed": false,
+    "staged_smoke_executed": false,
+    "deploy_redeploy_restart_sync_executed": false,
+    "production_readiness_claimed": false
+  },
+  "apps": [
+    {
+      "app": "XFlow",
+      "path": "apps/XFlow",
+      "git_root": "apps/XFlow",
+      "branch": "master",
+      "remote": "origin https://github.com/craftyguru/xflowx.git",
+      "admin_route_page_path": "src/app/(dashboard)/admin/*; src/app/(dashboard)/apps/[slug]/admin/page.tsx",
+      "api_admin_route_path": "src/app/api/admin/*",
+      "existing_admin_proof_docs": [
+        "docs/xflow-admin-tab-final-closeout.md",
+        "docs/xflow-admin-tab-final-closeout.json",
+        "docs/xflow-admin-surface-evidence-matrix.md",
+        "docs/xflow-mutation-audit-proof.md",
+        "docs/xflow-production-hard-stop-register.md"
+      ],
+      "admin_surface_status": "local-complete",
+      "local_proof_status": "local-complete",
+      "auth_rbac_status": "local-complete",
+      "variant_state_status": "local-complete",
+      "mutation_audit_status": "local-complete",
+      "provider_proof_status": "paused",
+      "production_readiness_status": "blocked",
+      "real_provider_calls_executed": false,
+      "real_mutations_executed": false,
+      "remaining_blockers": [
+        "real provider authority proof if production UI claims provider status",
+        "sandbox/no-op mutation execution if launch requires proving admin-triggered action execution",
+        "production/staging environment isolation",
+        "production credential and secret handling proof",
+        "billing/entitlement authority if active",
+        "rollback/safe-failure proof for real deployments"
+      ],
+      "intentionally_unavailable": [
+        "real redeploy",
+        "real restart",
+        "provider sync/connect/refresh",
+        "provider mutation",
+        "billing mutation",
+        "entitlement mutation",
+        "credential mutation",
+        "raw log/provider error reveal"
+      ],
+      "recommended_next_action": "stop_and_review",
+      "commit_status": "pending"
+    },
+    {
+      "app": "Verixet",
+      "path": "apps/Verixet",
+      "git_root": "apps/Verixet",
+      "branch": "main",
+      "remote": "origin https://github.com/craftyguru/verixet.git",
+      "admin_route_page_path": "src/components/dashboard/*; superadmin/platform surfaces in dashboard modules",
+      "api_admin_route_path": "control-plane and dashboard API routes under src/app/api",
+      "existing_admin_proof_docs": [
+        "docs/final-production-readiness-audit.md",
+        "docs/READINESS_AUDIT.md",
+        "docs/dashboard-audit.md"
+      ],
+      "admin_surface_status": "partial",
+      "local_proof_status": "partial",
+      "auth_rbac_status": "partial",
+      "variant_state_status": "unknown",
+      "mutation_audit_status": "partial",
+      "provider_proof_status": "blocked",
+      "production_readiness_status": "blocked",
+      "real_provider_calls_executed": false,
+      "real_mutations_executed": false,
+      "remaining_blockers": [
+        "no final admin closeout verifier using the shared status vocabulary",
+        "no six-state admin variant proof register found",
+        "provider/live/billing claims need app-specific admin proof classification before production readiness"
+      ],
+      "intentionally_unavailable": [
+        "provider proof",
+        "live smoke",
+        "deploy/redeploy/restart",
+        "billing/provider mutation"
+      ],
+      "recommended_next_action": "create Verixet admin final closeout docs and verifier",
+      "commit_status": "no new changes in this audit"
+    },
+    {
+      "app": "AudAix",
+      "path": "apps/AudAix",
+      "git_root": "apps/AudAix",
+      "branch": "main",
+      "remote": "origin https://github.com/craftyguru/AudAiX.git",
+      "admin_route_page_path": "superadmin/operator dashboard routes and tests under src/routes and tests",
+      "api_admin_route_path": "src/routes/superadmin-routes.ts; operator/system-health routes",
+      "existing_admin_proof_docs": [
+        "docs/audaix-superadmin-gap-audit.md",
+        "docs/superadmin-role-assignment-policy.md",
+        "docs/superadmin-backend-staging-enablement.md"
+      ],
+      "admin_surface_status": "partial",
+      "local_proof_status": "partial",
+      "auth_rbac_status": "partial",
+      "variant_state_status": "unknown",
+      "mutation_audit_status": "partial",
+      "provider_proof_status": "blocked",
+      "production_readiness_status": "blocked",
+      "real_provider_calls_executed": false,
+      "real_mutations_executed": false,
+      "remaining_blockers": [
+        "no final admin closeout verifier using the shared status vocabulary",
+        "local tests include fixture/log vocabulary, not production proof",
+        "staging superadmin mutation enablement remains separate and was not executed"
+      ],
+      "intentionally_unavailable": [
+        "staging mutation route smoke",
+        "production verification",
+        "live Supabase/provider proof",
+        "deploy/redeploy/restart"
+      ],
+      "recommended_next_action": "create AudAix admin final closeout docs and verifier",
+      "commit_status": "no new changes in this audit"
+    },
+    {
+      "app": "WordGeni",
+      "path": "apps/WordGeni",
+      "git_root": "apps/WordGeni",
+      "branch": "main",
+      "remote": "origin https://github.com/craftyguru/WordGeni.git",
+      "admin_route_page_path": "apps/web/src/app/(dashboard)/admin/page.tsx",
+      "api_admin_route_path": "apps/api/src/routes/admin.ts",
+      "existing_admin_proof_docs": [
+        "docs/admin/WORDGENI_ADMIN_FINAL_CLOSEOUT.md",
+        "docs/admin/WORDGENI_ADMIN_FINAL_CLOSEOUT.json",
+        "docs/admin/WORDGENI_ADMIN_LOCAL_PROOF.md",
+        "docs/admin/WORDGENI_ADMIN_LOCAL_PROOF_REGISTER.json",
+        "docs/admin/WORDGENI_ADMIN_AUTH_RBAC_PROOF.md",
+        "docs/admin/WORDGENI_ADMIN_MUTATION_AUDIT_PROOF.md",
+        "docs/admin/WORDGENI_ADMIN_PROVIDER_DECISION_PROOF.md",
+        "docs/admin/WORDGENI_ADMIN_VARIANT_PROOF.md"
+      ],
+      "admin_surface_status": "local-complete",
+      "local_proof_status": "local-complete",
+      "auth_rbac_status": "local-complete",
+      "variant_state_status": "local-complete",
+      "mutation_audit_status": "local-complete",
+      "provider_proof_status": "not-needed-now",
+      "production_readiness_status": "blocked",
+      "real_provider_calls_executed": false,
+      "real_mutations_executed": false,
+      "remaining_blockers": [
+        "production readiness",
+        "real provider execution proof if future UI reintroduces provider claims",
+        "real incident resolve execution proof",
+        "staging or production smoke",
+        "billing/entitlement or provider mutation proof",
+        "broader launch proof outside admin dashboard"
+      ],
+      "intentionally_unavailable": [
+        "provider sync/connect/refresh",
+        "credential mutation",
+        "billing/entitlement mutation",
+        "refund/delete/suspend/impersonation",
+        "raw prompt/response/log/error reveal",
+        "production deployment status claims"
+      ],
+      "recommended_next_action": "stop_and_review",
+      "commit_status": "pending"
+    },
+    {
+      "app": "RatAiFy",
+      "path": "apps/RatAiFy",
+      "git_root": "apps/RatAiFy",
+      "branch": "main",
+      "remote": "origin https://github.com/craftyguru/Rataify.git",
+      "admin_route_page_path": "client/src/pages/superadmin/*",
+      "api_admin_route_path": "server/routes/admin-tools.ts; server/routes/superadmin-*.ts",
+      "existing_admin_proof_docs": [
+        "docs/internal/RBAC_AUDIT_REPORT.md",
+        "docs/internal/HARDENING_IMPLEMENTATION_STATUS.md",
+        "docs/internal/PROFESSIONALIZATION_AUDIT.md"
+      ],
+      "admin_surface_status": "partial",
+      "local_proof_status": "partial",
+      "auth_rbac_status": "partial",
+      "variant_state_status": "unknown",
+      "mutation_audit_status": "partial",
+      "provider_proof_status": "blocked",
+      "production_readiness_status": "blocked",
+      "real_provider_calls_executed": false,
+      "real_mutations_executed": false,
+      "remaining_blockers": [
+        "no final admin closeout verifier using the shared status vocabulary",
+        "no provider proof register found for admin surfaces",
+        "no six-state admin variant proof register found"
+      ],
+      "intentionally_unavailable": [
+        "live SEO/control-plane proof",
+        "production smoke",
+        "provider/billing mutation",
+        "deploy/redeploy/restart"
+      ],
+      "recommended_next_action": "create RatAiFy admin final closeout docs and verifier",
+      "commit_status": "no new changes in this audit"
+    },
+    {
+      "app": "CreVux",
+      "path": "apps/CreVux",
+      "git_root": "apps/CreVux",
+      "branch": "main",
+      "remote": "origin https://github.com/craftyguru/Crevux.git",
+      "admin_route_page_path": "artifacts/image-gen/src/pages/AdminDashboardPage.tsx",
+      "api_admin_route_path": "artifacts/api-server admin/internal routes",
+      "existing_admin_proof_docs": [
+        "docs/admin/CREVUX_ADMIN_FINAL_CLOSEOUT.md",
+        "docs/admin/CREVUX_ADMIN_FINAL_CLOSEOUT.json",
+        "docs/admin/CREVUX_ADMIN_LOCAL_PROOF.md",
+        "docs/admin/CREVUX_ADMIN_LOCAL_PROOF_REGISTER.json",
+        "docs/admin/ADMIN_DASHBOARD_AUDIT.md"
+      ],
+      "admin_surface_status": "local-complete",
+      "local_proof_status": "local-complete",
+      "auth_rbac_status": "local-complete",
+      "variant_state_status": "local-complete",
+      "mutation_audit_status": "local-complete",
+      "provider_proof_status": "not-needed-now",
+      "production_readiness_status": "blocked",
+      "real_provider_calls_executed": false,
+      "real_mutations_executed": false,
+      "remaining_blockers": [
+        "production readiness",
+        "real provider execution proof if future UI reintroduces provider claims",
+        "real incident resolve execution proof",
+        "staging or production smoke",
+        "billing/entitlement or provider mutation proof",
+        "raw diagnostic reveal policy if needed",
+        "broader launch proof outside admin dashboard"
+      ],
+      "intentionally_unavailable": [
+        "provider sync/connect/refresh",
+        "credential mutation",
+        "billing/entitlement mutation",
+        "refund/delete/suspend/impersonation",
+        "raw prompt/response/log/error reveal",
+        "production deployment status claims"
+      ],
+      "recommended_next_action": "stop_and_review",
+      "commit_status": "no new changes in this audit"
+    }
+  ],
+  "validation_summary": [
+    {
+      "app": "XFlow",
+      "commands": [
+        "npm run verify:admin-tab-final-closeout",
+        "npm run verify:production-readiness-triage",
+        "npm run verify:production-hard-stops",
+        "npm run verify:mutation-audit-proof",
+        "npm run verify:sandbox-noop-mutation-approval",
+        "npm run verify:deployment-action-server-contract",
+        "npm run verify:read-only-provider-proof-approval",
+        "npm run verify:read-only-provider-proof",
+        "npm run verify:provider-authority-readiness",
+        "npm run verify:admin-surface-matrix",
+        "npm run verify:routes",
+        "npm run verify:page-auth-matrix",
+        "npm run verify:api-auth-matrix",
+        "npm run verify:rbac-matrix",
+        "npm run typecheck"
+      ],
+      "result": "pass"
+    },
+    {
+      "app": "Verixet",
+      "commands": [
+        "npm run check:app-routes",
+        "npm run check:api-contracts",
+        "npm run typecheck"
+      ],
+      "result": "pass"
+    },
+    {
+      "app": "AudAix",
+      "commands": [
+        "npm run test:ci",
+        "npm run typecheck"
+      ],
+      "result": "pass"
+    },
+    {
+      "app": "WordGeni",
+      "commands": [
+        "pnpm run verify:wordgeni-admin-final-closeout",
+        "pnpm run verify:wordgeni-admin-local-proof",
+        "pnpm run verify:wordgeni-admin-auth-proof",
+        "pnpm run verify:wordgeni-admin-variant-proof",
+        "pnpm run verify:wordgeni-admin-mutation-proof",
+        "pnpm run verify:wordgeni-admin-provider-decision",
+        "pnpm --dir apps/api exec vitest run src/wordgeni-admin-final-closeout.test.ts src/routes/admin.route.test.ts src/routes/admin.incident-resolve.audit.route.test.ts src/services/admin-redaction.test.ts",
+        "pnpm --dir apps/web exec vitest run \"src/app/(dashboard)/admin/admin-dashboard.test.ts\" \"src/app/(dashboard)/admin/admin-dashboard-variants.test.ts\"",
+        "pnpm --dir apps/api typecheck",
+        "pnpm --dir apps/web typecheck"
+      ],
+      "result": "pass"
+    },
+    {
+      "app": "RatAiFy",
+      "commands": [
+        "npm run verify:routes",
+        "npm run verify:security",
+        "npm run typecheck"
+      ],
+      "result": "pass"
+    },
+    {
+      "app": "CreVux",
+      "commands": [
+        "pnpm run verify:crevux-admin-final-closeout",
+        "pnpm run verify:crevux-admin-local-proof",
+        "pnpm --filter @workspace/api-server exec tsx ./scripts/verify-admin-role-guards.ts",
+        "pnpm --filter @workspace/image-gen exec vitest run src/pages/AdminDashboardPage.test.tsx",
+        "pnpm --filter @workspace/api-server exec vitest run src/__tests__/crevux-admin-final-closeout.test.ts",
+        "pnpm --filter @workspace/image-gen run typecheck",
+        "pnpm --filter @workspace/api-server run typecheck"
+      ],
+      "result": "pass"
+    }
+  ]
+}

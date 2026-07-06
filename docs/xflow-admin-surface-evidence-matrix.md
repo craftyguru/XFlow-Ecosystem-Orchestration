@@ -1,6 +1,6 @@
 # XFlow Admin Surface Evidence Matrix
 
-Generated: 2026-07-05T09:34:06.177Z
+Generated: 2026-07-06T00:48:17.573Z
 
 Scope: local-only browser proof. This matrix does not use or prove staging, production, remote provider APIs, deployment execution, billing, entitlement, provider credential, or control-plane mutation behavior.
 
