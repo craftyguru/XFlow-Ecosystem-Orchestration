@@ -1,0 +1,222 @@
+[
+  {
+    "id": "xflow-u1-dashboard-overview-render",
+    "area": "dashboard",
+    "surface": "Dashboard overview",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/overview/page.tsx",
+    "proof_status": "proved-local",
+    "risk": "medium",
+    "evidence": "Route exists, is protected by dashboard layout, and is covered by primary route/auth matrix verification.",
+    "remaining_gap": "No fresh browser screenshot proof was run in U1.",
+    "next_action": "Run U-FINAL browser proof only after U1 static gates pass."
+  },
+  {
+    "id": "xflow-u1-dashboard-denied-unauthenticated",
+    "area": "auth",
+    "surface": "Unauthenticated dashboard access",
+    "route_or_file": "apps/XFlow/src/middleware.ts; apps/XFlow/tests/smoke/primary-journeys.test.ts",
+    "proof_status": "proved-denied",
+    "risk": "high",
+    "evidence": "Dashboard paths are protected by middleware routing and primary journey tests assert protected routing for main dashboard destinations.",
+    "remaining_gap": "No browser login session proof was run in this U1 pass.",
+    "next_action": "Keep route/auth matrix checks in the required validation set."
+  },
+  {
+    "id": "xflow-u1-apps-list-and-detail",
+    "area": "apps",
+    "surface": "Apps list and app detail pages",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/apps/page.tsx; apps/XFlow/src/app/(dashboard)/apps/[slug]/page.tsx",
+    "proof_status": "proved-local",
+    "risk": "medium",
+    "evidence": "Route files exist and navigation smoke coverage maps main app detail tabs to real page files.",
+    "remaining_gap": "No live provider or app connection status proof was run.",
+    "next_action": "Keep app status language scoped to setup/readiness signals until provider proof is approved."
+  },
+  {
+    "id": "xflow-u1-tools-directory",
+    "area": "tools",
+    "surface": "Tools directory and tool groups",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/tools/page.tsx; apps/XFlow/src/app/(dashboard)/tools/groups/*/page.tsx",
+    "proof_status": "proved-local",
+    "risk": "medium",
+    "evidence": "Tool routes exist under the protected dashboard surface and are included in route integrity checks.",
+    "remaining_gap": "Individual tool runtime behavior still needs feature-level local proof.",
+    "next_action": "Run U3 for AI Context Engine and Chronicle connectedness."
+  },
+  {
+    "id": "xflow-u1-settings-profile-workspace",
+    "area": "settings",
+    "surface": "Workspace settings",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/settings/page.tsx",
+    "proof_status": "proved-local",
+    "risk": "medium",
+    "evidence": "Settings route and sections are present for diagnostics, sessions, security health, and workspace administration.",
+    "remaining_gap": "Mutation flows were not executed in U1.",
+    "next_action": "Use U2 to prove account/settings mutations with local fixtures and explicit mutation scope."
+  },
+  {
+    "id": "xflow-u1-settings-security",
+    "area": "settings",
+    "surface": "Security settings",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/settings/security/page.tsx",
+    "proof_status": "proved-local",
+    "risk": "high",
+    "evidence": "Security route exists and is covered by page/auth/RBAC matrices.",
+    "remaining_gap": "MFA/passkey enrollment and destructive session actions were not executed.",
+    "next_action": "Keep security mutation execution for U2 with local approval only."
+  },
+  {
+    "id": "xflow-u1-billing-boundary",
+    "area": "billing",
+    "surface": "Billing setup and checkout boundary",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/billing/xflow-setup/page.tsx; apps/XFlow/src/app/(dashboard)/billing/checkout/page.tsx; apps/XFlow/docs/xflow-verixet-entitlement-integration.md",
+    "proof_status": "proved-degraded",
+    "risk": "high",
+    "evidence": "Billing surfaces route through XFlow setup and Verixet boundary documentation; provider calls were not run.",
+    "remaining_gap": "Stripe/Verixet provider proof is still required before paid, active, or provider-verified billing claims.",
+    "next_action": "U4 billing/entitlement boundary proof with provider calls still disabled unless separately approved."
+  },
+  {
+    "id": "xflow-u1-entitlement-gates",
+    "area": "billing",
+    "surface": "Entitlement and usage gates",
+    "route_or_file": "apps/XFlow/src/lib/verixet/xflow-entitlements.ts; apps/XFlow/src/lib/pricing/pricing-entitlements.ts",
+    "proof_status": "proved-local",
+    "risk": "high",
+    "evidence": "Local entitlement helpers and pricing entitlement modules exist; local tests cover entitlement-oriented service boundaries.",
+    "remaining_gap": "No external Verixet entitlement snapshot was queried.",
+    "next_action": "Classify as provider-proof-needed until Verixet evidence is approved."
+  },
+  {
+    "id": "xflow-u1-provider-integrations-boundary",
+    "area": "provider",
+    "surface": "Integrations and provider pages",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/apps/[slug]/integrations/page.tsx; apps/XFlow/src/app/(dashboard)/apps/[slug]/config/page.tsx",
+    "proof_status": "proved-degraded",
+    "risk": "high",
+    "evidence": "Provider-facing copy now uses setup/config/readiness wording for unproven states.",
+    "remaining_gap": "No provider connect, refresh, sync, or verification action was executed.",
+    "next_action": "U5 provider status proof if product launch requires provider status claims."
+  },
+  {
+    "id": "xflow-u1-deployments-boundary",
+    "area": "provider",
+    "surface": "Deployments pages and actions",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/deployments/page.tsx; apps/XFlow/src/app/(dashboard)/apps/[slug]/deployments/page.tsx",
+    "proof_status": "intentionally-unavailable",
+    "risk": "high",
+    "evidence": "U1 did not execute deployment, redeploy, restart, or sync actions.",
+    "remaining_gap": "Deployment mutation proof remains outside U1.",
+    "next_action": "Require explicit U5/U-FINAL approval before any deployment-related action proof."
+  },
+  {
+    "id": "xflow-u1-empty-state-dashboard",
+    "area": "dashboard",
+    "surface": "Dashboard empty state",
+    "route_or_file": "apps/XFlow/tests/unit/workspace-dashboard-summary.test.ts",
+    "proof_status": "proved-empty",
+    "risk": "medium",
+    "evidence": "Workspace dashboard summary test covers unavailable states when telemetry does not exist yet.",
+    "remaining_gap": "No browser screenshot assertion was run.",
+    "next_action": "Keep empty-state assertions in local unit coverage."
+  },
+  {
+    "id": "xflow-u1-loading-state",
+    "area": "dashboard",
+    "surface": "Dashboard loading state",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/loading.tsx",
+    "proof_status": "proved-local",
+    "risk": "low",
+    "evidence": "Dashboard loading route exists and is pinned in primary journey shell manifest coverage.",
+    "remaining_gap": "No visual animation/browser proof was run.",
+    "next_action": "Browser proof can inspect loading state later if needed."
+  },
+  {
+    "id": "xflow-u1-error-state",
+    "area": "dashboard",
+    "surface": "Dashboard error state",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/error.tsx; apps/XFlow/src/app/error.tsx",
+    "proof_status": "proved-error",
+    "risk": "medium",
+    "evidence": "Dashboard and global error routes exist and are pinned in shell manifest coverage.",
+    "remaining_gap": "No forced browser error proof was run.",
+    "next_action": "Keep raw error and stack trace exposure blocked in verifier."
+  },
+  {
+    "id": "xflow-u1-provider-unavailable-state",
+    "area": "provider",
+    "surface": "Provider unavailable/degraded state",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/apps/[slug]/metrics/page.tsx; apps/XFlow/src/app/(dashboard)/apps/[slug]/jobs/page.tsx; apps/XFlow/src/app/(dashboard)/apps/[slug]/logs/page.tsx",
+    "proof_status": "proved-degraded",
+    "risk": "high",
+    "evidence": "Panels now state that control-plane fetches are not provider proof and require verified routes before fetching.",
+    "remaining_gap": "Provider proof was not executed.",
+    "next_action": "Keep provider labels guarded by verifier."
+  },
+  {
+    "id": "xflow-u1-privacy-log-redaction",
+    "area": "privacy",
+    "surface": "User-facing logs page",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/apps/[slug]/logs/page.tsx",
+    "proof_status": "proved-redacted",
+    "risk": "high",
+    "evidence": "Correlation IDs are not rendered and sensitive metadata keys are redacted before display.",
+    "remaining_gap": "Raw persisted log storage was not audited in U1.",
+    "next_action": "U6 should extend redaction proof across API responses and persistence."
+  },
+  {
+    "id": "xflow-u1-support-status-help",
+    "area": "support",
+    "surface": "Support, status, and help pages",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/help/ecosystem-guide/page.tsx; apps/XFlow/src/app/(showcase)/support/page.tsx; apps/XFlow/src/app/(showcase)/status/page.tsx",
+    "proof_status": "proved-local",
+    "risk": "low",
+    "evidence": "Support, status, and help route files exist and are static/local in U1.",
+    "remaining_gap": "No email/SMS/support-provider delivery was triggered.",
+    "next_action": "Keep support notification provider proof out of U1."
+  },
+  {
+    "id": "xflow-u1-developer-pages",
+    "area": "developer",
+    "surface": "Developer console pages",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/developer/*/page.tsx",
+    "proof_status": "proved-local",
+    "risk": "high",
+    "evidence": "Developer routes exist for API keys, usage, webhooks, docs, and billing limits.",
+    "remaining_gap": "API key and webhook mutations were not executed.",
+    "next_action": "Keep credential actions blocked until an explicit U2/U3 mutation proof phase."
+  },
+  {
+    "id": "xflow-u1-ai-tools-boundary",
+    "area": "tools",
+    "surface": "AI Context Engine and Copilot surfaces",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/tools/ai-context-engine/*/page.tsx; apps/XFlow/src/app/(dashboard)/copilot/page.tsx",
+    "proof_status": "proved-degraded",
+    "risk": "high",
+    "evidence": "AI tool routes exist and local tests cover AI Context Engine contracts; no AI provider call was run.",
+    "remaining_gap": "Provider-backed AI generation and RAG checks remain unproved.",
+    "next_action": "Use U3 with AI provider disabled fixtures."
+  },
+  {
+    "id": "xflow-u1-user-facing-api-boundary",
+    "area": "api",
+    "surface": "Dashboard user-facing APIs",
+    "route_or_file": "apps/XFlow/src/app/api/dashboard/*; apps/XFlow/src/app/api/v1/*; apps/XFlow/scripts/verify-api-auth-matrix.ts",
+    "proof_status": "proved-local",
+    "risk": "high",
+    "evidence": "API auth matrix and route verifiers are required U1 validation gates.",
+    "remaining_gap": "Full response-body privacy proof is deferred to U6.",
+    "next_action": "Run api auth matrix and redaction-focused tests before final closeout."
+  },
+  {
+    "id": "xflow-u1-production-readiness-boundary",
+    "area": "readiness",
+    "surface": "Production readiness claim boundary",
+    "route_or_file": "docs/xflow-user-dashboard-local-proof.md",
+    "proof_status": "blocked",
+    "risk": "high",
+    "evidence": "U1 is local-only; production/staging smoke, provider calls, billing calls, and deployment actions were not run.",
+    "remaining_gap": "Production readiness remains not claimable.",
+    "next_action": "Do not claim production readiness until U-FINAL with approved external proof."
+  }
+]

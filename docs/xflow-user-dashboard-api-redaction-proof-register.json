@@ -1,0 +1,176 @@
+[
+  {
+    "id": "xflow-u4-api-dashboard-summary",
+    "area": "dashboard",
+    "surface": "Dashboard overview API",
+    "method": "GET",
+    "endpoint": "/api/dashboard/summary",
+    "route_or_file": "apps/XFlow/src/app/api/dashboard/summary/route.ts",
+    "classification": "locally-api-redaction-proved",
+    "evidence": "Loopback fixture-auth GET was exercised and the response shape passed the U4 sensitive key/value scanner.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u4-api-redaction/api-redaction-summary.json"
+    ],
+    "remaining_gap": "This does not prove external runtime authority.",
+    "next_action": "Keep provider and production claims outside U4."
+  },
+  {
+    "id": "xflow-u4-api-app-summary",
+    "area": "apps",
+    "surface": "App detail summary API",
+    "method": "GET",
+    "endpoint": "/api/dashboard/apps/xflow-local-proof-app/summary",
+    "route_or_file": "apps/XFlow/src/app/api/dashboard/apps/[slug]/summary/route.ts",
+    "classification": "locally-api-redaction-proved",
+    "evidence": "Loopback fixture-auth GET was exercised for the disposable local app slug and passed redaction scanning.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u4-api-redaction/api-redaction-summary.json"
+    ],
+    "remaining_gap": "This does not prove external app telemetry authority.",
+    "next_action": "Keep external app authority classified separately."
+  },
+  {
+    "id": "xflow-u4-api-dashboard-activity",
+    "area": "dashboard",
+    "surface": "Dashboard jobs, alerts, incidents, and timeline APIs",
+    "method": "GET",
+    "endpoint": "/api/dashboard/jobs; /api/dashboard/alerts; /api/dashboard/incidents; /api/dashboard/timeline",
+    "route_or_file": "apps/XFlow/src/app/api/dashboard/{jobs,alerts,incidents,timeline}/route.ts",
+    "classification": "locally-api-redaction-proved",
+    "evidence": "Loopback fixture-auth GETs were exercised for dashboard activity endpoints and response shapes passed redaction scanning.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u4-api-redaction/api-redaction-summary.json"
+    ],
+    "remaining_gap": "No provider job, alert, incident, or timeline authority is proved.",
+    "next_action": "Keep activity evidence scoped to local fixture API responses."
+  },
+  {
+    "id": "xflow-u4-api-developer-read-only",
+    "area": "developer",
+    "surface": "Developer apps, API key list, usage, and request log APIs",
+    "method": "GET",
+    "endpoint": "/api/developer/apps; /api/developer/api-keys; /api/developer/usage; /api/developer/request-logs",
+    "route_or_file": "apps/XFlow/src/app/api/developer/*/route.ts",
+    "classification": "locally-api-redaction-proved",
+    "evidence": "Loopback fixture-auth GETs were exercised. The scanner allows safe key prefixes and IDs while failing raw credential-shaped keys or values.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u4-api-redaction/api-redaction-summary.json"
+    ],
+    "remaining_gap": "Credential create, rotate, revoke, and reveal behavior is not proved.",
+    "next_action": "Keep credential lifecycle routes classified as mutation-proof-not-executed."
+  },
+  {
+    "id": "xflow-u4-api-settings-session",
+    "area": "settings",
+    "surface": "Session and workspace/user read-only APIs",
+    "method": "GET",
+    "endpoint": "/api/auth/sessions; /api/ecosystem/session; /api/ecosystem/apps; /api/ecosystem/entitlements",
+    "route_or_file": "apps/XFlow/src/app/api/auth/sessions/route.ts; apps/XFlow/src/app/api/ecosystem/*/route.ts",
+    "classification": "locally-api-redaction-proved",
+    "evidence": "Loopback fixture-auth GETs were exercised and passed response redaction scanning.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u4-api-redaction/api-redaction-summary.json"
+    ],
+    "remaining_gap": "Session revocation, workspace changes, and entitlement authority are not proved.",
+    "next_action": "Keep write paths and external entitlement authority outside U4."
+  },
+  {
+    "id": "xflow-u4-api-tools-chronicle-ai",
+    "area": "tools",
+    "surface": "Chronicle and AI Context Engine read-only APIs",
+    "method": "GET",
+    "endpoint": "/api/chronicle/events; /api/chronicle/devices; /api/chronicle/sources; /api/chronicle/privacy; /api/v1/ai/overview; /api/v1/ai/apps",
+    "route_or_file": "apps/XFlow/src/app/api/chronicle/*/route.ts; apps/XFlow/src/app/api/v1/ai/*/route.ts",
+    "classification": "locally-api-redaction-proved",
+    "evidence": "Loopback fixture-auth GETs were exercised for read-only Chronicle and AI Context Engine endpoints and passed redaction scanning.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u4-api-redaction/api-redaction-summary.json"
+    ],
+    "remaining_gap": "AI execution, generation, RAG runs, Chronicle writes, and retention mutations are not proved.",
+    "next_action": "Keep tool mutations and model-provider behavior outside U4."
+  },
+  {
+    "id": "xflow-u4-api-ai-settings-rbac-boundary",
+    "area": "tools",
+    "surface": "AI Context Engine settings API",
+    "method": "GET",
+    "endpoint": "/api/v1/ai/settings",
+    "route_or_file": "apps/XFlow/src/app/api/v1/ai/settings/route.ts",
+    "classification": "auth-required-not-exercised",
+    "evidence": "The local fixture account reached an RBAC boundary for this settings API, so U4 does not claim a successful settings response redaction proof.",
+    "evidence_artifacts": [],
+    "remaining_gap": "AI settings response redaction remains unproved for an authorized local role.",
+    "next_action": "Use a disposable local role fixture with explicit AI settings authority before exercising this route."
+  },
+  {
+    "id": "xflow-u4-api-integration-setup",
+    "area": "provider",
+    "surface": "Integration setup/readiness APIs",
+    "method": "GET",
+    "endpoint": "/api/apps/xflow-local-proof-app/integrations/readiness; /api/apps/xflow-local-proof-app/rataify/setup-state",
+    "route_or_file": "apps/XFlow/src/app/api/apps/[appSlug]/integrations/readiness/route.ts; apps/XFlow/src/app/api/apps/[appSlug]/rataify/setup-state/route.ts",
+    "classification": "locally-api-redaction-proved",
+    "evidence": "Loopback fixture-auth GETs were exercised without debug mode and passed redaction scanning for setup/readiness response shapes.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u4-api-redaction/api-redaction-summary.json"
+    ],
+    "remaining_gap": "External integration authority remains unproved.",
+    "next_action": "Keep provider verification and debug diagnostics outside U4."
+  },
+  {
+    "id": "xflow-u4-api-billing-status",
+    "area": "billing",
+    "surface": "Billing status read-only API",
+    "method": "GET",
+    "endpoint": "/api/billing/status",
+    "route_or_file": "apps/XFlow/src/app/api/billing/status/route.ts",
+    "classification": "locally-api-redaction-proved",
+    "evidence": "Loopback fixture-auth GET was exercised and passed redaction scanning.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u4-api-redaction/api-redaction-summary.json"
+    ],
+    "remaining_gap": "Billing provider, checkout, portal, invoice, plan authority, and paid state are not proved.",
+    "next_action": "Keep billing authority classified as provider-proof-needed."
+  },
+  {
+    "id": "xflow-u4-api-deployment-logs",
+    "area": "provider",
+    "surface": "Deployment provider logs API",
+    "method": "GET",
+    "endpoint": "/api/deployments/[id]/logs",
+    "route_or_file": "apps/XFlow/src/app/api/deployments/[id]/logs/route.ts",
+    "classification": "provider-proof-needed",
+    "evidence": "U4 did not exercise provider log retrieval because that route can depend on deployment/provider log authority.",
+    "evidence_artifacts": [],
+    "remaining_gap": "Provider log redaction remains unproved.",
+    "next_action": "Use a separately approved provider-safe proof before exercising provider log APIs."
+  },
+  {
+    "id": "xflow-u4-api-debug-diagnostics",
+    "area": "provider",
+    "surface": "Debug diagnostics with environment-name metadata",
+    "method": "GET",
+    "endpoint": "/api/apps/[appSlug]/rataify/setup-state?debug=1; /api/admin/env-doctor; /api/diagnostics",
+    "route_or_file": "apps/XFlow/src/app/api/apps/[appSlug]/rataify/setup-state/route.ts; apps/XFlow/src/app/api/admin/env-doctor/route.ts; apps/XFlow/src/app/api/diagnostics/route.ts",
+    "classification": "auth-required-not-exercised",
+    "evidence": "U4 did not exercise debug or admin diagnostics endpoints as user-dashboard API proof.",
+    "evidence_artifacts": [],
+    "remaining_gap": "Debug/admin diagnostic redaction is outside this user-dashboard U4 scope.",
+    "next_action": "Keep debug/admin diagnostics behind separate operator proof and redaction review."
+  },
+  {
+    "id": "xflow-u4-api-mutation-routes",
+    "area": "settings",
+    "surface": "Account, settings, security, credential, workspace, provider, billing, and AI mutation APIs",
+    "method": "POST",
+    "endpoint": "apps/XFlow/src/app/api/** mutation routes",
+    "route_or_file": "apps/XFlow/src/app/api/**/route.ts",
+    "classification": "mutation-proof-not-executed",
+    "evidence": "U4 exercised read-only API GETs only. No mutation request was sent.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u4-api-redaction/api-redaction-summary.json"
+    ],
+    "remaining_gap": "Mutation response redaction and mutation behavior are not proved.",
+    "next_action": "Require explicit local mutation scope before exercising write APIs."
+  }
+]

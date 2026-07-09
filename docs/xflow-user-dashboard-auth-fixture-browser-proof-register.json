@@ -1,0 +1,148 @@
+[
+  {
+    "id": "xflow-u3-dashboard-overview",
+    "area": "dashboard",
+    "surface": "Dashboard overview",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/overview/page.tsx",
+    "classification": "locally-auth-fixture-browser-proved",
+    "evidence": "Loopback browser capture using the local browser proof storage-state fixture rendered the signed-in overview with disposable fixture workspace context only.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/screenshots/u3-fixture-auth-overview.png",
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/browser-proof-summary.json"
+    ],
+    "remaining_gap": "This fixture evidence does not prove external runtime state.",
+    "next_action": "Keep external runtime claims classified outside U3."
+  },
+  {
+    "id": "xflow-u3-apps-list",
+    "area": "apps",
+    "surface": "Apps list",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/apps/page.tsx",
+    "classification": "locally-auth-fixture-browser-proved",
+    "evidence": "Loopback browser capture rendered the apps command center with the disposable local fixture app and workspace context.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/screenshots/u3-fixture-auth-apps-list.png"
+    ],
+    "remaining_gap": "The fixture app is not real user or external app state.",
+    "next_action": "Use provider-proof-needed for any external app-state assertion."
+  },
+  {
+    "id": "xflow-u3-app-detail",
+    "area": "apps",
+    "surface": "App detail page",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/apps/[slug]/page.tsx",
+    "classification": "locally-auth-fixture-browser-proved",
+    "evidence": "Loopback browser capture rendered the app detail page for the disposable local proof app slug.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/screenshots/u3-fixture-auth-app-detail.png"
+    ],
+    "remaining_gap": "No external app runtime, telemetry authority, or customer app record is proved.",
+    "next_action": "Keep app detail status wording bounded to local fixture evidence."
+  },
+  {
+    "id": "xflow-u3-tools-directory",
+    "area": "tools",
+    "surface": "Tools directory",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/tools/page.tsx",
+    "classification": "locally-auth-fixture-browser-proved",
+    "evidence": "Loopback browser capture rendered the authenticated tools directory under fixture auth.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/screenshots/u3-fixture-auth-tools.png"
+    ],
+    "remaining_gap": "AI generation, RAG execution, and third-party tool behavior were not executed.",
+    "next_action": "Keep AI and external tool runtime proof separate from U3."
+  },
+  {
+    "id": "xflow-u3-developer-surface",
+    "area": "developer",
+    "surface": "Developer surface",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/developer/page.tsx",
+    "classification": "locally-auth-fixture-browser-proved",
+    "evidence": "Loopback browser capture rendered the developer console surface with fixture auth and did not create, rotate, revoke, or expose credentials.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/screenshots/u3-fixture-auth-developer.png"
+    ],
+    "remaining_gap": "Credential lifecycle behavior is not proved.",
+    "next_action": "Keep API key and webhook actions in mutation-proof-not-executed unless separately approved."
+  },
+  {
+    "id": "xflow-u3-settings-security-read-only",
+    "area": "settings",
+    "surface": "Settings and security read-only pages",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/settings/page.tsx; apps/XFlow/src/app/(dashboard)/settings/security/page.tsx",
+    "classification": "locally-auth-fixture-browser-proved",
+    "evidence": "Loopback browser capture rendered settings and security pages with fixture auth. No forms or security actions were submitted.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/screenshots/u3-fixture-auth-settings.png",
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/screenshots/u3-fixture-auth-security.png"
+    ],
+    "remaining_gap": "MFA, passkey, session, account, and workspace changes were not executed.",
+    "next_action": "Keep settings/security proof read-only unless a later local mutation phase is approved."
+  },
+  {
+    "id": "xflow-u3-support-status-help-logs",
+    "area": "support",
+    "surface": "Help, support, status, and logs surfaces",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/help/ecosystem-guide/page.tsx; apps/XFlow/src/app/(showcase)/support/page.tsx; apps/XFlow/src/app/(showcase)/status/page.tsx; apps/XFlow/src/app/(dashboard)/apps/[slug]/logs/page.tsx",
+    "classification": "locally-auth-fixture-browser-proved",
+    "evidence": "Loopback browser capture covered authenticated help/logs plus local public support and status pages. No support delivery or notification provider was triggered.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/screenshots/u3-fixture-auth-help.png",
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/screenshots/u3-fixture-auth-support.png",
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/screenshots/u3-fixture-auth-status.png",
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/screenshots/u3-fixture-auth-logs.png"
+    ],
+    "remaining_gap": "Support email, ticket delivery, raw log persistence, and full API redaction proof remain outside U3.",
+    "next_action": "Keep delivery and persistence proof separate from fixture browser proof."
+  },
+  {
+    "id": "xflow-u3-integration-panels",
+    "area": "provider",
+    "surface": "Provider and integration panels",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/apps/[slug]/integrations/page.tsx; apps/XFlow/src/app/(dashboard)/apps/[slug]/config/page.tsx",
+    "classification": "provider-proof-needed",
+    "evidence": "Loopback fixture capture reached the setup panels only. U3 did not run external verification, refresh, handoff, or status authority checks.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/screenshots/u3-fixture-auth-setup-panels.png"
+    ],
+    "remaining_gap": "External integration authority remains unproved.",
+    "next_action": "Require a separate approved provider proof phase before any external-state claim."
+  },
+  {
+    "id": "xflow-u3-billing-entitlement-boundary",
+    "area": "billing",
+    "surface": "Billing and entitlement boundary",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/billing/xflow-setup/page.tsx; apps/XFlow/src/app/(dashboard)/billing/checkout/page.tsx",
+    "classification": "provider-proof-needed",
+    "evidence": "U3 did not call Stripe, Verixet, checkout, portal, invoice, plan, or entitlement authority surfaces.",
+    "evidence_artifacts": [],
+    "remaining_gap": "Billing and entitlement authority remain unproved.",
+    "next_action": "Run only a separately approved billing boundary proof before making paid-state assertions."
+  },
+  {
+    "id": "xflow-u3-account-settings-mutations",
+    "area": "settings",
+    "surface": "Account, settings, security, credential, and workspace mutations",
+    "route_or_file": "apps/XFlow/src/app/api/auth/*; apps/XFlow/src/app/api/workspaces/*; apps/XFlow/src/app/(dashboard)/developer/api-keys/page.tsx",
+    "classification": "mutation-proof-not-executed",
+    "evidence": "U3 captured read-only browser pages only and did not submit forms or call mutation APIs.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/browser-proof-summary.json"
+    ],
+    "remaining_gap": "Mutation behavior is not proved.",
+    "next_action": "Require explicit local mutation scope before any account, security, workspace, billing, credential, or provider action."
+  },
+  {
+    "id": "xflow-u3-production-readiness-boundary",
+    "area": "readiness",
+    "surface": "Production readiness boundary",
+    "route_or_file": "docs/xflow-user-dashboard-auth-fixture-browser-proof.md",
+    "classification": "intentionally-unavailable",
+    "evidence": "U3 is local authenticated fixture proof only. No staging smoke, production smoke, deployment, provider call, provider credential, real user data, or real account mutation was used.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u3-user-dashboard/verification-summary.json"
+    ],
+    "remaining_gap": "Production readiness remains not claimable.",
+    "next_action": "Keep production readiness blocked until separately approved external proof exists."
+  }
+]

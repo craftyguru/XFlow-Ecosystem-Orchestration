@@ -1,0 +1,162 @@
+[
+  {
+    "id": "xflow-u2-local-dashboard-screenshot-route",
+    "area": "dashboard",
+    "surface": "Local dashboard screenshot route",
+    "route_or_file": "apps/XFlow/src/app/local-screenshot/dashboard/page.tsx",
+    "classification": "locally-browser-proved",
+    "evidence": "Loopback browser capture of the local screenshot dashboard route. The route is disabled in production and uses local sample data only.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-local-dashboard-overview.png",
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/browser-proof-summary.json"
+    ],
+    "remaining_gap": "This is a local visual representation, not authenticated dashboard runtime proof.",
+    "next_action": "Use authenticated local fixture proof only after explicit mutation-safe fixture approval."
+  },
+  {
+    "id": "xflow-u2-dashboard-overview-auth-boundary",
+    "area": "dashboard",
+    "surface": "Dashboard overview",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/overview/page.tsx",
+    "classification": "locally-browser-proved",
+    "evidence": "Unauthenticated loopback browser visit to /overview redirects to the local sign-in boundary without rendering private dashboard data.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-auth-boundary-overview.png"
+    ],
+    "remaining_gap": "Authenticated overview content was not captured because local credentials or fixture mutation were not used.",
+    "next_action": "Keep authenticated content as local-static-only until a safe local auth state exists."
+  },
+  {
+    "id": "xflow-u2-apps-list",
+    "area": "apps",
+    "surface": "Apps list",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/apps/page.tsx",
+    "classification": "local-static-only",
+    "evidence": "Route/auth matrices and U1 static proof cover the page. U2 browser capture proves the signed-out local auth boundary only.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-auth-boundary-apps.png"
+    ],
+    "remaining_gap": "The authenticated app list was not rendered in browser because that requires a local session fixture.",
+    "next_action": "Capture with a disposable local fixture only in a separately approved mutation-safe phase."
+  },
+  {
+    "id": "xflow-u2-app-detail",
+    "area": "apps",
+    "surface": "App detail page",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/apps/[slug]/page.tsx",
+    "classification": "local-static-only",
+    "evidence": "U1 static route proof remains valid. U2 browser capture proves protected access redirects to local sign-in when no session exists.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-auth-boundary-app-detail.png"
+    ],
+    "remaining_gap": "No authenticated app detail browser screenshot was captured.",
+    "next_action": "Do not upgrade this row until a local authenticated fixture is available without provider calls."
+  },
+  {
+    "id": "xflow-u2-integration-panels",
+    "area": "provider",
+    "surface": "Provider and integration panels",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/apps/[slug]/integrations/page.tsx; apps/XFlow/src/app/(dashboard)/apps/[slug]/config/page.tsx",
+    "classification": "provider-proof-needed",
+    "evidence": "U1 copy guardrails prevent unqualified provider-state claims. U2 browser capture only proves the local auth boundary for the protected integration route.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-integration-boundary-auth-gate.png"
+    ],
+    "remaining_gap": "No provider connect, refresh, verification, or external status proof was executed.",
+    "next_action": "Keep setup/control-plane wording until a later approved provider proof phase."
+  },
+  {
+    "id": "xflow-u2-tools-developer",
+    "area": "tools",
+    "surface": "Tools and developer surfaces",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/tools/page.tsx; apps/XFlow/src/app/(dashboard)/developer/*/page.tsx",
+    "classification": "local-static-only",
+    "evidence": "Route/auth matrices and U1 static proof cover these surfaces. U2 browser capture proves local auth gating for representative protected routes.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-auth-boundary-tools.png",
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-auth-boundary-developer.png"
+    ],
+    "remaining_gap": "Authenticated tool and developer content was not captured.",
+    "next_action": "Keep AI/provider and credential actions outside browser proof until explicitly approved."
+  },
+  {
+    "id": "xflow-u2-settings-security-read-only",
+    "area": "settings",
+    "surface": "Settings and security read-only surfaces",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/settings/page.tsx; apps/XFlow/src/app/(dashboard)/settings/security/page.tsx",
+    "classification": "local-static-only",
+    "evidence": "U1 static proof covers route presence and copy guardrails. U2 browser capture proves local auth gating for representative settings routes.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-auth-boundary-settings.png",
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-auth-boundary-security.png"
+    ],
+    "remaining_gap": "No authenticated settings content was captured.",
+    "next_action": "Keep settings browser proof read-only unless a later phase explicitly approves local fixture setup."
+  },
+  {
+    "id": "xflow-u2-account-settings-mutations",
+    "area": "settings",
+    "surface": "Account, settings, and security mutations",
+    "route_or_file": "apps/XFlow/src/app/api/auth/*; apps/XFlow/src/app/api/workspaces/*",
+    "classification": "mutation-proof-not-executed",
+    "evidence": "U2 did not submit forms or call mutation APIs. Browser proof captured read-only pages and redirect boundaries only.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/browser-proof-summary.json"
+    ],
+    "remaining_gap": "Mutation success is not proved.",
+    "next_action": "Require explicit local mutation scope before account, settings, MFA, passkey, workspace, or session actions."
+  },
+  {
+    "id": "xflow-u2-support-status-help",
+    "area": "support",
+    "surface": "Support, status, and help surfaces",
+    "route_or_file": "apps/XFlow/src/app/(showcase)/support/page.tsx; apps/XFlow/src/app/(showcase)/status/page.tsx; apps/XFlow/src/app/(dashboard)/help/ecosystem-guide/page.tsx",
+    "classification": "locally-browser-proved",
+    "evidence": "Loopback browser capture covers public support and status pages. Protected dashboard help is covered by a local auth-boundary capture.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-public-support.png",
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-public-status.png",
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-auth-boundary-help.png"
+    ],
+    "remaining_gap": "No support email, SMS, ticket, or notification provider was triggered.",
+    "next_action": "Keep support delivery proof outside U2."
+  },
+  {
+    "id": "xflow-u2-logs-status-empty-degraded",
+    "area": "privacy",
+    "surface": "Logs, status, empty, and degraded states",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/apps/[slug]/logs/page.tsx; apps/XFlow/src/app/local-screenshot/dashboard/page.tsx",
+    "classification": "locally-browser-proved",
+    "evidence": "Local dashboard screenshot route shows empty/degraded local states. Protected logs route is browser-captured only at the local auth boundary; U1 redaction guardrails remain active.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-local-dashboard-overview.png",
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/screenshots/u2-auth-boundary-logs.png"
+    ],
+    "remaining_gap": "Authenticated log rows and dashboard API response bodies still require U6 redaction proof.",
+    "next_action": "Do not expose raw logs, trace identifiers, provider identifiers, or customer content."
+  },
+  {
+    "id": "xflow-u2-billing-entitlement-boundary",
+    "area": "billing",
+    "surface": "Billing and entitlement boundary",
+    "route_or_file": "apps/XFlow/src/app/(dashboard)/billing/xflow-setup/page.tsx; apps/XFlow/src/app/(dashboard)/billing/checkout/page.tsx",
+    "classification": "provider-proof-needed",
+    "evidence": "U2 browser proof did not call billing providers. Protected billing routes are not upgraded beyond U1 local/static boundary proof.",
+    "evidence_artifacts": [],
+    "remaining_gap": "Stripe, Verixet, checkout, portal, entitlement snapshots, and paid-state assertions remain unproved.",
+    "next_action": "Run a separate approved billing boundary proof before claiming paid or active billing state."
+  },
+  {
+    "id": "xflow-u2-production-readiness-boundary",
+    "area": "readiness",
+    "surface": "Production readiness boundary",
+    "route_or_file": "docs/xflow-user-dashboard-local-browser-proof.md",
+    "classification": "intentionally-unavailable",
+    "evidence": "U2 is local browser proof only. No staging smoke, production smoke, deployment, provider call, or credential action was executed.",
+    "evidence_artifacts": [
+      "apps/XFlow/.xflow-local-browser-proof/u2-user-dashboard/verification-summary.json"
+    ],
+    "remaining_gap": "Production readiness remains not claimable.",
+    "next_action": "Keep U2 evidence scoped to local browser proof only."
+  }
+]
