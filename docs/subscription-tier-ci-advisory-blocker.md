@@ -6,11 +6,11 @@ Date: 2026-07-09
 
 - Repository: `craftyguru/XFlow-Ecosystem-Orchestration`
 - Workflow: `Subscription Tier Proof Gate`
-- Run ID: `29009794233`
-- Run URL: `https://github.com/craftyguru/XFlow-Ecosystem-Orchestration/actions/runs/29009794233`
+- Run ID: `29010953295`
+- Run URL: `https://github.com/craftyguru/XFlow-Ecosystem-Orchestration/actions/runs/29010953295`
 - Event: `workflow_dispatch`
 - Result: failed
-- Classification: app repo checkout/materialization blocker
+- Classification: proof command failure
 
 ## Secret Status
 
@@ -40,7 +40,9 @@ The workflow completed these CI bootstrap stages successfully:
 - CreVux pnpm dependency bootstrap
 - Report artifact upload
 
-This rules out the previous private repository authentication failure, Node version failure, npm/pnpm bootstrap failure, AudAiX native build failure, and report artifact path failure for this run.
+This rules out the previous private repository authentication failure, app repository materialization failure, Node version failure, AudAiX native build failure, and report artifact path failure for this run.
+
+The six app proof wrapper commits were pushed before this run. CI found and executed the wrappers.
 
 ## Failure
 
@@ -50,54 +52,55 @@ The failing step was `Run subscription-tier proof gate`, which ran:
 npm run verify:subscription-tier
 ```
 
-The generated report classified all six wrappers as missing:
+The generated report showed four app wrappers passing and two app wrappers failing:
+
+| App | Result | Notes |
+| --- | --- | --- |
+| Verixet | passed | 77 focused Vitest tests, route type generation, and typecheck passed |
+| XFlow | failed | focused Vitest tests passed; subscription proof typecheck failed |
+| WordGeni | passed | focused API/web tests and typechecks passed |
+| CreVux | failed | focused checks reached image-gen pricing typecheck and failed |
+| AudAiX | passed | focused dashboard tests, local route proof, and typecheck passed |
+| RatAiFy | passed | focused node tests and typecheck passed |
+
+XFlow failure:
 
 ```text
-Missing wrapper: apps/Verixet/scripts/verify-subscription-tier-proof.mjs
-Missing wrapper: apps/XFlow/scripts/verify-subscription-tier-proof.mjs
-Missing wrapper: apps/WordGeni/scripts/verify-subscription-tier-proof.mjs
-Missing wrapper: apps/CreVux/scripts/verify-subscription-tier-proof.mjs
-Missing wrapper: apps/AudAix/scripts/verify-subscription-tier-proof.mjs
-Missing wrapper: apps/RatAiFy/scripts/verify-subscription-tier-proof.mjs
+agents/workflow-copilot-desktop/src/tauri.ts(1,24): error TS2307: Cannot find module '@tauri-apps/api/core' or its corresponding type declarations.
+agents/workflow-copilot-desktop/vite.config.ts(2,19): error TS2307: Cannot find module '@vitejs/plugin-react' or its corresponding type declarations.
 ```
 
-The local app repositories contain those wrapper files, but their current local branches are ahead of the corresponding remote branches used by the workflow:
+CreVux failure:
 
-| App | Local branch state |
-| --- | --- |
-| Verixet | `main...origin/main [ahead 8]` |
-| XFlow | `master...origin/master [ahead 1]` |
-| WordGeni | `main...origin/main [ahead 1]` |
-| CreVux | `main...origin/main [ahead 1]` |
-| AudAiX | `main...origin/main [ahead 1]` |
-| RatAiFy | `main...origin/main [ahead 1]` |
+```text
+[crevux:p3-proof] Failed: CreVux image-gen pricing typecheck
+```
 
-Therefore the CI workflow is checking out clean remote app repositories that do not yet include the proof wrapper commits required by the root verifier.
+The CreVux typecheck output includes missing fresh-checkout declaration outputs such as `lib/api-client-react/dist/index.d.ts`, `lib/scene-interaction/dist/index.d.ts`, `lib/pro-settings-contract/dist/index.d.ts`, and `lib/cross-app-visual-companion/dist/index.d.ts`, plus image-gen `TS7006` implicit-any errors.
 
 ## Decision
 
 No workflow fix was made in this pass.
 
-The workflow is correctly checking out private app repositories and bootstrapping dependencies. The next blocker is publication/materialization of the app-level proof wrapper commits into the app remotes or an intentional workflow change to check out known wrapper branches/SHAs.
+The workflow is correctly checking out private app repositories, materializing the wrapper commits, and bootstrapping the currently configured root/app dependencies.
 
-Because this involves app repository publication strategy, this pass does not modify app code, app wrappers, package files, or lockfiles.
+XFlow has a clear missing nested dependency surface for `agents/workflow-copilot-desktop`, but CreVux has both fresh-build declaration output issues and source typecheck errors from the app proof command. Because not all observed failures are proven workflow-only bootstrap defects, this pass documents the blocker rather than modifying app code, app wrappers, package files, or lockfiles.
 
 ## Recommended Next Step
 
-Publish or otherwise materialize the app wrapper commits used by the local proof gate:
+Triage the two failing proof surfaces deliberately:
 
-- Push the app branches that contain `scripts/verify-subscription-tier-proof.mjs`, or
-- Merge those wrapper commits into each app's remote default branch, or
-- Update the advisory workflow to check out explicit known-good app refs if default branches are not the intended CI source.
+- XFlow: decide whether the advisory workflow should install `apps/XFlow/agents/workflow-copilot-desktop` with its lockfile before running the root proof gate, or whether the XFlow proof wrapper should avoid typechecking that unrelated desktop package.
+- CreVux: decide whether the advisory workflow should run an explicit fresh-checkout library build before the proof wrapper, or whether the CreVux proof wrapper/typecheck scope should be narrowed to the subscription proof surface.
 
-After the app wrapper commits are available to CI, rerun the advisory workflow.
+After those proof-surface decisions are made, rerun the advisory workflow.
 
 ## Final Status
 
-Root status before this report was clean. This report is the only root task-owned change.
+Root status before this report update was clean. This report update is the only root task-owned change.
 
-Six app repository working trees remained clean. The app repositories were inspected only for branch/tracking state and wrapper-file tracking.
+Six app repository working trees remained clean. The app repositories were pushed to publish existing commits only; no new app commits were created.
 
 ## Safety Confirmation
 
-No production code, app logic, app repositories, app wrappers, package files, lockfiles, schemas, migrations, Stripe logic, checkout flows, entitlement behavior, CI required status, runtime behavior, dependency installs, dependency rebuilds, or app internals were changed.
+No production code, app logic, app wrappers, package files, lockfiles, schemas, migrations, Stripe logic, checkout flows, entitlement behavior, CI required status, runtime behavior, dependency installs, dependency rebuilds, or app internals were changed.
