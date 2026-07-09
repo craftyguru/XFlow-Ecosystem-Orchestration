@@ -1,0 +1,73 @@
+{
+  "proof": "workspace-external-proof-approval",
+  "date": "2026-07-06",
+  "localOnly": true,
+  "defaultDecision": "NO-GO",
+  "providerProofApproved": false,
+  "billingProofApproved": false,
+  "deploymentProofApproved": false,
+  "oauthProofApproved": false,
+  "mutationProofApproved": false,
+  "entries": [
+    {
+      "id": "readonly-provider-status",
+      "classification": "approval-required-no-go",
+      "apps": ["XFlow", "CreVux", "WordGeni", "RatAiFy", "AudAix", "Verixet"],
+      "approved": false,
+      "externalCallsAuthorized": false,
+      "mutationsAuthorized": false,
+      "requiredApprovalFields": ["app", "surface", "command", "environment", "credentialReferences", "evidencePath", "stopCondition", "operatorApproval"],
+      "stopCondition": "Stop before any provider or connected-app service call."
+    },
+    {
+      "id": "billing-stripe-authority",
+      "classification": "approval-required-no-go",
+      "apps": ["XFlow", "CreVux", "WordGeni", "RatAiFy", "AudAix", "Verixet"],
+      "approved": false,
+      "externalCallsAuthorized": false,
+      "mutationsAuthorized": false,
+      "requiredApprovalFields": ["app", "billingOwner", "command", "testModeConfirmation", "credentialReferences", "rollbackOwner", "evidencePath", "operatorApproval"],
+      "stopCondition": "Stop before any Stripe, billing, payment, entitlement, portal, webhook, or catalog authority call."
+    },
+    {
+      "id": "oauth-connectivity",
+      "classification": "approval-required-no-go",
+      "apps": ["XFlow", "RatAiFy", "AudAix", "Verixet"],
+      "approved": false,
+      "externalCallsAuthorized": false,
+      "mutationsAuthorized": false,
+      "requiredApprovalFields": ["app", "oauthClient", "callbackUrl", "disposableAccount", "revocationPlan", "evidencePath", "operatorApproval"],
+      "stopCondition": "Stop before any OAuth, handoff, connected-app, or callback proof."
+    },
+    {
+      "id": "deployment-staging-smoke",
+      "classification": "approval-required-no-go",
+      "apps": ["XFlow", "CreVux", "WordGeni", "RatAiFy", "AudAix", "Verixet"],
+      "approved": false,
+      "externalCallsAuthorized": false,
+      "mutationsAuthorized": false,
+      "requiredApprovalFields": ["app", "exactUrl", "environment", "command", "deploymentOwner", "rollbackPlan", "evidencePath", "operatorApproval"],
+      "stopCondition": "Stop before any staging, production, Railway, Vercel, deploy, post-deploy, or hosted smoke command."
+    },
+    {
+      "id": "scan-audit-audio-ai-jobs",
+      "classification": "approval-required-no-go",
+      "apps": ["CreVux", "WordGeni", "RatAiFy", "AudAix", "Verixet"],
+      "approved": false,
+      "externalCallsAuthorized": false,
+      "mutationsAuthorized": false,
+      "requiredApprovalFields": ["app", "provider", "testTarget", "spendLimit", "customerDataExcluded", "evidencePath", "operatorApproval"],
+      "stopCondition": "Stop before any scan, audit, audio, AI, media, export-provider, or worker job."
+    },
+    {
+      "id": "mutation-write-proof",
+      "classification": "approval-required-no-go",
+      "apps": ["XFlow", "CreVux", "WordGeni", "RatAiFy", "AudAix", "Verixet"],
+      "approved": false,
+      "externalCallsAuthorized": false,
+      "mutationsAuthorized": false,
+      "requiredApprovalFields": ["app", "mutation", "disposableTarget", "command", "rollbackPlan", "auditExpectation", "redactionExpectation", "operatorApproval"],
+      "stopCondition": "Stop before any account, security, billing, provider, deployment, webhook, control-plane, or data mutation."
+    }
+  ]
+}

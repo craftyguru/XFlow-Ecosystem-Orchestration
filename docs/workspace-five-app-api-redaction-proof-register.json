@@ -1,0 +1,92 @@
+{
+  "proof": "workspace-five-app-api-redaction",
+  "date": "2026-07-06",
+  "localOnly": true,
+  "xflowExcluded": true,
+  "productionReady": false,
+  "providerProof": false,
+  "billingProof": false,
+  "deploymentProof": false,
+  "mutationProof": false,
+  "classifications": [
+    "locally-static-redaction-proved",
+    "locally-response-shape-proved",
+    "auth-required-not-exercised",
+    "provider-proof-needed",
+    "billing-proof-needed",
+    "entitlement-proof-needed",
+    "deployment-proof-needed",
+    "ai-provider-proof-needed",
+    "scan-provider-proof-needed",
+    "audit-provider-proof-needed",
+    "audio-provider-proof-needed",
+    "mutation-proof-not-executed",
+    "intentionally-unavailable",
+    "not-applicable"
+  ],
+  "entries": [
+    {
+      "id": "crevux-api-redaction",
+      "app": "CreVux",
+      "classification": "locally-static-redaction-proved",
+      "localOnly": true,
+      "surfaces": ["auth/session", "settings/workspace", "mobile dashboard API", "billing", "provider generation", "WordGeni integration"],
+      "unproved": "No API server, provider, billing, deployment, DB/session, or mutation route was executed."
+    },
+    {
+      "id": "wordgeni-api-redaction",
+      "app": "WordGeni",
+      "classification": "locally-static-redaction-proved",
+      "localOnly": true,
+      "surfaces": ["web API proxy", "auth/session", "workspace/project/source", "AI/provider", "billing", "exports/download metadata"],
+      "unproved": "No API server, AI provider, billing provider, export provider, DB/session, or mutation route was executed."
+    },
+    {
+      "id": "rataify-api-redaction",
+      "app": "RatAiFy",
+      "classification": "locally-static-redaction-proved",
+      "localOnly": true,
+      "surfaces": ["auth/session", "org/workspace", "sites/scans/issues", "billing", "API keys", "connected apps", "control-plane", "UCL"],
+      "unproved": "No Express server, provider, billing, scan, deployment, DB/session, or mutation route was executed."
+    },
+    {
+      "id": "audaix-api-redaction",
+      "app": "AudAix",
+      "classification": "locally-static-redaction-proved",
+      "localOnly": true,
+      "surfaces": ["auth/session", "workspace/site", "audit reports", "billing", "XFlow/Verixet/Rataify", "security scanner", "UCL"],
+      "unproved": "No Fastify server, provider, billing, audit/scan provider, DB/session, or mutation route was executed."
+    },
+    {
+      "id": "verixet-api-redaction",
+      "app": "Verixet",
+      "classification": "locally-static-redaction-proved",
+      "localOnly": true,
+      "surfaces": ["auth/session", "dashboard login/logout", "billing/Stripe connection", "commerce/entitlements", "connected apps", "webhooks", "control-plane", "dashboard security"],
+      "unproved": "No Next server, Stripe, entitlement authority, OAuth/connectivity, provider, DB/session, or mutation route was executed."
+    },
+    {
+      "id": "cross-app-provider-billing-deployment-boundary",
+      "app": "workspace",
+      "classification": "provider-proof-needed",
+      "localOnly": true,
+      "surfaces": ["provider", "billing", "entitlement", "deployment", "connectivity", "AI", "scan", "audit", "audio"],
+      "unproved": "All external authority surfaces remain proof-needed and were not contacted."
+    },
+    {
+      "id": "cross-app-mutation-boundary",
+      "app": "workspace",
+      "classification": "mutation-proof-not-executed",
+      "localOnly": true,
+      "surfaces": ["POST", "PUT", "PATCH", "DELETE", "account/security actions", "billing actions", "provider actions", "webhook/control-plane actions"],
+      "unproved": "Mutation response redaction and behavior remain unproved because no mutation was executed."
+    }
+  ],
+  "blocked": [
+    "Real authenticated response proof requires local fixture session state per app.",
+    "Provider response proof requires provider-safe fixtures or approved provider proof.",
+    "Billing and entitlement response proof requires billing authority fixtures.",
+    "Scan/audit/audio/AI response proof requires provider-safe fixtures.",
+    "Mutation response proof requires a separately approved disposable local mutation plan."
+  ]
+}

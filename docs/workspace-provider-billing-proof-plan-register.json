@@ -1,0 +1,75 @@
+{
+  "proof": "workspace-provider-billing-proof-plan",
+  "date": "2026-07-06",
+  "localOnly": true,
+  "productionReady": false,
+  "providerProof": false,
+  "billingProof": false,
+  "deploymentProof": false,
+  "mutationProof": false,
+  "entries": [
+    {
+      "id": "xflow-provider-billing-plan",
+      "app": "XFlow",
+      "classification": "provider-proof-planned",
+      "localOnly": true,
+      "surfaces": ["provider authority", "Verixet OAuth", "Stripe billing readiness", "staged smoke", "deployment credentials"],
+      "safeNow": "planning and static guard validation only",
+      "stopCondition": "Stop before any production, staging, provider, billing, deployment, OAuth, email/SMS, or mutation command."
+    },
+    {
+      "id": "crevux-provider-billing-plan",
+      "app": "CreVux",
+      "classification": "provider-proof-planned",
+      "localOnly": true,
+      "surfaces": ["OpenAI/media providers", "Stripe webhook/test billing", "Railway/deploy parity", "Supabase runtime"],
+      "safeNow": "planning and static guard validation only",
+      "stopCondition": "Stop before any hosted CreVux, Railway, Stripe, OpenAI, Supabase runtime, or mutation command."
+    },
+    {
+      "id": "wordgeni-provider-billing-plan",
+      "app": "WordGeni",
+      "classification": "ai-provider-proof-planned",
+      "localOnly": true,
+      "surfaces": ["AI provider", "export provider", "Stripe proof", "Railway deploy proof", "live API health"],
+      "safeNow": "planning and static guard validation only",
+      "stopCondition": "Stop before pnpm install/purge, live verification, provider, Stripe, deployment, or mutation commands."
+    },
+    {
+      "id": "rataify-provider-billing-plan",
+      "app": "RatAiFy",
+      "classification": "scan-audit-audio-ai-proof-planned",
+      "localOnly": true,
+      "surfaces": ["connected apps", "control plane", "scan provider", "billing/entitlement", "staging proof"],
+      "safeNow": "planning and static guard validation only",
+      "stopCondition": "Stop before live SEO, control-plane live, staging bootstrap, scan provider, billing, connected-app, or mutation commands."
+    },
+    {
+      "id": "audaix-provider-billing-plan",
+      "app": "AudAix",
+      "classification": "audit-provider-proof-planned",
+      "localOnly": true,
+      "surfaces": ["Supabase runtime", "audit/scan workers", "Stripe billing", "XFlow/Verixet/RatAiFy connectors", "staging/admin proof"],
+      "safeNow": "planning and static guard validation only",
+      "stopCondition": "Stop before Supabase runtime, provider, billing, scan/audit worker, staging, connector, or mutation commands."
+    },
+    {
+      "id": "verixet-provider-billing-plan",
+      "app": "Verixet",
+      "classification": "billing-proof-planned",
+      "localOnly": true,
+      "surfaces": ["Stripe catalog/billing", "entitlement authority", "OAuth/connectivity", "webhooks", "deployment/staging", "provider adapters"],
+      "safeNow": "planning and static guard validation only",
+      "stopCondition": "Stop before billing execute/apply/sync, staging, post-deploy, OAuth, webhook, provider, or mutation commands."
+    },
+    {
+      "id": "workspace-mutation-boundary",
+      "app": "workspace",
+      "classification": "mutation-proof-not-executed",
+      "localOnly": true,
+      "surfaces": ["provider writes", "billing writes", "deployment writes", "OAuth writes", "account/security writes", "webhook/control-plane actions"],
+      "safeNow": "classification only",
+      "stopCondition": "Stop before any mutation success proof unless a disposable approved environment and rollback plan exist."
+    }
+  ]
+}

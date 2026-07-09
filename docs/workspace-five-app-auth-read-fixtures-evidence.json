@@ -1,0 +1,62 @@
+{
+  "proof": "workspace-five-app-auth-read-fixtures",
+  "localOnly": true,
+  "generatedAt": "2026-07-09T08:17:43.032Z",
+  "apps": [
+    {
+      "app": "CreVux",
+      "routesMapped": 3,
+      "fixturesValidated": 2,
+      "mutationRoutesClassifiedNotExecuted": 3,
+      "classifications": {
+        "locally-fixture-read-proved": 1,
+        "locally-response-shape-proved": 1
+      }
+    },
+    {
+      "app": "WordGeni",
+      "routesMapped": 4,
+      "fixturesValidated": 2,
+      "mutationRoutesClassifiedNotExecuted": 2,
+      "classifications": {
+        "locally-fixture-read-proved": 1,
+        "locally-response-shape-proved": 1
+      }
+    },
+    {
+      "app": "RatAiFy",
+      "routesMapped": 4,
+      "fixturesValidated": 2,
+      "mutationRoutesClassifiedNotExecuted": 4,
+      "classifications": {
+        "locally-fixture-read-proved": 1,
+        "locally-response-shape-proved": 1
+      }
+    },
+    {
+      "app": "AudAix",
+      "routesMapped": 3,
+      "fixturesValidated": 2,
+      "mutationRoutesClassifiedNotExecuted": 3,
+      "classifications": {
+        "locally-fixture-read-proved": 1,
+        "locally-response-shape-proved": 1
+      }
+    },
+    {
+      "app": "Verixet",
+      "routesMapped": 3,
+      "fixturesValidated": 2,
+      "mutationRoutesClassifiedNotExecuted": 0,
+      "classifications": {
+        "locally-fixture-read-proved": 1,
+        "locally-response-shape-proved": 1
+      }
+    }
+  ],
+  "totals": {
+    "routesMapped": 17,
+    "fixturesValidated": 10,
+    "mutationRoutesNotExecuted": 12
+  }
+}

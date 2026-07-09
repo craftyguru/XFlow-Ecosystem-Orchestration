@@ -1,0 +1,81 @@
+{
+  "proof": "workspace-five-app-auth-read-fixtures",
+  "date": "2026-07-06",
+  "localOnly": true,
+  "xflowExcluded": true,
+  "productionReady": false,
+  "providerProof": false,
+  "billingProof": false,
+  "deploymentProof": false,
+  "mutationProof": false,
+  "classifications": [
+    "locally-fixture-read-proved",
+    "locally-response-shape-proved",
+    "auth-required-not-exercised",
+    "provider-proof-needed",
+    "billing-proof-needed",
+    "entitlement-proof-needed",
+    "ai-provider-proof-needed",
+    "scan-provider-proof-needed",
+    "audit-provider-proof-needed",
+    "audio-provider-proof-needed",
+    "mutation-proof-not-executed",
+    "not-applicable"
+  ],
+  "entries": [
+    {
+      "id": "crevux-authenticated-read-fixtures",
+      "app": "CreVux",
+      "classification": "locally-fixture-read-proved",
+      "localOnly": true,
+      "surfaces": ["auth/session", "settings/workspace", "mobile dashboard API"],
+      "unproved": "No API server, DB/session, provider, billing, deployment, or mutation route was executed."
+    },
+    {
+      "id": "wordgeni-authenticated-read-fixtures",
+      "app": "WordGeni",
+      "classification": "locally-fixture-read-proved",
+      "localOnly": true,
+      "surfaces": ["workspace", "project detail", "web API proxy"],
+      "unproved": "No API server, DB/session, AI provider, billing provider, export provider, or mutation route was executed."
+    },
+    {
+      "id": "rataify-authenticated-read-fixtures",
+      "app": "RatAiFy",
+      "classification": "locally-fixture-read-proved",
+      "localOnly": true,
+      "surfaces": ["current user", "org/workspace", "sites", "connected apps"],
+      "unproved": "No Express server, DB/session, scan provider, billing provider, connected-app service, or mutation route was executed."
+    },
+    {
+      "id": "audaix-authenticated-read-fixtures",
+      "app": "AudAix",
+      "classification": "locally-fixture-read-proved",
+      "localOnly": true,
+      "surfaces": ["auth/session", "workspace", "site reads"],
+      "unproved": "No Fastify server, DB/session, audit provider, billing provider, scan provider, or mutation route was executed."
+    },
+    {
+      "id": "verixet-authenticated-read-fixtures",
+      "app": "Verixet",
+      "classification": "locally-fixture-read-proved",
+      "localOnly": true,
+      "surfaces": ["dashboard security status", "operator brief", "billing overview"],
+      "unproved": "No Next server, DB/session, Stripe, entitlement authority, OAuth/connectivity, provider, or mutation route was executed."
+    },
+    {
+      "id": "cross-app-mutation-boundary",
+      "app": "workspace",
+      "classification": "mutation-proof-not-executed",
+      "localOnly": true,
+      "surfaces": ["POST", "PUT", "PATCH", "DELETE", "account/security actions", "provider actions", "billing actions"],
+      "unproved": "Mutation behavior remains unproved because no mutation was executed."
+    }
+  ],
+  "blocked": [
+    "Real authenticated runtime proof still requires disposable local session fixtures per app.",
+    "Provider response proof requires provider-safe fixtures or approved provider proof.",
+    "Billing and entitlement response proof requires billing authority fixtures.",
+    "Mutation response proof requires a separate disposable local mutation plan."
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "proof": "workspace-five-app-api-redaction",
+  "localOnly": true,
+  "generatedAt": "2026-07-09T08:17:49.408Z",
+  "apps": [
+    {
+      "app": "CreVux",
+      "apiFiles": 59,
+      "clientFiles": 13,
+      "routeMethods": 306,
+      "responseSnippetsScanned": 1397,
+      "classifications": {
+        "locally-static-redaction-proved": 33,
+        "ai-provider-proof-needed": 11,
+        "audio-provider-proof-needed": 1,
+        "audit-provider-proof-needed": 1,
+        "auth-required-not-exercised": 3,
+        "billing-proof-needed": 3,
+        "entitlement-proof-needed": 2,
+        "deployment-proof-needed": 2,
+        "provider-proof-needed": 3
+      },
+      "findings": []
+    },
+    {
+      "app": "WordGeni",
+      "apiFiles": 41,
+      "clientFiles": 28,
+      "routeMethods": 24,
+      "responseSnippetsScanned": 234,
+      "classifications": {
+        "locally-static-redaction-proved": 19,
+        "ai-provider-proof-needed": 6,
+        "auth-required-not-exercised": 7,
+        "billing-proof-needed": 4,
+        "provider-proof-needed": 2,
+        "audit-provider-proof-needed": 1,
+        "deployment-proof-needed": 2
+      },
+      "findings": []
+    },
+    {
+      "app": "RatAiFy",
+      "apiFiles": 58,
+      "clientFiles": 247,
+      "routeMethods": 309,
+      "responseSnippetsScanned": 1239,
+      "classifications": {
+        "ai-provider-proof-needed": 53,
+        "billing-proof-needed": 2,
+        "entitlement-proof-needed": 3
+      },
+      "findings": []
+    },
+    {
+      "app": "AudAix",
+      "apiFiles": 34,
+      "clientFiles": 106,
+      "routeMethods": 316,
+      "responseSnippetsScanned": 1021,
+      "classifications": {
+        "ai-provider-proof-needed": 31,
+        "entitlement-proof-needed": 1,
+        "billing-proof-needed": 2
+      },
+      "findings": []
+    },
+    {
+      "app": "Verixet",
+      "apiFiles": 249,
+      "clientFiles": 331,
+      "routeMethods": 302,
+      "responseSnippetsScanned": 900,
+      "classifications": {
+        "provider-proof-needed": 141,
+        "billing-proof-needed": 47,
+        "ai-provider-proof-needed": 6,
+        "entitlement-proof-needed": 39,
+        "audit-provider-proof-needed": 2,
+        "deployment-proof-needed": 7,
+        "scan-provider-proof-needed": 7
+      },
+      "findings": []
+    }
+  ],
+  "totals": {
+    "apiFiles": 441,
+    "clientFiles": 725,
+    "responseSnippetsScanned": 4791,
+    "unsafeFindings": 0
+  }
+}
