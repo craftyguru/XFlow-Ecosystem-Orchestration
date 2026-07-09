@@ -27,6 +27,7 @@
     "supabase:validate": "node scripts/validate-supabase-phase1.mjs && node scripts/validate-supabase-phase2.mjs && node scripts/validate-service-role-import-boundary.mjs && node scripts/validate-rls-proof.mjs",
     "test:rls": "node scripts/validate-rls-proof.mjs",
     "proof:production": "node scripts/proof-production.mjs",
+    "verify:subscription-tier": "node scripts/verify-subscription-tier-p3-gate.mjs",
     "verixet:stripe:price-env:verify": "npm --prefix apps/Verixet run stripe:price-env:verify",
     "stripe:price-env:verify": "npm --prefix apps/Verixet run stripe:price-env:verify",
     "security:local:preflight": "node scripts/security-local-harness-preflight.mjs",

@@ -16,12 +16,12 @@ PASS: final P3 recurring subscription proof gate passed.
 
 | App | Command | Exit code | Duration ms | Result |
 | --- | --- | ---: | ---: | --- |
-| Verixet | `cd apps/Verixet && node scripts/verify-subscription-tier-proof.mjs` | 0 | 9761 | passed |
-| XFlow | `cd apps/XFlow && node scripts/verify-subscription-tier-proof.mjs` | 0 | 9230 | passed |
-| WordGeni | `cd apps/WordGeni && node scripts/verify-subscription-tier-proof.mjs` | 0 | 15834 | passed |
-| CreVux | `cd apps/CreVux && node scripts/verify-subscription-tier-proof.mjs` | 0 | 65934 | passed |
-| AudAiX | `cd apps/AudAix && node scripts/verify-subscription-tier-proof.mjs` | 0 | 36074 | passed |
-| RatAiFy | `cd apps/RatAiFy && node scripts/verify-subscription-tier-proof.mjs` | 0 | 7374 | passed |
+| Verixet | `cd apps/Verixet && node scripts/verify-subscription-tier-proof.mjs` | 0 | 10049 | passed |
+| XFlow | `cd apps/XFlow && node scripts/verify-subscription-tier-proof.mjs` | 0 | 9267 | passed |
+| WordGeni | `cd apps/WordGeni && node scripts/verify-subscription-tier-proof.mjs` | 0 | 15801 | passed |
+| CreVux | `cd apps/CreVux && node scripts/verify-subscription-tier-proof.mjs` | 0 | 67087 | passed |
+| AudAiX | `cd apps/AudAix && node scripts/verify-subscription-tier-proof.mjs` | 0 | 36137 | passed |
+| RatAiFy | `cd apps/RatAiFy && node scripts/verify-subscription-tier-proof.mjs` | 0 | 7498 | passed |
 
 ## Output Tails
 
@@ -42,8 +42,8 @@ Stdout tail:
 
  Test Files  8 passed (8)
       Tests  77 passed (77)
-   Start at  03:02:14
-   Duration  1.10s (transform 1000ms, setup 0ms, import 2.74s, tests 489ms, environment 1ms)
+   Start at  03:11:44
+   Duration  1.19s (transform 1.08s, setup 0ms, import 2.93s, tests 478ms, environment 1ms)
 
 
 [verixet:p4-proof] Verixet Next route type generation
@@ -75,21 +75,21 @@ Stdout tail:
 
  RUN  v3.2.6 K:/XFlow-Ecosystem Workspace/apps/XFlow
 
- ? tests/showcase-chrome.test.ts (4 tests) 4ms
- ? tests/unit/billing-entitlement-resolution.test.ts (9 tests) 8ms
+ ? tests/showcase-chrome.test.ts (4 tests) 6ms
  ? tests/unit/authority-routing.test.ts (3 tests) 7ms
  ? tests/unit/ecosystem-auth-return-url.test.ts (4 tests) 7ms
- ? tests/unit/verixet-billing-handoff.test.ts (13 tests) 7ms
+ ? tests/unit/billing-entitlement-resolution.test.ts (9 tests) 7ms
+ ? tests/unit/verixet-billing-handoff.test.ts (13 tests) 6ms
  ? tests/unit/verixet-handoff.test.ts (5 tests) 15ms
  ? tests/unit/signup-pricing-catalog.test.ts (7 tests) 7ms
- ? tests/unit/ecosystem-pricing-catalog.test.ts (12 tests) 17ms
- ? tests/unit/showcase-pricing-page.test.ts (10 tests) 68ms
- ? tests/unit/central-auth-start-route.test.ts (3 tests) 23ms
+ ? tests/unit/ecosystem-pricing-catalog.test.ts (12 tests) 19ms
+ ? tests/unit/showcase-pricing-page.test.ts (10 tests) 77ms
+ ? tests/unit/central-auth-start-route.test.ts (3 tests) 17ms
 
  Test Files  10 passed (10)
       Tests  70 passed (70)
-   Start at  03:02:24
-   Duration  2.34s (transform 1.35s, setup 0ms, collect 4.00s, tests 162ms, environment 2ms, prepare 2.26s)
+   Start at  03:11:54
+   Duration  2.44s (transform 1.35s, setup 0ms, collect 3.90s, tests 169ms, environment 2ms, prepare 2.17s)
 
 
 [xflow:p4-proof] XFlow subscription proof typecheck
@@ -114,13 +114,13 @@ Stdout tail:
 ```text
  ? src/services/verixet-catalog-display.test.ts (6 tests) 13ms
  ? src/services/verixet-usage-admission.test.ts (6 tests) 11ms
- ? src/services/stripe/plan-from-price.test.ts (8 tests) 8ms
- ? src/services/ai-usage-limits.test.ts (4 tests) 5ms
+ ? src/services/stripe/plan-from-price.test.ts (8 tests) 9ms
+ ? src/services/ai-usage-limits.test.ts (4 tests) 6ms
 
  Test Files  6 passed (6)
       Tests  33 passed (33)
-   Start at  03:02:33
-   Duration  3.45s (transform 313ms, setup 28ms, collect 1.24s, tests 487ms, environment 1ms, prepare 714ms)
+   Start at  03:12:03
+   Duration  3.40s (transform 305ms, setup 28ms, collect 1.20s, tests 454ms, environment 1ms, prepare 695ms)
 
 
 [wordgeni:p3-proof] WordGeni API subscription-tier typecheck
@@ -129,12 +129,12 @@ Stdout tail:
 
  RUN  v3.2.6 K:/XFlow-Ecosystem Workspace/apps/WordGeni/apps/web
 
- ? src/components/pricing/pricing-page-client.test.ts (8 tests) 106ms
+ ? src/components/pricing/pricing-page-client.test.ts (8 tests) 107ms
 
  Test Files  1 passed (1)
       Tests  8 passed (8)
-   Start at  03:02:43
-   Duration  1.61s (transform 182ms, setup 0ms, collect 902ms, tests 106ms, environment 0ms, prepare 138ms)
+   Start at  03:12:12
+   Duration  2.07s (transform 200ms, setup 0ms, collect 921ms, tests 107ms, environment 0ms, prepare 239ms)
 
 
 [wordgeni:p3-proof] WordGeni web pricing typecheck
@@ -162,8 +162,8 @@ Stdout tail:
 
  Test Files  3 passed | 1 skipped (4)
       Tests  15 passed | 3 skipped (18)
-   Start at  03:02:50
-   Duration  444ms (transform 197ms, setup 0ms, import 486ms, tests 23ms, environment 0ms)
+   Start at  03:12:20
+   Duration  451ms (transform 275ms, setup 0ms, import 553ms, tests 25ms, environment 0ms)
 
 
 [crevux:p3-proof] CreVux API subscription/media typecheck
@@ -175,8 +175,8 @@ Stdout tail:
 
  Test Files  3 passed (3)
       Tests  12 passed (12)
-   Start at  03:03:06
-   Duration  3.49s (transform 839ms, setup 461ms, import 2.85s, tests 2.49s, environment 2.30s)
+   Start at  03:12:36
+   Duration  3.52s (transform 684ms, setup 436ms, import 2.71s, tests 2.57s, environment 2.26s)
 
 
 [crevux:p3-proof] CreVux image-gen pricing typecheck
@@ -207,14 +207,14 @@ Stdout tail:
 
  RUN  v3.2.6 K:/XFlow-Ecosystem Workspace/apps/AudAix/dashboard
 
- ? src/pages/PricingPage.test.tsx (5 tests) 563ms
-   ? AudAiX PricingPage > renders the pricing path selectors and defaults to the single app path  344ms
- ? src/features/workspace-billing/WorkspaceBillingSections.test.tsx (4 tests) 290ms
+ ? src/pages/PricingPage.test.tsx (5 tests) 581ms
+   ? AudAiX PricingPage > renders the pricing path selectors and defaults to the single app path  352ms
+ ? src/features/workspace-billing/WorkspaceBillingSections.test.tsx (4 tests) 292ms
 
  Test Files  2 passed (2)
       Tests  9 passed (9)
-   Start at  03:04:16
-   Duration  4.60s (transform 274ms, setup 218ms, collect 759ms, tests 853ms, environment 2.26s, prepare 189ms)
+   Start at  03:13:46
+   Duration  4.55s (transform 272ms, setup 220ms, collect 739ms, tests 873ms, environment 2.20s, prepare 191ms)
 
 
 [audaix:p3-proof] AudAiX local route proof
@@ -247,19 +247,19 @@ Exit code: 0
 Stdout tail:
 
 ```text
-  duration_ms: 0.2654
+  duration_ms: 0.2772
   type: 'test'
   ...
 # Subtest: scan route no longer duplicates monthly usage authority after requireRataifyUsage
 ok 75 - scan route no longer duplicates monthly usage authority after requireRataifyUsage
   ---
-  duration_ms: 0.3461
+  duration_ms: 0.3506
   type: 'test'
   ...
 # Subtest: client API error handler understands structured upgrade payloads
 ok 76 - client API error handler understands structured upgrade payloads
   ---
-  duration_ms: 1.0859
+  duration_ms: 1.187
   type: 'test'
   ...
 1..76
@@ -270,7 +270,7 @@ ok 76 - client API error handler understands structured upgrade payloads
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 1199.0132
+# duration_ms 1262.6481
 
 [rataify:p3-proof] RatAiFy subscription proof typecheck
 
@@ -288,6 +288,7 @@ Stderr tail:
 Root:
 
 ```text
+ M docs/subscription-tier-p3-recurring-proof-gate-report.md
  M package.json
 ?? docs/ratify-post-rollout-observation.md
 ?? docs/ratify-production-deployment-plan.md
