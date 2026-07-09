@@ -19,41 +19,59 @@ jobs:
 
       # Advisory/manual first: this workflow is not a required branch-protection check yet.
       # The root repo ignores apps/, so CI must materialize each app repo at the expected path.
+      - name: Verify private app repo checkout token
+        shell: bash
+        env:
+          ECOSYSTEM_APP_REPO_READ_TOKEN: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${ECOSYSTEM_APP_REPO_READ_TOKEN}" ]; then
+            echo "::error::Missing ECOSYSTEM_APP_REPO_READ_TOKEN. This advisory workflow checks out six private sibling app repos and needs a read-only token with contents access to those repos."
+            exit 1
+          fi
+
       - name: Checkout Verixet
         uses: actions/checkout@v4
         with:
           repository: craftyguru/verixet
           path: apps/Verixet
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
 
       - name: Checkout XFlow
         uses: actions/checkout@v4
         with:
           repository: craftyguru/xflowx
           path: apps/XFlow
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
 
       - name: Checkout WordGeni
         uses: actions/checkout@v4
         with:
           repository: craftyguru/WordGeni
           path: apps/WordGeni
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
 
       - name: Checkout CreVux
         uses: actions/checkout@v4
         with:
           repository: craftyguru/Crevux
           path: apps/CreVux
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
 
       - name: Checkout AudAiX
         uses: actions/checkout@v4
         with:
           repository: craftyguru/AudAiX
           path: apps/AudAix
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
 
       - name: Checkout RatAiFy
         uses: actions/checkout@v4
         with:
           repository: craftyguru/Rataify
           path: apps/RatAiFy
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
