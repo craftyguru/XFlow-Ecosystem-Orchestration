@@ -16,12 +16,12 @@ PASS: final P3 recurring subscription proof gate passed.
 
 | App | Command | Exit code | Duration ms | Result |
 | --- | --- | ---: | ---: | --- |
-| Verixet | `cd apps/Verixet && node scripts/verify-subscription-tier-proof.mjs` | 0 | 11123 | passed |
-| XFlow | `cd apps/XFlow && node scripts/verify-subscription-tier-proof.mjs` | 0 | 9477 | passed |
-| WordGeni | `cd apps/WordGeni && node scripts/verify-subscription-tier-proof.mjs` | 0 | 16634 | passed |
-| CreVux | `cd apps/CreVux && node scripts/verify-subscription-tier-proof.mjs` | 0 | 68656 | passed |
-| AudAiX | `cd apps/AudAix && node scripts/verify-subscription-tier-proof.mjs` | 0 | 35456 | passed |
-| RatAiFy | `cd apps/RatAiFy && node scripts/verify-subscription-tier-proof.mjs` | 0 | 7322 | passed |
+| Verixet | `cd apps/Verixet && node scripts/verify-subscription-tier-proof.mjs` | 0 | 10405 | passed |
+| XFlow | `cd apps/XFlow && node scripts/verify-subscription-tier-proof.mjs` | 0 | 9556 | passed |
+| WordGeni | `cd apps/WordGeni && node scripts/verify-subscription-tier-proof.mjs` | 0 | 15806 | passed |
+| CreVux | `cd apps/CreVux && node scripts/verify-subscription-tier-proof.mjs` | 0 | 66837 | passed |
+| AudAiX | `cd apps/AudAix && node scripts/verify-subscription-tier-proof.mjs` | 0 | 36086 | passed |
+| RatAiFy | `cd apps/RatAiFy && node scripts/verify-subscription-tier-proof.mjs` | 0 | 7392 | passed |
 
 ## Output Tails
 
@@ -42,8 +42,8 @@ Stdout tail:
 
  Test Files  8 passed (8)
       Tests  77 passed (77)
-   Start at  03:18:40
-   Duration  1.45s (transform 1.31s, setup 0ms, import 3.75s, tests 607ms, environment 1ms)
+   Start at  03:47:59
+   Duration  1.18s (transform 988ms, setup 0ms, import 2.88s, tests 498ms, environment 1ms)
 
 
 [verixet:p4-proof] Verixet Next route type generation
@@ -75,21 +75,21 @@ Stdout tail:
 
  RUN  v3.2.6 K:/XFlow-Ecosystem Workspace/apps/XFlow
 
- ? tests/showcase-chrome.test.ts (4 tests) 5ms
- ? tests/unit/verixet-billing-handoff.test.ts (13 tests) 7ms
+ ? tests/showcase-chrome.test.ts (4 tests) 7ms
+ ? tests/unit/verixet-billing-handoff.test.ts (13 tests) 5ms
  ? tests/unit/authority-routing.test.ts (3 tests) 7ms
- ? tests/unit/ecosystem-auth-return-url.test.ts (4 tests) 5ms
+ ? tests/unit/ecosystem-auth-return-url.test.ts (4 tests) 7ms
  ? tests/unit/billing-entitlement-resolution.test.ts (9 tests) 7ms
- ? tests/unit/verixet-handoff.test.ts (5 tests) 16ms
- ? tests/unit/signup-pricing-catalog.test.ts (7 tests) 6ms
- ? tests/unit/ecosystem-pricing-catalog.test.ts (12 tests) 18ms
- ? tests/unit/showcase-pricing-page.test.ts (10 tests) 84ms
- ? tests/unit/central-auth-start-route.test.ts (3 tests) 24ms
+ ? tests/unit/verixet-handoff.test.ts (5 tests) 15ms
+ ? tests/unit/signup-pricing-catalog.test.ts (7 tests) 5ms
+ ? tests/unit/ecosystem-pricing-catalog.test.ts (12 tests) 22ms
+ ? tests/unit/showcase-pricing-page.test.ts (10 tests) 75ms
+ ? tests/unit/central-auth-start-route.test.ts (3 tests) 18ms
 
  Test Files  10 passed (10)
       Tests  70 passed (70)
-   Start at  03:18:51
-   Duration  2.48s (transform 1.34s, setup 0ms, collect 4.06s, tests 179ms, environment 3ms, prepare 1.52s)
+   Start at  03:48:09
+   Duration  2.54s (transform 1.39s, setup 0ms, collect 4.00s, tests 169ms, environment 3ms, prepare 1.90s)
 
 
 [xflow:p4-proof] XFlow subscription proof typecheck
@@ -112,15 +112,15 @@ Exit code: 0
 Stdout tail:
 
 ```text
- ? src/services/verixet-catalog-display.test.ts (6 tests) 16ms
- ? src/services/verixet-usage-admission.test.ts (6 tests) 10ms
- ? src/services/stripe/plan-from-price.test.ts (8 tests) 8ms
- ? src/services/ai-usage-limits.test.ts (4 tests) 6ms
+ ? src/services/verixet-catalog-display.test.ts (6 tests) 14ms
+ ? src/services/verixet-usage-admission.test.ts (6 tests) 11ms
+ ? src/services/stripe/plan-from-price.test.ts (8 tests) 6ms
+ ? src/services/ai-usage-limits.test.ts (4 tests) 5ms
 
  Test Files  6 passed (6)
       Tests  33 passed (33)
-   Start at  03:19:00
-   Duration  3.44s (transform 304ms, setup 28ms, collect 1.22s, tests 473ms, environment 1ms, prepare 706ms)
+   Start at  03:48:19
+   Duration  3.40s (transform 307ms, setup 28ms, collect 1.24s, tests 447ms, environment 1ms, prepare 685ms)
 
 
 [wordgeni:p3-proof] WordGeni API subscription-tier typecheck
@@ -129,12 +129,12 @@ Stdout tail:
 
  RUN  v3.2.6 K:/XFlow-Ecosystem Workspace/apps/WordGeni/apps/web
 
- ? src/components/pricing/pricing-page-client.test.ts (8 tests) 123ms
+ ? src/components/pricing/pricing-page-client.test.ts (8 tests) 111ms
 
  Test Files  1 passed (1)
       Tests  8 passed (8)
-   Start at  03:19:10
-   Duration  1.87s (transform 216ms, setup 0ms, collect 996ms, tests 123ms, environment 0ms, prepare 276ms)
+   Start at  03:48:28
+   Duration  1.99s (transform 198ms, setup 0ms, collect 907ms, tests 111ms, environment 0ms, prepare 163ms)
 
 
 [wordgeni:p3-proof] WordGeni web pricing typecheck
@@ -162,8 +162,8 @@ Stdout tail:
 
  Test Files  3 passed | 1 skipped (4)
       Tests  15 passed | 3 skipped (18)
-   Start at  03:19:18
-   Duration  489ms (transform 335ms, setup 0ms, import 648ms, tests 25ms, environment 1ms)
+   Start at  03:48:36
+   Duration  484ms (transform 353ms, setup 0ms, import 653ms, tests 21ms, environment 0ms)
 
 
 [crevux:p3-proof] CreVux API subscription/media typecheck
@@ -175,8 +175,8 @@ Stdout tail:
 
  Test Files  3 passed (3)
       Tests  12 passed (12)
-   Start at  03:19:35
-   Duration  3.56s (transform 709ms, setup 456ms, import 2.75s, tests 2.62s, environment 2.27s)
+   Start at  03:48:52
+   Duration  3.49s (transform 740ms, setup 451ms, import 2.77s, tests 2.57s, environment 2.20s)
 
 
 [crevux:p3-proof] CreVux image-gen pricing typecheck
@@ -207,14 +207,14 @@ Stdout tail:
 
  RUN  v3.2.6 K:/XFlow-Ecosystem Workspace/apps/AudAix/dashboard
 
- ? src/pages/PricingPage.test.tsx (5 tests) 567ms
+ ? src/pages/PricingPage.test.tsx (5 tests) 583ms
    ? AudAiX PricingPage > renders the pricing path selectors and defaults to the single app path  359ms
- ? src/features/workspace-billing/WorkspaceBillingSections.test.tsx (4 tests) 282ms
+ ? src/features/workspace-billing/WorkspaceBillingSections.test.tsx (4 tests) 302ms
 
  Test Files  2 passed (2)
       Tests  9 passed (9)
-   Start at  03:20:46
-   Duration  4.57s (transform 266ms, setup 218ms, collect 742ms, tests 849ms, environment 2.27s, prepare 184ms)
+   Start at  03:50:02
+   Duration  4.55s (transform 263ms, setup 220ms, collect 737ms, tests 885ms, environment 2.21s, prepare 195ms)
 
 
 [audaix:p3-proof] AudAiX local route proof
@@ -247,19 +247,19 @@ Exit code: 0
 Stdout tail:
 
 ```text
-  duration_ms: 0.3182
+  duration_ms: 0.2719
   type: 'test'
   ...
 # Subtest: scan route no longer duplicates monthly usage authority after requireRataifyUsage
 ok 75 - scan route no longer duplicates monthly usage authority after requireRataifyUsage
   ---
-  duration_ms: 0.2602
+  duration_ms: 0.2275
   type: 'test'
   ...
 # Subtest: client API error handler understands structured upgrade payloads
 ok 76 - client API error handler understands structured upgrade payloads
   ---
-  duration_ms: 1.0425
+  duration_ms: 1.023
   type: 'test'
   ...
 1..76
@@ -270,7 +270,7 @@ ok 76 - client API error handler understands structured upgrade payloads
 # cancelled 0
 # skipped 0
 # todo 0
-# duration_ms 1209.7507
+# duration_ms 1223.6662
 
 [rataify:p3-proof] RatAiFy subscription proof typecheck
 
@@ -288,22 +288,7 @@ Stderr tail:
 Root:
 
 ```text
-?? docs/ratify-post-rollout-observation.md
-?? docs/ratify-production-deployment-plan.md
-?? docs/ratify-production-rollout-readiness.md
-?? docs/ratify-staging-proof-recovery.md
-?? docs/ratify-staging-proof-rollout.md
-?? docs/workflow-copilot-audit.md
-?? docs/xflow-user-dashboard-api-redaction-proof-register.json
-?? docs/xflow-user-dashboard-api-redaction-proof.md
-?? docs/xflow-user-dashboard-auth-fixture-browser-proof-register.json
-?? docs/xflow-user-dashboard-auth-fixture-browser-proof.md
-?? docs/xflow-user-dashboard-local-browser-proof-register.json
-?? docs/xflow-user-dashboard-local-browser-proof.md
-?? docs/xflow-user-dashboard-local-proof-register.json
-?? docs/xflow-user-dashboard-local-proof.md
-?? docs/xflow-user-dashboard-mutation-boundary-proof-register.json
-?? docs/xflow-user-dashboard-mutation-boundary-proof.md
+ M docs/subscription-tier-p3-recurring-proof-gate-report.md
 ```
 
 | App | Path | Status |
