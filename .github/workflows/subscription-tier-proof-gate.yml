@@ -1,0 +1,167 @@
+name: Subscription Tier Proof Gate
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  subscription-tier-proof:
+    name: Advisory six-app subscription proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout root
+        uses: actions/checkout@v4
+
+      # Advisory/manual first: this workflow is not a required branch-protection check yet.
+      # The root repo ignores apps/, so CI must materialize each app repo at the expected path.
+      - name: Checkout Verixet
+        uses: actions/checkout@v4
+        with:
+          repository: craftyguru/verixet
+          path: apps/Verixet
+
+      - name: Checkout XFlow
+        uses: actions/checkout@v4
+        with:
+          repository: craftyguru/xflowx
+          path: apps/XFlow
+
+      - name: Checkout WordGeni
+        uses: actions/checkout@v4
+        with:
+          repository: craftyguru/WordGeni
+          path: apps/WordGeni
+
+      - name: Checkout CreVux
+        uses: actions/checkout@v4
+        with:
+          repository: craftyguru/Crevux
+          path: apps/CreVux
+
+      - name: Checkout AudAiX
+        uses: actions/checkout@v4
+        with:
+          repository: craftyguru/AudAiX
+          path: apps/AudAix
+
+      - name: Checkout RatAiFy
+        uses: actions/checkout@v4
+        with:
+          repository: craftyguru/Rataify
+          path: apps/RatAiFy
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Verify nested app repos are present
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          missing=0
+          for app in Verixet XFlow WordGeni CreVux AudAix RatAiFy; do
+            if [ ! -d "apps/$app/.git" ]; then
+              echo "::error file=apps/$app::Missing nested app repo. The subscription-tier proof gate expects the six app repos materialized under apps/$app before it runs."
+              missing=1
+            fi
+          done
+
+          if [ "$missing" -ne 0 ]; then
+            echo "The root repo ignores apps/ and does not use git submodules. Check out each app repo into apps/<AppName> before running npm run verify:subscription-tier."
+            exit 1
+          fi
+
+      - name: Install root dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -f package-lock.json ]; then
+            npm ci --ignore-scripts --no-audit --no-fund
+          else
+            echo "No root package-lock.json found; skipping root npm ci."
+          fi
+
+      - name: Install npm app dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          for app in apps/Verixet apps/XFlow apps/RatAiFy; do
+            if [ ! -f "$app/package-lock.json" ]; then
+              echo "::error file=$app/package-lock.json::Expected npm lockfile is missing."
+              exit 1
+            fi
+            npm ci --prefix "$app" --no-audit --no-fund
+          done
+
+      - name: Install AudAiX dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -f apps/AudAix/package-lock.json ]; then
+            echo "::error file=apps/AudAix/package-lock.json::Expected AudAiX npm lockfile is missing."
+            exit 1
+          fi
+          if [ ! -f apps/AudAix/dashboard/package-lock.json ]; then
+            echo "::error file=apps/AudAix/dashboard/package-lock.json::Expected AudAiX dashboard npm lockfile is missing."
+            exit 1
+          fi
+
+          npm ci --prefix apps/AudAix --no-audit --no-fund
+          npm ci --prefix apps/AudAix/dashboard --no-audit --no-fund
+
+      - name: Install WordGeni dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -f apps/WordGeni/pnpm-lock.yaml ]; then
+            echo "::error file=apps/WordGeni/pnpm-lock.yaml::Expected WordGeni pnpm lockfile is missing."
+            exit 1
+          fi
+
+          corepack prepare pnpm@9.15.0 --activate
+          pnpm --dir apps/WordGeni install --frozen-lockfile
+
+      - name: Install CreVux dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ ! -f apps/CreVux/pnpm-lock.yaml ]; then
+            echo "::error file=apps/CreVux/pnpm-lock.yaml::Expected CreVux pnpm lockfile is missing."
+            exit 1
+          fi
+
+          corepack prepare pnpm@10.30.3 --activate
+          pnpm --dir apps/CreVux install --frozen-lockfile
+
+      - name: Run subscription-tier proof gate
+        id: subscription_proof
+        continue-on-error: ${{ github.event_name == 'pull_request' }}
+        run: npm run verify:subscription-tier
+
+      - name: Explain advisory pull request result
+        if: ${{ github.event_name == 'pull_request' && steps.subscription_proof.outcome == 'failure' }}
+        run: |
+          echo "::warning::Subscription-tier proof gate failed in advisory mode. This workflow is not required yet; inspect the uploaded report and logs before promoting it to required CI."
+
+      - name: Upload subscription proof report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: subscription-tier-proof-gate-report
+          path: docs/subscription-tier-p3-recurring-proof-gate-report.md
+          if-no-files-found: warn
