@@ -1,0 +1,69 @@
+# Ecosystem Readiness Status
+
+Date: 2026-07-11
+
+This is the canonical readiness register for the six production apps. Status values are limited to `PROVEN`, `PARTIAL`, `BLOCKED`, `NOT RUN`, and `NOT APPLICABLE`.
+
+| App | Local professionalization | Public health proven | Deployed commit exposed | Deployed commit matches expected HEAD | Authenticated workflow proven | Billing/entitlement proven | Provider-cost fail-closed proven | Production screenshots/video proven | Current blockers | Latest evidence date | Evidence file or command |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| XFlow | PROVEN | PROVEN | PROVEN | BLOCKED | NOT RUN | PARTIAL | PARTIAL | NOT RUN | Production reports `af5a494da0c1b292815dffcd771e663f7cc76751`; expected repo HEAD is `960b5eff27f07b8bb9db83146422095855d7feec`. Authenticated control-plane, workspace isolation, Verixet handoff, and production media proof still require approved smoke. | 2026-07-11 | `curl https://xflowx.com/api/health`; `git -C apps/XFlow rev-parse HEAD`; `apps/XFlow/README.md`; `docs/xflow-production-drift-closeout.md` |
+| Verixet | PROVEN | PROVEN | PARTIAL | NOT RUN | NOT RUN | PARTIAL | PARTIAL | NOT RUN | Public health is live but deployed production does not yet expose commit metadata. Runtime billing/entitlement proof, account isolation, and Stripe/provider proof require approved test context. | 2026-07-11 | `curl https://verixet.com/api/v1/health`; `apps/Verixet/README.md`; `docs/verixet-authority-runtime-readiness.md` |
+| RatAiFy | PROVEN | PROVEN | PROVEN | PROVEN | NOT RUN | PARTIAL | PARTIAL | NOT RUN | Public health exposes current commit. Authenticated scanner/report flow, artifact authorization, paid scan gate, and unauthorized site denial require approved smoke. | 2026-07-11 | `curl https://rataify.com/health`; `git -C apps/RatAiFy rev-parse HEAD`; `apps/RatAiFy/README.md`; `docs/verixet-authority-runtime-readiness.md` |
+| AudAiX | PROVEN | PROVEN | BLOCKED | NOT RUN | NOT RUN | PARTIAL | PARTIAL | NOT RUN | Public `/health` is live but deployed production does not yet expose commit metadata. Authenticated audit/report/evidence flow, workspace isolation, and paid audit gate require approved smoke. | 2026-07-11 | `curl https://audaix.com/health`; `apps/AudAix/README.md`; `docs/verixet-authority-runtime-readiness.md` |
+| Crevux | PROVEN | PROVEN | PROVEN | PROVEN | NOT RUN | PARTIAL | PARTIAL | NOT RUN | Public health exposes current commit. Authenticated asset isolation, generation entitlement gate without provider invocation, export authorization, and denied entitlement proof require approved smoke. | 2026-07-11 | `curl https://crevux.com/api/healthz`; `git -C apps/CreVux rev-parse HEAD`; `apps/CreVux/README.md`; `docs/verixet-authority-runtime-readiness.md` |
+| WordGeni | PROVEN | PROVEN | BLOCKED | NOT RUN | NOT RUN | PARTIAL | PARTIAL | NOT RUN | Public web/API health is live but deployed production does not yet expose commit metadata. Authenticated source-backed writing, export authorization, worker proof, denied entitlement, and workspace isolation require approved smoke. | 2026-07-11 | `curl https://wordgeni.com/api/health`; `curl https://api.wordgeni.com/health`; `apps/WordGeni/README.md`; `docs/verixet-authority-runtime-readiness.md` |
+
+## Ecosystem Authority Model
+
+- XFlow owns control-plane, workspace, identity, app catalog, app connection, and cross-app routing authority.
+- Verixet owns billing, subscriptions, entitlements, usage, credits, checkout, catalog, and access decisions.
+- Satellite apps own their product workflows and may use local mirrors or caches only when clearly labeled as non-authoritative.
+- Local mirrors must not be presented as canonical billing truth.
+- Paid/provider-cost actions must fail closed when Verixet denies access or when entitlement authority is unavailable.
+
+## Currently Approved Proof Scope
+
+- Repository inspection.
+- Static/code-level billing authority audit.
+- Public unauthenticated health checks.
+- Local tests and typechecks that do not require production credentials.
+- Documentation updates.
+- Additive build metadata in public health/readiness responses.
+
+## Deployment Metadata Environment Variables
+
+Health and readiness endpoints should resolve deployment metadata with this deterministic precedence:
+
+- `commit`: `RAILWAY_GIT_COMMIT_SHA` -> `VERCEL_GIT_COMMIT_SHA` -> `GITHUB_SHA` -> `SOURCE_VERSION` -> `unknown`
+- `buildTime`: `BUILD_TIMESTAMP` -> `RAILWAY_DEPLOYMENT_CREATED_AT` -> `unknown`
+- `environment`: `RAILWAY_ENVIRONMENT_NAME` -> `VERCEL_ENV` -> `NODE_ENV` -> `unknown`
+
+Endpoints must return the full commit string. UI and docs may display shortened values, but API proof should preserve the full value. Endpoints must not hardcode `production`; unknown is safer than a false environment.
+
+## Actions Requiring Explicit Approval
+
+- Production or staging deploys, redeploys, restarts, or syncs.
+- Authenticated production smoke tests.
+- Billing, entitlement, subscription, Stripe, or customer mutations.
+- Provider-cost calls, including AI/media/audit provider calls.
+- Migrations, production database writes, seed operations, or data cleanup.
+- Secret rotation, credential changes, or deployment environment changes.
+- Capturing production screenshots or video from authenticated accounts.
+
+## Stale Evidence That Must Not Be Treated As Current
+
+- `DEPLOYMENT_STATE_VERIFICATION.md` is useful historical context from 2026-06-18, but app commits have advanced since then.
+- `PHASE3_FINAL_ECOSYSTEM_STATUS.md` records prior CI/security closure, not current authenticated production proof.
+- Local screenshot proof in `docs/ecosystem/product-proof.md` proves committed local media only; it does not prove live production workflows.
+- Admin/readiness closeout documents that say local proof is complete do not prove provider, billing, deployment, mutation, or authenticated production behavior.
+
+## Next Production-Proof Sequence
+
+1. Review and approve the repository-side diff from this cleanup phase.
+2. Commit approved repository changes by repo, without pushing until requested.
+3. Redeploy XFlow to expected HEAD `960b5eff27f07b8bb9db83146422095855d7feec`.
+4. Deploy Verixet, AudAiX, and WordGeni metadata endpoint changes after review.
+5. Re-run unauthenticated public health checks and verify commit metadata.
+6. Prepare approved test accounts and fixtures for each app.
+7. Run authenticated smoke plan in `docs/authenticated-production-smoke-plan.md`.
+8. Capture proof records using `docs/templates/production-proof-record.md`.
