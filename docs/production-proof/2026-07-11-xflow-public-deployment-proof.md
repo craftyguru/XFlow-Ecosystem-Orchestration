@@ -83,3 +83,24 @@
 - Approval source: User approval in Codex thread for XFlow commit `960b5eff27f07b8bb9db83146422095855d7feec`.
 - Approval scope: Deploy XFlow only; no migrations, secrets, Stripe/billing mutations, provider-cost calls, authenticated tests, production data mutations, unrelated config changes.
 - Residual risk: XFlow production remains on stale commit, so authenticated proof must not proceed for XFlow.
+
+## Phase 2B Railway Drift Closeout
+
+- Closeout date/time: 2026-07-11T11:14:16Z through Railway GraphQL inspection after the Phase 2A failed public deployment attempt.
+- Railway project: `xflowx` (`e4768601-f28f-4ac0-8f83-272219070e62`)
+- Railway environment: `production` (`7b0d90f9-2837-40b2-a549-f843a70a9bb2`)
+- Railway service: `xflowx` (`07e55648-447d-469b-876e-4564e1c807e7`)
+- Connected repository: `craftyguru/xflowx`
+- Connected branch: `master`
+- Deployment trigger: provider `github`, repository `craftyguru/xflowx`, branch `master`, service `xflowx`, environment `production`
+- Root directory: `null`
+- Public domains: `xflowx.com` and `www.xflowx.com`, both active custom domains on service `07e55648-447d-469b-876e-4564e1c807e7`
+- Last successful deployment: `a7a79f3d-0797-47a2-a322-e4029b7acdfc`, commit `af5a494da0c1b292815dffcd771e663f7cc76751`, status `SUCCESS`, created `2026-07-07T23:37:43.210Z`
+- Approved commit deployment: `673f961e-8bcb-40c8-8612-0f4290f256d4`, commit `960b5eff27f07b8bb9db83146422095855d7feec`, status `FAILED`, created `2026-07-09T10:36:27.156Z`, status updated `2026-07-09T10:37:38.710Z`
+- Approved commit deployment failure step: `BUILD_IMAGE`
+- Approved commit deployment failure message: `Failed to build an image. Please check the build logs for more details.`
+- Manual CLI upload attempt: `433f1d40-3295-4dc9-8471-2c934f209a7f`, status `FAILED`, step `BUILD_IMAGE`, created `2026-07-11T11:09:58.979Z`
+- Manual redeploy attempt: `6e7bf7de-7c60-4ed6-8662-bd751ba79d0c`, status `FAILED`, step `BUILD_IMAGE`, created `2026-07-11T11:12:35.920Z`
+- Root cause classification: `FAILED BUILD`
+- Final XFlow closeout status: `BLOCKED`
+- Smallest next approval required: investigate and fix the Railway Docker build failure for XFlow. This may require reviewing build logs in the Railway dashboard and approving code or deployment-configuration changes if the build failure points to a repository or Dockerfile defect.
