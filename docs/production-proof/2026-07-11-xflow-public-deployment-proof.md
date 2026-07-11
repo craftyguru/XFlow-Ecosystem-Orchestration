@@ -104,3 +104,23 @@
 - Root cause classification: `FAILED BUILD`
 - Final XFlow closeout status: `BLOCKED`
 - Smallest next approval required: investigate and fix the Railway Docker build failure for XFlow. This may require reviewing build logs in the Railway dashboard and approving code or deployment-configuration changes if the build failure points to a repository or Dockerfile defect.
+
+## Phase 2C Build Failure Investigation
+
+- Investigation date/time: 2026-07-11
+- Failed deployment IDs inspected: `673f961e-8bcb-40c8-8612-0f4290f256d4`, `433f1d40-3295-4dc9-8471-2c934f209a7f`, `6e7bf7de-7c60-4ed6-8662-bd751ba79d0c`
+- Railway finite log result: `deploymentLogs` returned no log rows for unfiltered, `build`, `error`, `docker`, `npm`, `pnpm`, and `yarn` filters.
+- Railway event result: all three failed deployments completed `SNAPSHOT_CODE` and failed at `BUILD_IMAGE` with `Failed to build an image. Please check the build logs for more details.`
+- Build configuration inspected: `package.json`, `package-lock.json`, `Dockerfile`, `railway.toml`, `.dockerignore`, `.railwayignore`, `next.config.ts`, `tsconfig.json`, `scripts/next-build.cjs`, `scripts/next-build-skip-standalone.cjs`.
+- Build-relevant config diff between last successful commit `af5a494da0c1b292815dffcd771e663f7cc76751` and approved commit `960b5eff27f07b8bb9db83146422095855d7feec`: no changes to `Dockerfile`, lockfile, package scripts, Railway config, Next config, or TypeScript config.
+- Changed area between last successful and approved commit: pricing/catalog/billing presentation files and focused tests/proof script.
+- Local install verification: `npm ci --dry-run` passed with Node `v22.18.0` and npm `10.9.3`.
+- Docker deps-stage install simulation: copied the same dependency-context files as the Dockerfile `deps` stage and ran `npm ci`; install passed.
+- Local build verification: `npm run build` passed.
+- Local forced standalone build verification: `XFLOW_NEXT_FORCE_STANDALONE=1 XFLOW_NEXT_IGNORE_BUILD_TYPE_ERRORS=1 npm run build` passed and produced `.next/standalone/server.js`.
+- Typecheck verification: `npm run typecheck` passed.
+- Focused tests: pricing/catalog/billing proof tests passed.
+- Docker verification limitation: `docker build --progress=plain -t xflow-phase2c-build .` could not run because Docker Desktop Linux engine was unavailable locally.
+- Defect classification: `INSUFFICIENT EVIDENCE`
+- Fix status: no code or deployment-configuration fix applied because no exact repository defect was proven.
+- Final XFlow Phase 2C status: `BLOCKED`
