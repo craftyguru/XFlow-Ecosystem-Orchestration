@@ -124,3 +124,18 @@
 - Defect classification: `INSUFFICIENT EVIDENCE`
 - Fix status: no code or deployment-configuration fix applied because no exact repository defect was proven.
 - Final XFlow Phase 2C status: `BLOCKED`
+
+## Phase 2D Missing Verixet Catalog Dependency Fix
+
+- Investigation date/time: 2026-07-11
+- Railway deployment ID: `673f961e-8bcb-40c8-8612-0f4290f256d4`
+- Builder: Railway Docker/BuildKit image build using repository `Dockerfile`
+- Failing stage: `builder`
+- Failing Dockerfile line: `28`, `RUN npm run build`
+- First actionable error: `Module not found: Can't resolve '../../../../Verixet/generated/catalog/verixet-public-catalog.v1.json'`
+- Import trace: `src/lib/pricing/verixet-generated-catalog.ts` -> `src/lib/pricing/ecosystemPlans.ts` -> `src/app/(auth)/sign-up/SignUpClient.tsx` and `src/app/api/auth/signup/start/route.ts`
+- Root cause classification: XFlow had a runtime build dependency on a sibling Verixet repository artifact that exists in the local multi-repo workspace but is absent from Railway's standalone XFlow build context.
+- Repository fix: XFlow commit `965989a165926ce1de40e6353d6140a45a636d16` replaces the cross-repo runtime import with a checked-in generated mirror at `apps/XFlow/src/generated/verixet-public-catalog.v1.json`; adds `npm run sync:verixet-catalog` for release-prep refresh from the sibling Verixet artifact; adds `npm run verify:standalone-catalog-mirror` to fail if the cross-repo import is reintroduced or the mirror becomes invalid.
+- Authority note: Verixet remains the canonical billing, subscription, entitlement, usage, credit, checkout, and catalog authority. The XFlow mirror is a deployment artifact/cache for public display and handoff metadata only.
+- Production status after fix: still `BLOCKED` until a new approved deployment proves public health/readiness commit metadata has advanced from `af5a494da0c1b292815dffcd771e663f7cc76751`.
+- Deployment performed in this phase: none.
