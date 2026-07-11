@@ -139,3 +139,68 @@
 - Authority note: Verixet remains the canonical billing, subscription, entitlement, usage, credit, checkout, and catalog authority. The XFlow mirror is a deployment artifact/cache for public display and handoff metadata only.
 - Production status after fix: still `BLOCKED` until a new approved deployment proves public health/readiness commit metadata has advanced from `af5a494da0c1b292815dffcd771e663f7cc76751`.
 - Deployment performed in this phase: none.
+
+## Phase 2E Redeploy And Public Verification
+
+- Verification date/time: 2026-07-11T20:23:12.9148274Z
+- Target Railway project: `xflowx` (`e4768601-f28f-4ac0-8f83-272219070e62`)
+- Target Railway environment: `production` (`7b0d90f9-2837-40b2-a549-f843a70a9bb2`)
+- Target Railway service: `xflowx` (`07e55648-447d-469b-876e-4564e1c807e7`)
+- Approved commit: `965989a165926ce1de40e6353d6140a45a636d16`
+- Successful Railway deployment: `350ccf4e-835e-4317-9edf-fbc6d095ef69`
+- Deployment status: `SUCCESS`
+- Build result: build succeeded and deployed.
+- Public health result: HTTP 200, `status` `live`, commit `965989a165926ce1de40e6353d6140a45a636d16`
+- Public readiness result: HTTP 200, `status` `ready`, commit `965989a165926ce1de40e6353d6140a45a636d16`
+- Metadata result: public endpoints expose app/service `xflow`, version `3.4.1`, environment `production`, and the full expected commit SHA. `buildTimestamp` remains `null` in the existing XFlow response contract.
+- Note: An initial `railway up` local upload deployment `338c60b4-4a9d-4d7d-8cf6-4f01d3fea9e8` succeeded without commit metadata and was removed with `railway down`; XFlow was then redeployed through Railway's targeted service-instance deploy for exact commit `965989a165926ce1de40e6353d6140a45a636d16`.
+- Final public commit status: `PROVEN`
+
+Health response:
+
+```json
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "status": "live",
+  "service": "xflow",
+  "version": "3.4.1",
+  "appSlug": "xflow",
+  "buildMarker": "support-phase-5b",
+  "supportRouteVersion": "support-route-phase-5b",
+  "buildTimestamp": null,
+  "commitSha": "965989a165926ce1de40e6353d6140a45a636d16",
+  "runtimeEnvironment": "production",
+  "serviceRootMarker": "xflow-health-route",
+  "deploy": {
+    "app": "xflow",
+    "version": "3.4.1",
+    "commit_sha": "965989a165926ce1de40e6353d6140a45a636d16",
+    "commit_short": "965989a16592",
+    "environment": "production"
+  },
+  "requestId": "1f42b9a6-e240-42b5-bcfa-0c29bb363de0",
+  "timestamp": "2026-07-11T20:23:12.251Z"
+}
+```
+
+Readiness response:
+
+```json
+{
+  "schemaVersion": 1,
+  "ok": true,
+  "status": "ready",
+  "service": "xflow",
+  "version": "3.4.1",
+  "deploy": {
+    "app": "xflow",
+    "version": "3.4.1",
+    "commit_sha": "965989a165926ce1de40e6353d6140a45a636d16",
+    "commit_short": "965989a16592",
+    "environment": "production"
+  },
+  "requestId": "45c6192c-534b-466a-8d61-55d898c4ba2a",
+  "timestamp": "2026-07-11T20:23:12.400Z"
+}
+```
