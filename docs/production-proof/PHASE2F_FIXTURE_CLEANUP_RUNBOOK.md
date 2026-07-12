@@ -21,7 +21,15 @@ Local validation cleanup is exercised through:
 npm run phase2f:fixtures:validate
 ```
 
-The latest validation deleted 29 locally created fixture rows and confirmed unrelated row counts were unchanged.
+The latest unit validation deleted 29 locally created fixture rows and confirmed unrelated row counts were unchanged.
+
+Real database validation cleanup is exercised through:
+
+```text
+npm run phase2f:fixtures:validate-db
+```
+
+The latest database validation deleted 33 marked rows from the disposable migrated PostgreSQL database, confirmed 0 marked rows remained, and confirmed unrelated row counts were unchanged.
 
 ## Cleanup Approval Boundary
 

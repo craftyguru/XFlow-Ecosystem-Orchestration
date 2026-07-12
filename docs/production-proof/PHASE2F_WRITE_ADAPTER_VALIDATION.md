@@ -4,13 +4,16 @@ Date: 2026-07-12
 
 ## Summary
 
-Phase 2F.4 implemented executable bounded write adapters for the six-app fixture system. Validation was run against the local in-memory fixture store only. No production users, workspaces, entitlements, app fixture rows, Stripe objects, provider jobs, deployments, or migrations were created.
+Phase 2F.4 implemented executable bounded write adapters for the six-app fixture system. This document records the local in-memory unit validation. Phase 2F.4B separately validated the adapter fixture shape against a real disposable PostgreSQL database built from the repository Supabase migrations; see `docs/production-proof/PHASE2F_DATABASE_ADAPTER_VALIDATION.md`.
+
+No production users, workspaces, entitlements, app fixture rows, Stripe objects, provider jobs, deployments, or production migrations were created.
 
 ## Commands
 
 ```text
 npm run test:phase2f-fixtures
-npm run phase2f:fixtures:validate -- --json
+npm run phase2f:fixtures:validate-unit -- --json
+npm run phase2f:fixtures:validate-db
 npm run phase2f:fixtures:dry-run -- --json
 npm run phase2f:fixtures:verify -- --json
 npm run phase2f:fixtures:cleanup -- --json
@@ -30,9 +33,9 @@ npm run phase2f:fixtures:cleanup -- --json
 
 ## Validation Environment
 
-Environment: local in-memory fixture store.
+Environment for this document: local in-memory fixture store.
 
-This was selected because no approved non-production shared Supabase credentials were available in this phase. The adapters execute real create/reuse/verify/cleanup methods against the fixture store and enforce markers, deterministic IDs, cleanup order, collision refusal, and idempotency.
+The unit adapters execute real create/reuse/verify/cleanup methods against the fixture store and enforce markers, deterministic IDs, cleanup order, collision refusal, and idempotency. The real database validation command now covers migrated PostgreSQL tables, constraints, FKs, RLS visibility, idempotency, and cleanup separately.
 
 ## Validation Evidence
 
@@ -71,7 +74,8 @@ Required private values must come from `.env.phase2f.local` or an approved secre
 
 ## Remaining Risks
 
-- Local validation does not prove live production schema/RLS behavior.
+- Unit validation does not prove live production schema/RLS behavior.
+- Database validation proves behavior against a disposable migrated PostgreSQL database, not production.
 - Auth provider creation must be validated against the approved production auth service before real execution.
 - Verixet optional non-billable entitlement grants may require an approved non-Stripe subscription/test entitlement representation.
 - Authenticated production smoke tests and screenshot capture remain separately approval-bound.

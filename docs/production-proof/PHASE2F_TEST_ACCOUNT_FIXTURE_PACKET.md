@@ -256,3 +256,28 @@ Latest local validation evidence:
 | Unrelated rows unchanged | true |
 
 Current Phase 2F gate: WRITE ADAPTERS VALIDATED LOCALLY; production execution still requires explicit approval, required credentials, expected project validation, and `--environment production --confirm-production-fixtures --enable-reviewed-write-adapters`.
+
+## Phase 2F.4B Database Adapter Validation Status
+
+Phase 2F.4B adds a real non-production database validation command:
+
+```text
+npm run phase2f:fixtures:validate-db
+```
+
+The validation was run against an isolated disposable PostgreSQL 17 database built from the repository Supabase migrations. It created, reused, verified, RLS-checked, and cleaned up deterministic marked fixture rows across Auth, XFlow/Core, Verixet, RatAiFy, AudAiX, Crevux, and WordGeni tables.
+
+Latest database validation evidence:
+
+| Step | Result |
+| --- | --- |
+| Schema identity | 6 ecosystem apps, 48 migrated app-schema tables |
+| First provision | 33 created, 0 reused |
+| First verify | adapter counts matched expected rows |
+| Second provision | 0 created, 33 reused |
+| Second verify | adapter counts matched expected rows |
+| RLS visibility | standard user visible, outsider denied |
+| Cleanup | 33 deleted, 0 marked rows remained |
+| Unrelated rows unchanged | true |
+
+Current Phase 2F gate: DATABASE ADAPTERS VALIDATED LOCALLY; production fixture creation and authenticated smoke tests still require explicit approval.
