@@ -10,6 +10,8 @@ Production was not touched. No production credentials were used.
 
 Final enablement status: PRODUCTION WRITE PATH ENABLED - PRIVATE CONFIGURATION REQUIRED.
 
+Phase 2F.5B private configuration status: target identity was populated from approved private sources and read-only schema validation passed. The runtime now rejects template placeholders such as `REQUIRES_PRIVATE_INPUT`. Production execution remains blocked until the three required test identity passwords are entered privately.
+
 ## Previous Blockers
 
 Phase 2F.5 was blocked because:

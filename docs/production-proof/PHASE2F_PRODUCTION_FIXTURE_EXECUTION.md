@@ -10,6 +10,8 @@ Final decision: BLOCKED.
 
 Phase 2F.5A follow-up: the unconditional production-write refusal has been replaced by a calculated gate and the live PostgreSQL path has been validated locally. Production fixture execution still requires private `.env.phase2f.local` values and renewed approval.
 
+Phase 2F.5B follow-up: `.env.phase2f.local` was created as an ignored private file. Production target identity and read-only schema validation passed, but three required password placeholders remain. Final status remains blocked until those private values are entered directly into the ignored file and no-write preflight is rerun.
+
 ## Reviewed Commit And Branch
 
 | Field | Value |

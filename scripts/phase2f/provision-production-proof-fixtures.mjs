@@ -2,6 +2,7 @@
 import {
   REVIEWED_ADAPTER_MANIFEST,
   buildRunResult,
+  isMissingEnvValue,
   loadLocalEnv,
   parseArgs,
   readState,
@@ -59,6 +60,33 @@ if (!args.dryRun && result.ok) {
 }
 
 if (args.dryRun) {
+  if (args.environment === "production") {
+    const env = loadLocalEnv();
+    const databaseUrl = resolveDatabaseUrl(env);
+    if (!isMissingEnvValue(env.PHASE2F_DATABASE_URL)) {
+      const targetValidation = validateDatabaseTargetIdentity({ environment: args.environment, databaseUrl, env });
+      const binding = targetBindingFor({ environment: args.environment, target: targetValidation.target });
+      const stateErrors = validateStateTargetBinding({ state: readState(), binding });
+      result.targetValidation = {
+        ok: targetValidation.errors.length === 0,
+        target: {
+          hostname: targetValidation.target.isLocalhost ? targetValidation.target.hostname : "[REDACTED]",
+          port: targetValidation.target.port,
+          database: targetValidation.target.database,
+          isLocalhost: targetValidation.target.isLocalhost,
+        },
+        errors: targetValidation.errors,
+      };
+      result.stateBinding = { ok: stateErrors.length === 0, errors: stateErrors, binding };
+    } else {
+      result.targetValidation = {
+        ok: false,
+        target: null,
+        errors: ["PHASE2F_DATABASE_URL is missing or requires private input"],
+      };
+      result.stateBinding = { ok: false, errors: ["target binding unavailable without PHASE2F_DATABASE_URL"] };
+    }
+  }
   writeStateAtomic({
     phase: "2F.3",
     status: "DRY_RUN_ONLY",

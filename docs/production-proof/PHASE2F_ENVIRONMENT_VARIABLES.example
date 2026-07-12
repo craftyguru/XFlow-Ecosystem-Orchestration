@@ -2,6 +2,7 @@
 
 # Copy variable names into the ignored `.env.phase2f.local` file.
 # Replace placeholders privately. Do not commit real values.
+# Runtime preflight treats replace_me and REQUIRES_PRIVATE_INPUT as missing values.
 
 # Production database connection secret.
 PHASE2F_DATABASE_URL=replace_me

@@ -72,6 +72,11 @@ export const OPTIONAL_ENV = Object.freeze([
   "PHASE2F_EXPECTED_SUPABASE_PROJECT_REF",
 ]);
 
+export function isMissingEnvValue(value) {
+  if (!value) return true;
+  return ["replace_me", "replace_me_optional", "REQUIRES_PRIVATE_INPUT"].includes(String(value).trim());
+}
+
 export const SCHEMA_EVIDENCE = Object.freeze({
   xflow: [
     "apps/XFlow/drizzle/schema/users.ts",
@@ -154,7 +159,7 @@ export function validateRuntime(args, env) {
       errors.push(`production execution requires reviewed manifest version ${REVIEWED_ADAPTER_MANIFEST.version}`);
     }
     for (const key of REQUIRED_PRODUCTION_ENV) {
-      if (!env[key]) errors.push(`missing required environment variable ${key}`);
+      if (isMissingEnvValue(env[key])) errors.push(`missing required environment variable ${key}`);
     }
   } else if (!args.dryRun && args.environment !== "local") {
     errors.push("non-production validation execution currently supports --environment local only");
@@ -445,7 +450,7 @@ export function buildRunResult({ command, args, env = loadLocalEnv() }) {
   const runtimeErrors = validateRuntime(args, env);
   const planErrors = validatePlan(plan);
   const guardErrors = validateProviderBillingGuard(plan);
-  const missingEnv = (args.environment === "production" ? REQUIRED_PRODUCTION_ENV : REQUIRED_ENV).filter((key) => !env[key]);
+  const missingEnv = (args.environment === "production" ? REQUIRED_PRODUCTION_ENV : REQUIRED_ENV).filter((key) => isMissingEnvValue(env[key]));
   const productionGate = {
     defaultDeny: true,
     manifestVersion: REVIEWED_ADAPTER_MANIFEST.version,

@@ -96,6 +96,18 @@ test("production gate refuses missing credentials and target vars", () => {
   }
 });
 
+test("production gate refuses template placeholder values", () => {
+  const errors = validateRuntime(
+    { dryRun: false, environment: "production", confirmProductionFixtures: true, enableReviewedWriteAdapters: true },
+    fullProductionEnv({
+      PHASE2F_STANDARD_PASSWORD: "REQUIRES_PRIVATE_INPUT",
+      PHASE2F_DATABASE_URL: "replace_me",
+    }),
+  );
+  assert.ok(errors.some((error) => error.includes("PHASE2F_STANDARD_PASSWORD")));
+  assert.ok(errors.some((error) => error.includes("PHASE2F_DATABASE_URL")));
+});
+
 test("target validation refuses mismatch and localhost production", () => {
   const mismatch = validateDatabaseTargetIdentity({
     environment: "production",
