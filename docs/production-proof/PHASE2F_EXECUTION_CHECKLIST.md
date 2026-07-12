@@ -4,7 +4,7 @@ Date: 2026-07-11
 
 Use this checklist only after `docs/production-proof/PHASE2F_TEST_ACCOUNT_FIXTURE_PACKET.md` is approved and the approved test identities and fixtures exist.
 
-Current Phase 2F gate: PRIVATE INPUT REQUIRED. The root provisioner can produce a schema-aware dry-run plan, execute create/reuse/verify/cleanup adapters against the local unit validation store, validate deterministic fixture rows against a disposable PostgreSQL database, and execute the guarded live PostgreSQL path locally. Phase 2F.5B created the ignored `.env.phase2f.local` with production target identity populated, but three required password placeholders remain. Do not start production fixture creation or authenticated smoke tests until those private values are entered directly into the ignored file, read-only preflight passes, and execution is explicitly approved.
+Current Phase 2F gate: BLOCKED. The root provisioner can produce a schema-aware dry-run plan, execute create/reuse/verify/cleanup adapters against the local unit validation store, validate deterministic fixture rows against a disposable PostgreSQL database, and execute the guarded live PostgreSQL path locally. Phase 2F.5C completed private passwords and final no-write production checks, but production fixture execution is blocked until the live SQL fixture path consumes the private Phase 2F auth email/password variables and produces valid auth password hashes.
 
 ## Before Testing
 

@@ -303,4 +303,8 @@ Phase 2F.5A enables the guarded production write path technically while leaving 
 
 Phase 2F.5B keeps the minimum identity set to `standard`, `denied`, and `outsider`. `.env.phase2f.local` now contains deterministic synthetic email labels and still requires private values for `PHASE2F_STANDARD_PASSWORD`, `PHASE2F_DENIED_PASSWORD`, and `PHASE2F_OUTSIDER_PASSWORD`. Optional `entitled` and `admin` identities remain omitted until a later authenticated proof explicitly needs them.
 
+## Phase 2F.5C Final Preflight Status
+
+The three required passwords are now present privately. Bounded read-only collision checks found the configured auth identities absent and safe to create. Execution is not approved because the live SQL provision path must first be updated to consume the private identity credentials and create valid auth password hashes.
+
 Current Phase 2F gate: PRODUCTION WRITE PATH ENABLED - PRIVATE CONFIGURATION REQUIRED; authenticated production smoke testing remains blocked.

@@ -8,6 +8,8 @@ Phase 2F.5B prepared the ignored private configuration file for a future approve
 
 Final decision: PRIVATE INPUT REQUIRED.
 
+Phase 2F.5C update: the three password values were completed privately and final no-write preflight checks passed, but production execution is BLOCKED because the live SQL fixture path still hardcodes auth emails and placeholder password hashes instead of consuming the private Phase 2F credential variables.
+
 ## Starting State
 
 | Check | Result |
