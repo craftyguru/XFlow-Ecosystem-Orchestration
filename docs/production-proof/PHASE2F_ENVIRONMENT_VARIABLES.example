@@ -16,6 +16,13 @@ PHASE2F_EXPECTED_ENVIRONMENT_NAME=production
 # Reviewed adapter manifest acknowledgement.
 PHASE2F_REVIEWED_MANIFEST_VERSION=phase2f-production-fixtures-v1
 
+# Required Supabase Auth Admin target.
+# URL must match the expected project reference. Keys are private and must never be printed.
+PHASE2F_SUPABASE_URL=replace_me
+PHASE2F_SUPABASE_SERVICE_ROLE_KEY=replace_me
+PHASE2F_SUPABASE_ANON_KEY=replace_me
+PHASE2F_EXPECTED_SUPABASE_PROJECT_REF=replace_me
+
 # Required deterministic production proof identities.
 PHASE2F_STANDARD_EMAIL=replace_me
 PHASE2F_STANDARD_PASSWORD=replace_me

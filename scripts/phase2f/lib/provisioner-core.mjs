@@ -21,7 +21,7 @@ export const REVIEWED_ADAPTER_MANIFEST = Object.freeze({
   fixtureMarkerVersion: "phase2f-production-proof",
   reviewedAdapters: ["auth", "xflow", "verixet", "rataify", "audaix", "crevux", "wordgeni"],
   schemas: {
-    auth: ["auth.users"],
+    auth: ["auth.users", "auth.identities"],
     xflow: ["core.workspaces", "core.workspace_members", "core.workspace_app_access", "core.app_connections", "xflow.app_links"],
     verixet: ["verixet.billing_accounts", "verixet.entitlement_decisions"],
     rataify: ["rataify.sites", "rataify.reviews", "rataify.issues", "rataify.evidence_items"],
@@ -29,7 +29,15 @@ export const REVIEWED_ADAPTER_MANIFEST = Object.freeze({
     crevux: ["crevux.projects", "crevux.assets", "crevux.exports"],
     wordgeni: ["wordgeni.documents", "wordgeni.document_sources", "wordgeni.provenance_items"],
   },
-  permittedOperationTypes: ["create-or-reuse-marked-fixture", "verify-marked-fixture", "delete-marked-fixture"],
+  permittedOperationTypes: [
+    "create-or-reuse-marked-fixture",
+    "verify-marked-fixture",
+    "delete-marked-fixture",
+    "auth-admin-lookup-user",
+    "auth-admin-create-user",
+    "auth-password-verify",
+    "auth-admin-delete-created-user",
+  ],
   prohibitedOperationTypes: ["stripe-mutation", "provider-call", "checkout", "subscription", "invoice", "payment-method", "crawl", "scan-execution", "audit-execution", "ai-generation", "embedding", "ingestion", "paid-export"],
   cleanupDependencyOrder: ["wordgeni", "crevux", "audaix", "rataify", "verixet", "xflow", "auth"],
 });
@@ -60,6 +68,9 @@ export const REQUIRED_PRODUCTION_ENV = Object.freeze([
   "PHASE2F_EXPECTED_DB_NAME",
   "PHASE2F_EXPECTED_ENVIRONMENT_NAME",
   "PHASE2F_REVIEWED_MANIFEST_VERSION",
+  "PHASE2F_SUPABASE_URL",
+  "PHASE2F_SUPABASE_SERVICE_ROLE_KEY",
+  "PHASE2F_SUPABASE_ANON_KEY",
 ]);
 
 export const OPTIONAL_ENV = Object.freeze([
@@ -67,8 +78,6 @@ export const OPTIONAL_ENV = Object.freeze([
   "PHASE2F_ENTITLED_PASSWORD",
   "PHASE2F_ADMIN_EMAIL",
   "PHASE2F_ADMIN_PASSWORD",
-  "PHASE2F_SUPABASE_URL",
-  "PHASE2F_SUPABASE_SERVICE_ROLE_KEY",
   "PHASE2F_EXPECTED_SUPABASE_PROJECT_REF",
 ]);
 
@@ -422,9 +431,23 @@ export function validateProviderBillingGuard(plan) {
 }
 
 export function redactResult(result) {
+  const configuredSecrets = [
+    process.env.PHASE2F_STANDARD_PASSWORD,
+    process.env.PHASE2F_DENIED_PASSWORD,
+    process.env.PHASE2F_OUTSIDER_PASSWORD,
+    process.env.PHASE2F_ENTITLED_PASSWORD,
+    process.env.PHASE2F_ADMIN_PASSWORD,
+    process.env.PHASE2F_SUPABASE_SERVICE_ROLE_KEY,
+    process.env.PHASE2F_SUPABASE_ANON_KEY,
+  ].filter(Boolean);
   return JSON.parse(
     JSON.stringify(result, (key, value) => {
       if (/password|token|secret|cookie|key/i.test(key)) return value ? "[REDACTED]" : value;
+      if (typeof value === "string" && configuredSecrets.some((secret) => value.includes(secret))) {
+        let text = value;
+        for (const secret of configuredSecrets) text = text.split(secret).join("[REDACTED]");
+        return text;
+      }
       return value;
     }),
   );

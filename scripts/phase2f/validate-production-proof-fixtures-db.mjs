@@ -16,6 +16,8 @@ const ids = {
   workspace: "00000000-0000-4000-8000-000000002f10",
 };
 
+export const DEFAULT_DB_FIXTURE_IDS = Object.freeze({ ...ids });
+
 const markerSql = `'{"phase":"2F","label":"phase2f-production-proof","environment":"database-validation","isTest":true}'::jsonb`;
 
 const snapshotSql = `
@@ -385,6 +387,65 @@ select jsonb_build_object(
 )::text;
 `;
 
+function replaceAllLiteral(input, from, to) {
+  return input.split(from).join(to);
+}
+
+function sqlForIds(sql, fixtureIds = DEFAULT_DB_FIXTURE_IDS) {
+  let next = sql;
+  for (const [key, value] of Object.entries(DEFAULT_DB_FIXTURE_IDS)) {
+    next = replaceAllLiteral(next, value, fixtureIds[key] ?? value);
+  }
+  return next;
+}
+
+function omitAuthInsertCtes(sql) {
+  return sql
+    .replace(/u1 as \([\s\S]*?on conflict \(id\) do nothing returning 'auth'::text as adapter\s*\),/, "u1 as (select null::text as adapter where false),")
+    .replace(/u2 as \([\s\S]*?on conflict \(id\) do nothing returning 'auth'::text as adapter\s*\),/, "u2 as (select null::text as adapter where false),")
+    .replace(/u3 as \([\s\S]*?on conflict \(id\) do nothing returning 'auth'::text as adapter\s*\),/, "u3 as (select null::text as adapter where false),");
+}
+
+export function fixtureIdsFromAuthResults(authResults = []) {
+  const byRole = Object.fromEntries(authResults.map((entry) => [entry.role, entry.user?.id]));
+  for (const role of ["standard", "denied", "outsider"]) {
+    if (!byRole[role]) throw new Error(`missing Phase 2F auth user id for ${role}`);
+  }
+  return {
+    ...DEFAULT_DB_FIXTURE_IDS,
+    standardUser: byRole.standard,
+    deniedUser: byRole.denied,
+    outsiderUser: byRole.outsider,
+  };
+}
+
+function buildProvisionSql({ fixtureIds = DEFAULT_DB_FIXTURE_IDS, includeAuthUserInserts = true } = {}) {
+  const sql = includeAuthUserInserts ? provisionSql : omitAuthInsertCtes(provisionSql);
+  return sqlForIds(sql, fixtureIds);
+}
+
+function buildVerifySql({ fixtureIds = DEFAULT_DB_FIXTURE_IDS } = {}) {
+  return sqlForIds(verifySql, fixtureIds);
+}
+
+function buildRlsSql({ fixtureIds = DEFAULT_DB_FIXTURE_IDS } = {}) {
+  return sqlForIds(rlsSql, fixtureIds);
+}
+
+function buildCleanupSql({ fixtureIds = DEFAULT_DB_FIXTURE_IDS, includeAuthUserDelete = true } = {}) {
+  const sql = includeAuthUserDelete
+    ? cleanupSql
+    : cleanupSql.replace(
+        /d_auth as \(delete from auth\.users[\s\S]*?returning 'auth'::text adapter\),/,
+        "d_auth as (select null::text as adapter where false),",
+      );
+  return sqlForIds(sql, fixtureIds);
+}
+
+function buildCleanupVerifySql({ fixtureIds = DEFAULT_DB_FIXTURE_IDS } = {}) {
+  return sqlForIds(cleanupVerifySql, fixtureIds);
+}
+
 export function assertDatabaseLifecycle(condition, message) {
   if (!condition) throw new Error(message);
 }
@@ -403,30 +464,33 @@ export function runDatabaseSchemaIdentity({ databaseUrl }) {
   return schemaIdentity;
 }
 
-export function runDatabaseProvision({ databaseUrl, phase = "2F.5A" }) {
+export function runDatabaseProvision({ databaseUrl, phase = "2F.5A", authResults = null }) {
+  const fixtureIds = authResults ? fixtureIdsFromAuthResults(authResults) : DEFAULT_DB_FIXTURE_IDS;
+  const includeAuthUserInserts = !authResults;
   const startedAt = new Date().toISOString();
   const result = {
     phase,
     command: "provision",
     target: target(databaseUrl),
+    authMode: includeAuthUserInserts ? "local-database-compatibility" : "supabase-auth-admin",
     startedAt,
     schemaIdentity: runDatabaseSchemaIdentity({ databaseUrl }),
     beforeCounts: runPsqlJson({ databaseUrl, sql: snapshotSql, label: "before-counts" }),
-    collisionProbe: runPsqlJson({ databaseUrl, sql: collisionProbeSql, label: "collision-probe" }),
+    collisionProbe: runPsqlJson({ databaseUrl, sql: sqlForIds(collisionProbeSql, fixtureIds), label: "collision-probe" }),
   };
   assertDatabaseLifecycle(result.collisionProbe.unmarkedCollisionDetected === true, "expected unmarked collision probe to be detected");
-  result.provision = runPsqlJson({ databaseUrl, sql: provisionSql, label: "provision" });
-  result.verify = runDatabaseVerify({ databaseUrl, phase }).verify;
+  result.provision = runPsqlJson({ databaseUrl, sql: buildProvisionSql({ fixtureIds, includeAuthUserInserts }), label: "provision" });
+  result.verify = runDatabaseVerify({ databaseUrl, phase, fixtureIds }).verify;
   result.completedAt = new Date().toISOString();
   result.ok = true;
   return result;
 }
 
-export function runDatabaseVerify({ databaseUrl, phase = "2F.5A" }) {
+export function runDatabaseVerify({ databaseUrl, phase = "2F.5A", fixtureIds = DEFAULT_DB_FIXTURE_IDS }) {
   const startedAt = new Date().toISOString();
-  const verify = runPsqlJson({ databaseUrl, sql: verifySql, label: "verify" });
+  const verify = runPsqlJson({ databaseUrl, sql: buildVerifySql({ fixtureIds }), label: "verify" });
   assertDatabaseLifecycle(verify.countsMatch === true, "verification counts did not match expected fixture counts");
-  const rls = runPsqlText({ databaseUrl, sql: rlsSql, label: "rls-visibility" }).stdout
+  const rls = runPsqlText({ databaseUrl, sql: buildRlsSql({ fixtureIds }), label: "rls-visibility" }).stdout
     .split(/\r?\n/)
     .filter(Boolean)
     .map((line) => JSON.parse(line));
@@ -444,7 +508,9 @@ export function runDatabaseVerify({ databaseUrl, phase = "2F.5A" }) {
   };
 }
 
-export function runDatabaseCleanup({ databaseUrl, phase = "2F.5A", dryRun = false }) {
+export function runDatabaseCleanup({ databaseUrl, phase = "2F.5A", dryRun = false, authResults = null }) {
+  const fixtureIds = authResults ? fixtureIdsFromAuthResults(authResults) : DEFAULT_DB_FIXTURE_IDS;
+  const includeAuthUserDelete = !authResults;
   const startedAt = new Date().toISOString();
   const beforeCounts = runPsqlJson({ databaseUrl, sql: snapshotSql, label: "cleanup-before-counts" });
   if (dryRun) {
@@ -465,8 +531,8 @@ export function runDatabaseCleanup({ databaseUrl, phase = "2F.5A", dryRun = fals
       ok: true,
     };
   }
-  const cleanup = runPsqlJson({ databaseUrl, sql: cleanupSql, label: "cleanup" });
-  const cleanupVerify = runPsqlJson({ databaseUrl, sql: cleanupVerifySql, label: "cleanup-verify" });
+  const cleanup = runPsqlJson({ databaseUrl, sql: buildCleanupSql({ fixtureIds, includeAuthUserDelete }), label: "cleanup" });
+  const cleanupVerify = runPsqlJson({ databaseUrl, sql: buildCleanupVerifySql({ fixtureIds }), label: "cleanup-verify" });
   const afterCounts = runPsqlJson({ databaseUrl, sql: snapshotSql, label: "cleanup-after-counts" });
   assertDatabaseLifecycle(cleanupVerify.remainingMarkedRows === 0, "cleanup left marked Phase 2F rows behind");
   return {
@@ -497,9 +563,9 @@ export function runDatabaseLifecycle({ databaseUrl, phase = "2F.4B" }) {
   result.collisionProbe = runPsqlJson({ databaseUrl, sql: collisionProbeSql, label: "collision-probe" });
   assertDatabaseLifecycle(result.collisionProbe.unmarkedCollisionDetected === true, "expected unmarked collision probe to be detected");
 
-  result.firstProvision = runPsqlJson({ databaseUrl, sql: provisionSql, label: "first-provision" });
+  result.firstProvision = runPsqlJson({ databaseUrl, sql: buildProvisionSql(), label: "first-provision" });
   result.firstVerify = runDatabaseVerify({ databaseUrl, phase }).verify;
-  result.secondProvision = runPsqlJson({ databaseUrl, sql: provisionSql, label: "second-provision" });
+  result.secondProvision = runPsqlJson({ databaseUrl, sql: buildProvisionSql(), label: "second-provision" });
   result.secondVerify = runDatabaseVerify({ databaseUrl, phase }).verify;
 
   assertDatabaseLifecycle(result.firstVerify.countsMatch === true, "first verification counts did not match expected fixture counts");
@@ -512,7 +578,7 @@ export function runDatabaseLifecycle({ databaseUrl, phase = "2F.4B" }) {
   result.rls = runDatabaseVerify({ databaseUrl, phase }).rls;
   result.cleanupDryRun = runDatabaseCleanup({ databaseUrl, phase, dryRun: true });
   result.cleanup = runDatabaseCleanup({ databaseUrl, phase, dryRun: false }).cleanup;
-  result.cleanupVerify = runPsqlJson({ databaseUrl, sql: cleanupVerifySql, label: "cleanup-verify" });
+  result.cleanupVerify = runPsqlJson({ databaseUrl, sql: buildCleanupVerifySql(), label: "cleanup-verify" });
   result.afterCounts = runPsqlJson({ databaseUrl, sql: snapshotSql, label: "after-counts" });
   assertDatabaseLifecycle(result.cleanupVerify.remainingMarkedRows === 0, "cleanup left marked Phase 2F rows behind");
   assertDatabaseLifecycle(JSON.stringify(result.beforeCounts) === JSON.stringify(result.afterCounts), "unrelated table counts changed after cleanup");

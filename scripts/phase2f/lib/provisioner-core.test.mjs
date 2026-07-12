@@ -57,6 +57,9 @@ function fullProductionEnv(overrides = {}) {
     PHASE2F_EXPECTED_DB_NAME: "postgres",
     PHASE2F_EXPECTED_ENVIRONMENT_NAME: "production",
     PHASE2F_REVIEWED_MANIFEST_VERSION: REVIEWED_ADAPTER_MANIFEST.version,
+    PHASE2F_SUPABASE_URL: "https://expected-ref.supabase.co",
+    PHASE2F_SUPABASE_SERVICE_ROLE_KEY: "service-role-test-key",
+    PHASE2F_SUPABASE_ANON_KEY: "anon-test-key",
     ...overrides,
   };
 }

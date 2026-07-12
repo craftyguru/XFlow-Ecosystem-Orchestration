@@ -4,7 +4,7 @@ Date: 2026-07-11
 
 Use this checklist only after `docs/production-proof/PHASE2F_TEST_ACCOUNT_FIXTURE_PACKET.md` is approved and the approved test identities and fixtures exist.
 
-Current Phase 2F gate: BLOCKED. The root provisioner can produce a schema-aware dry-run plan, execute create/reuse/verify/cleanup adapters against the local unit validation store, validate deterministic fixture rows against a disposable PostgreSQL database, and execute the guarded live PostgreSQL path locally. Phase 2F.5C completed private passwords and final no-write production checks, but production fixture execution is blocked until the live SQL fixture path consumes the private Phase 2F auth email/password variables and produces valid auth password hashes.
+Current Phase 2F gate: BLOCKED. The root provisioner can produce a schema-aware dry-run plan, execute create/reuse/verify/cleanup adapters against the local unit validation store, validate deterministic fixture rows against a disposable PostgreSQL database, and execute the guarded live PostgreSQL path locally. Phase 2F.5D corrected the production auth path to use Supabase Auth Admin and configured private credentials, but production fixture execution is blocked until a real non-production Supabase Auth lifecycle validates create/reuse/sign-in/idempotency/cleanup.
 
 ## Before Testing
 
@@ -15,6 +15,9 @@ Current Phase 2F gate: BLOCKED. The root provisioner can produce a schema-aware 
 - [ ] Confirm `docs/production-proof/PHASE2F_PRODUCTION_FIXTURE_EXECUTION.md` no longer has a BLOCKED result before starting authenticated proof.
 - [ ] Populate ignored `.env.phase2f.local` from `docs/production-proof/PHASE2F_ENVIRONMENT_VARIABLES.example`.
 - [ ] Confirm `PHASE2F_REVIEWED_MANIFEST_VERSION=phase2f-production-fixtures-v1`.
+- [ ] Confirm `PHASE2F_SUPABASE_URL`, `PHASE2F_SUPABASE_SERVICE_ROLE_KEY`, and `PHASE2F_SUPABASE_ANON_KEY` are populated privately.
+- [ ] Confirm Supabase Auth project-ref validation passes.
+- [ ] Confirm standard, denied, and outsider Auth identities were validated against a real non-production Auth service before production execution.
 - [ ] Confirm production target identity validates before any write.
 - [ ] Confirm any non-dry production provisioner run has explicit approval for `--environment production --confirm-production-fixtures`.
 - [ ] Load credentials securely from an approved secret store or ignored local env file.

@@ -8,7 +8,9 @@ Phase 2F.5C completed the private password packet and reran final no-write produ
 
 Final decision: BLOCKED.
 
-The no-write target, schema, collision, entitlement, provider/billing guard, dry-run, and refusal checks passed. The blocker is an implementation gap found during final preflight: the live PostgreSQL fixture SQL still hardcodes auth fixture emails and placeholder `encrypted_password` values instead of consuming the private `PHASE2F_*_EMAIL` and `PHASE2F_*_PASSWORD` values. Production fixture execution is not ready until that is fixed and reviewed.
+The no-write target, schema, collision, entitlement, provider/billing guard, dry-run, and refusal checks passed. The Phase 2F.5C blocker was an implementation gap found during final preflight: the live PostgreSQL fixture SQL still hardcoded auth fixture emails and placeholder `encrypted_password` values instead of consuming the private `PHASE2F_*_EMAIL` and `PHASE2F_*_PASSWORD` values.
+
+Phase 2F.5D update: the repository path now requires Supabase Auth Admin for production auth fixture creation and consumes configured emails/passwords. Production execution remains `BLOCKED` until a real non-production Supabase Auth lifecycle validates create/reuse/sign-in/idempotency/cleanup and the no-write production checks are rerun with the new Auth Admin variables.
 
 ## Starting State
 

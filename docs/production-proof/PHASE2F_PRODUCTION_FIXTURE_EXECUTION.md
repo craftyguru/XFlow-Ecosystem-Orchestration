@@ -12,7 +12,9 @@ Phase 2F.5A follow-up: the unconditional production-write refusal has been repla
 
 Phase 2F.5B follow-up: `.env.phase2f.local` was created as an ignored private file. Production target identity and read-only schema validation passed, but three required password placeholders remain. Final status remains blocked until those private values are entered directly into the ignored file and no-write preflight is rerun.
 
-Phase 2F.5C follow-up: private password values were completed and no-write preflight passed, including target, schema, collision, entitlement, provider/billing guard, dry-run, and refusal tests. Production fixture execution remains blocked because the live SQL fixture path still uses hardcoded auth emails and placeholder password hashes instead of the private Phase 2F credentials.
+Phase 2F.5C follow-up: private password values were completed and no-write preflight passed, including target, schema, collision, entitlement, provider/billing guard, dry-run, and refusal tests. Production fixture execution remained blocked because the live SQL fixture path still used hardcoded auth emails and placeholder password hashes instead of the private Phase 2F credentials.
+
+Phase 2F.5D follow-up: the production auth path now uses Supabase Auth Admin to create or reuse marked users and verify configured password sign-in before database fixture rows are written. Production fixture execution remains blocked until the Auth Admin path is validated against a real non-production Supabase Auth service and production no-write checks are rerun.
 
 ## Reviewed Commit And Branch
 

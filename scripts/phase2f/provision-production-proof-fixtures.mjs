@@ -12,6 +12,13 @@ import {
 } from "./lib/provisioner-core.mjs";
 import { resolveDatabaseUrl, validateDatabaseTargetIdentity } from "./lib/postgres-cli-store.mjs";
 import { runDatabaseProvision } from "./validate-production-proof-fixtures-db.mjs";
+import {
+  SupabaseAuthAdminClient,
+  buildPhase2fAuthIdentities,
+  provisionAuthFixtures,
+  resolveSupabaseAuthConfig,
+  verifyAuthFixtures,
+} from "./lib/supabase-auth-admin.mjs";
 
 const args = parseArgs(process.argv.slice(2));
 const result = buildRunResult({ command: "provision", args });
@@ -44,18 +51,46 @@ if (!args.dryRun && result.ok) {
     result.ok = false;
     result.runtimeErrors.push(...targetValidation.errors, ...stateErrors);
   } else {
-    result.productionGate.productionWritesEnabled = args.environment === "production";
-    result.database = runDatabaseProvision({ databaseUrl, phase: "2F.5A" });
-    writeStateAtomic({
-      phase: "2F.5A",
-      status: args.environment === "production" ? "PRODUCTION_FIXTURE_PROVISIONED" : "LOCAL_FIXTURE_PROVISIONED",
-      updatedAt: new Date().toISOString(),
-      resourcesCreated: true,
-      productionMutation: args.environment === "production",
-      targetBinding: binding,
-      manifestVersion: REVIEWED_ADAPTER_MANIFEST.version,
-      provision: result.database,
-    });
+    let authResults = null;
+    if (args.environment === "production") {
+      const authConfig = resolveSupabaseAuthConfig(env, { environment: args.environment });
+      const authIdentities = buildPhase2fAuthIdentities(env, { includeOptional: args.includeOptional });
+      const client = new SupabaseAuthAdminClient({ config: authConfig });
+      const auth = await provisionAuthFixtures({ client, identities: authIdentities });
+      result.auth = {
+        mode: "supabase-auth-admin",
+        ok: auth.ok,
+        projectRef: authConfig.projectRef ? "[CONFIGURED]" : "unknown",
+        results: auth.results,
+      };
+      if (!auth.ok) {
+        result.ok = false;
+        result.runtimeErrors.push("Supabase Auth Admin fixture provisioning did not produce authenticatable identities");
+      } else {
+        const verification = await verifyAuthFixtures({ client, identities: authIdentities });
+        result.auth.verification = verification;
+        if (!verification.ok) {
+          result.ok = false;
+          result.runtimeErrors.push("Supabase Auth password verification failed after provisioning");
+        }
+        authResults = auth.results;
+      }
+    }
+    if (result.ok) {
+      result.productionGate.productionWritesEnabled = args.environment === "production";
+      result.database = runDatabaseProvision({ databaseUrl, phase: "2F.5D", authResults });
+      writeStateAtomic({
+        phase: "2F.5D",
+        status: args.environment === "production" ? "PRODUCTION_FIXTURE_PROVISIONED" : "LOCAL_FIXTURE_PROVISIONED",
+        updatedAt: new Date().toISOString(),
+        resourcesCreated: true,
+        productionMutation: args.environment === "production",
+        targetBinding: binding,
+        manifestVersion: REVIEWED_ADAPTER_MANIFEST.version,
+        auth: result.auth,
+        provision: result.database,
+      });
+    }
   }
 }
 

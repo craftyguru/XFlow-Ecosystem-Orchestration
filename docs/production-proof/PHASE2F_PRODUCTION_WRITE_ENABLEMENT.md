@@ -12,6 +12,8 @@ Final enablement status: PRODUCTION WRITE PATH ENABLED - PRIVATE CONFIGURATION R
 
 Phase 2F.5B private configuration status: target identity was populated from approved private sources and read-only schema validation passed. The runtime now rejects template placeholders such as `REQUIRES_PRIVATE_INPUT`. Production execution remains blocked until the three required test identity passwords are entered privately.
 
+Phase 2F.5D status: production auth fixture creation now requires the bounded Supabase Auth Admin path and configured private credentials. Production execution also requires successful real non-production Auth lifecycle validation before approval can proceed.
+
 ## Previous Blockers
 
 Phase 2F.5 was blocked because:
@@ -53,6 +55,7 @@ Permitted operation types:
 - create or reuse marked fixtures;
 - verify marked fixtures;
 - delete marked fixtures in dependency order.
+- bounded Supabase Auth Admin lookup, create, password verification, and delete-created-user operations.
 
 Prohibited operation types:
 
@@ -70,6 +73,7 @@ Production writes default to false and require all of:
 - `--enable-reviewed-write-adapters`;
 - reviewed manifest version `phase2f-production-fixtures-v1`;
 - all required private env names populated;
+- Supabase Auth Admin URL, service-role key, anon key, and project-ref validation;
 - production target identity validation;
 - expected schema/migration contract;
 - clean state-file target binding;

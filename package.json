@@ -42,7 +42,7 @@
     "phase2f:fixtures:verify-live": "node scripts/phase2f/verify-production-proof-fixtures.mjs",
     "phase2f:fixtures:cleanup": "node scripts/phase2f/cleanup-production-proof-fixtures.mjs --dry-run",
     "phase2f:fixtures:cleanup-live": "node scripts/phase2f/cleanup-production-proof-fixtures.mjs",
-    "test:phase2f-fixtures": "node --test scripts/phase2f/lib/provisioner-core.test.mjs",
+    "test:phase2f-fixtures": "node --test scripts/phase2f/lib/provisioner-core.test.mjs scripts/phase2f/lib/supabase-auth-admin.test.mjs",
     "verixet:stripe:price-env:verify": "npm --prefix apps/Verixet run stripe:price-env:verify",
     "stripe:price-env:verify": "npm --prefix apps/Verixet run stripe:price-env:verify",
     "security:local:preflight": "node scripts/security-local-harness-preflight.mjs",

@@ -8,7 +8,9 @@ Phase 2F.5B prepared the ignored private configuration file for a future approve
 
 Final decision: PRIVATE INPUT REQUIRED.
 
-Phase 2F.5C update: the three password values were completed privately and final no-write preflight checks passed, but production execution is BLOCKED because the live SQL fixture path still hardcodes auth emails and placeholder password hashes instead of consuming the private Phase 2F credential variables.
+Phase 2F.5C update: the three password values were completed privately and final no-write preflight checks passed, but production execution was BLOCKED because the live SQL fixture path still hardcoded auth emails and placeholder password hashes instead of consuming the private Phase 2F credential variables.
+
+Phase 2F.5D update: the production auth path now uses Supabase Auth Admin and requires Supabase URL, service-role key, anon key, and matching project reference. Real non-production Auth validation is still BLOCKED in this workspace.
 
 ## Starting State
 
@@ -42,9 +44,10 @@ Phase 2F.5C update: the three password values were completed privately and final
 | `PHASE2F_ENTITLED_PASSWORD` | Optional | Yes | Optional entitled password | Private operator input if selected | No | Omitted | No for minimum set |
 | `PHASE2F_ADMIN_EMAIL` | Optional | No | Optional scoped admin identity | Phase 2F.6 if needed | No | Omitted | No for minimum set |
 | `PHASE2F_ADMIN_PASSWORD` | Optional | Yes | Optional scoped admin password | Private operator input if selected | No | Omitted | No for minimum set |
-| `PHASE2F_SUPABASE_URL` | Optional | No | Supplemental Supabase URL consistency check | Private/project config | Available elsewhere | Omitted | No |
-| `PHASE2F_SUPABASE_SERVICE_ROLE_KEY` | Optional | Yes | Supplemental service-role API key, not used by current adapter | Supabase dashboard | No | Omitted | No |
-| `PHASE2F_EXPECTED_SUPABASE_PROJECT_REF` | Optional | No | Alias-style supplemental project ref check | Project metadata | Available elsewhere | Omitted | No |
+| `PHASE2F_SUPABASE_URL` | Yes | No | Supabase Auth Admin/Auth API base URL | Private/project config | Available elsewhere | Required for 2F.5D | No if supplied privately |
+| `PHASE2F_SUPABASE_SERVICE_ROLE_KEY` | Yes | Yes | Supabase Auth Admin service-role API key | Supabase dashboard | No | Required for 2F.5D | Yes if absent |
+| `PHASE2F_SUPABASE_ANON_KEY` | Yes | Yes | Supabase Auth password sign-in verification key | Supabase dashboard | No | Required for 2F.5D | Yes if absent |
+| `PHASE2F_EXPECTED_SUPABASE_PROJECT_REF` | Optional | No | Auth URL project-ref check; falls back to `PHASE2F_EXPECTED_PROJECT_REF` | Project metadata | Available elsewhere | Recommended | No |
 
 The earlier seven missing values were the original identity/workspace requirements. The current production execution gate has thirteen true required values: those seven plus `PHASE2F_DATABASE_URL`, `PHASE2F_EXPECTED_PROJECT_REF`, `PHASE2F_EXPECTED_DB_HOST`, `PHASE2F_EXPECTED_DB_NAME`, `PHASE2F_EXPECTED_ENVIRONMENT_NAME`, and `PHASE2F_REVIEWED_MANIFEST_VERSION`.
 
