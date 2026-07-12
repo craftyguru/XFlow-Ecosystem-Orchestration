@@ -103,6 +103,8 @@ Attempted target checks:
 
 Plain PostgreSQL validation is not sufficient for Auth login proof, so real test-user authentication is not validated in this phase.
 
+Phase 2F.5E follow-up: the local Supabase target was selected and retried. Docker Desktop's Linux engine returned Docker API 500 errors for container operations, `npx supabase status` could not inspect local Supabase containers, and `http://127.0.0.1:54321/auth/v1/health` remained unreachable. See `docs/production-proof/PHASE2F_REAL_AUTH_LIFECYCLE_VALIDATION.md`.
+
 ## Production No-Write Status
 
 Production was not mutated. Production fixture execution remains blocked until:
