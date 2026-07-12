@@ -131,3 +131,7 @@ Production fixture creation remains blocked until explicitly approved with:
 ```
 
 Authenticated production smoke tests remain blocked until approved production test identities and fixtures exist and are recorded privately.
+
+## Phase 2F.5 Follow-Up
+
+Phase 2F.5 did not create production fixtures. The local database validation result remains valid evidence for the adapter shape, but production execution is blocked until the ignored env file exists and the reviewed provisioner has production writes explicitly enabled through a separate reviewed change.

@@ -66,3 +66,7 @@ Cleanup must stop when:
 ## Cost and Provider Controls
 
 Cleanup must not call Stripe, AI providers, scan/audit providers, media providers, object-generation providers, embeddings, ingestion workers, or webhook replay paths.
+
+## Phase 2F.5 Cleanup Status
+
+Phase 2F.5 created no production fixtures, so no production cleanup was required. The cleanup command was run only in plan-only dry-run mode and reported the expected safety rules.

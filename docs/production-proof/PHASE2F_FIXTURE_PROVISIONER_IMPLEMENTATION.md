@@ -115,6 +115,12 @@ Every planned operation has a deterministic key, precondition, idempotency rule,
 - No production fixtures are created by this phase.
 - Unit validation uses an in-memory fixture store; database validation uses disposable migrated PostgreSQL. Production execution still requires approval and live target validation.
 - Supabase Auth Admin API behavior remains blocked locally because the Docker-backed Supabase stack was unavailable; database validation covers only `auth.users` table-level fixture rows.
+
+## Phase 2F.5 Execution Finding
+
+Phase 2F.5 did not create production fixtures. The dry-run produced a 12-operation plan, but production execution stopped before any write because `.env.phase2f.local` was absent and the reviewed provisioner still reports `productionWritesEnabled: false`.
+
+Any production-write enablement must be implemented as a separate reviewed code change, validated against the disposable/local database first, and re-approved before retrying production fixture execution.
 - App-local auth password hash behavior still needs production-target approval before real writes.
 - Verixet non-billable entitlement may require an approved non-Stripe subscription/test entitlement representation because `entitlement_grants` references commerce subscription state.
 - Authenticated screenshots remain separately approval-bound.
