@@ -80,6 +80,8 @@ export function parseArgs(argv) {
     dryRun: flags.has("--dry-run"),
     environment: String(flags.get("--environment") || "dry-run"),
     confirmProductionFixtures: flags.has("--confirm-production-fixtures"),
+    confirmTestFixtures: flags.has("--confirm-test-fixtures"),
+    enableReviewedWriteAdapters: flags.has("--enable-reviewed-write-adapters"),
     includeOptional: flags.has("--include-optional"),
     json: flags.has("--json"),
   };
@@ -112,12 +114,17 @@ export function loadLocalEnv() {
 
 export function validateRuntime(args, env) {
   const errors = [];
-  if (!args.dryRun) {
+  if (args.environment === "production" && !args.dryRun) {
     if (args.environment !== "production") errors.push("real execution requires --environment production");
     if (!args.confirmProductionFixtures) errors.push("real execution requires --confirm-production-fixtures");
+    if (!args.enableReviewedWriteAdapters) errors.push("real execution requires --enable-reviewed-write-adapters");
     for (const key of REQUIRED_ENV) {
       if (!env[key]) errors.push(`missing required environment variable ${key}`);
     }
+  } else if (!args.dryRun && args.environment !== "local") {
+    errors.push("non-production validation execution currently supports --environment local only");
+  } else if (!args.dryRun && args.environment === "local" && !args.confirmTestFixtures) {
+    errors.push("local validation execution requires --confirm-test-fixtures");
   }
   if (env.PHASE2F_SUPABASE_URL && env.PHASE2F_EXPECTED_SUPABASE_PROJECT_REF) {
     const expected = env.PHASE2F_EXPECTED_SUPABASE_PROJECT_REF;

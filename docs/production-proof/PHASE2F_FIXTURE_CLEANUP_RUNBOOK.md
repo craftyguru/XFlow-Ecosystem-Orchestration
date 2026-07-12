@@ -15,6 +15,14 @@ node scripts/phase2f/cleanup-production-proof-fixtures.mjs --dry-run
 
 The dry run reports cleanup categories and safety rules without deleting data.
 
+Local validation cleanup is exercised through:
+
+```text
+npm run phase2f:fixtures:validate
+```
+
+The latest validation deleted 29 locally created fixture rows and confirmed unrelated row counts were unchanged.
+
 ## Cleanup Approval Boundary
 
 Destructive cleanup requires separate approval after fixture creation and proof capture. Do not run a non-dry cleanup unless all of these are true:

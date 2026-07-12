@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { buildPlan, parseEnvFile, redactResult, validatePlan, validateRuntime } from "./provisioner-core.mjs";
+import { adapters } from "../adapters/index.mjs";
+import { buildContext, runAdapters, runLocalValidation, validateAdapterInterface } from "./adapter-runner.mjs";
+import { MemoryFixtureStore } from "./fixture-store.mjs";
 
 test("buildPlan produces schema-aware operations with cleanup rules", () => {
   const plan = buildPlan({ includeOptional: true });
@@ -19,11 +22,11 @@ test("buildPlan produces schema-aware operations with cleanup rules", () => {
 
 test("validateRuntime requires explicit production acknowledgement for writes", () => {
   const errors = validateRuntime(
-    { dryRun: false, environment: "staging", confirmProductionFixtures: false },
+    { dryRun: false, environment: "production", confirmProductionFixtures: false, enableReviewedWriteAdapters: false },
     {},
   );
-  assert.ok(errors.includes("real execution requires --environment production"));
   assert.ok(errors.includes("real execution requires --confirm-production-fixtures"));
+  assert.ok(errors.includes("real execution requires --enable-reviewed-write-adapters"));
   assert.ok(errors.some((error) => error.includes("PHASE2F_STANDARD_EMAIL")));
 });
 
@@ -42,4 +45,43 @@ test("redactResult redacts secret-shaped keys", () => {
   assert.equal(redacted.apiSecret, "[REDACTED]");
   assert.equal(redacted.nested.serviceRoleKey, "[REDACTED]");
   assert.equal(redacted.safe, "ok");
+});
+
+test("all write adapters expose the required interface", () => {
+  assert.deepEqual(validateAdapterInterface(adapters), []);
+});
+
+test("local validation provisions, reuses, verifies, and cleans up fixtures", async () => {
+  const result = await runLocalValidation({
+    args: { dryRun: false, environment: "local", confirmTestFixtures: true, includeOptional: false },
+    env: { PHASE2F_PROOF_WORKSPACE_SLUG: "ecosystem-production-proof-local-validation" },
+  });
+  assert.equal(result.ok, true);
+  assert.ok(result.firstProvision.created > 0);
+  assert.equal(result.secondProvision.created, 0);
+  assert.ok(result.secondProvision.reused > 0);
+  assert.ok(result.cleanup.deleted > 0);
+  assert.equal(result.unrelatedRowsUnchanged, true);
+});
+
+test("adapters refuse to reuse non-test collisions", async () => {
+  const store = new MemoryFixtureStore({
+    "xflow.workspaces": [{ id: "real-workspace", slug: "ecosystem-production-proof-local-validation", name: "Real Workspace", metadata: {} }],
+  });
+  const context = buildContext({
+    args: { dryRun: false, environment: "local", confirmTestFixtures: true, includeOptional: false },
+    store,
+    env: { PHASE2F_PROOF_WORKSPACE_SLUG: "ecosystem-production-proof-local-validation" },
+  });
+  await assert.rejects(() => runAdapters(context, "provision"), /refusing to reuse unmarked row/);
+});
+
+test("cleanup preserves reused fixtures", async () => {
+  const context = buildContext({
+    args: { dryRun: false, environment: "local", confirmTestFixtures: true, includeOptional: false },
+    env: { PHASE2F_PROOF_WORKSPACE_SLUG: "ecosystem-production-proof-local-validation" },
+  });
+  await runAdapters(context, "provision");
+  await runAdapters(context, "cleanup");
+  assert.equal(context.store.findMany("auth.identities", () => true).length, 0);
 });

@@ -10,13 +10,38 @@ Phase 2F authenticated production proof requires isolated test identities, one p
 
 ```text
 npm run phase2f:fixtures:dry-run
+npm run phase2f:fixtures:validate
 npm run phase2f:fixtures:verify
 npm run phase2f:fixtures:cleanup
 node scripts/phase2f/provision-production-proof-fixtures.mjs --dry-run
+node scripts/phase2f/validate-production-proof-fixtures.mjs --environment local --confirm-test-fixtures
 node scripts/phase2f/provision-production-proof-fixtures.mjs --environment production --confirm-production-fixtures
 ```
 
-Real production writes are intentionally disabled until the app-specific write adapter is reviewed and approved. The production flags are still required so the command surface cannot accidentally treat staging or local execution as production.
+Local validation executes the actual write adapter methods against an in-memory non-production fixture store. Real production writes require explicit approval, production flags, expected project validation, and `--enable-reviewed-write-adapters`.
+
+## Write Adapter Architecture
+
+Adapters live in `scripts/phase2f/adapters/` and expose:
+
+```text
+plan(context)
+provision(context)
+verify(context)
+cleanup(context)
+```
+
+Implemented adapters:
+
+| Adapter | Scope |
+| --- | --- |
+| `auth-adapter.mjs` | Shared test identities without logging credentials. |
+| `xflow-adapter.mjs` | Proof workspace, memberships, app catalog metadata. |
+| `verixet-adapter.mjs` | Non-Stripe billing account and denied-entitlement verification. |
+| `rataify-adapter.mjs` | Stored site, scan, and metadata-only report fixture. |
+| `audaix-adapter.mjs` | Stored audit, report, and evidence fixture. |
+| `crevux-adapter.mjs` | Stored project, placeholder asset, and metadata-only export. |
+| `wordgeni-adapter.mjs` | Stored project, source, document, and provenance fixture. |
 
 ## Environment Variables
 
@@ -85,7 +110,8 @@ Every planned operation has a deterministic key, precondition, idempotency rule,
 ## Known Limitations
 
 - No production fixtures are created by this phase.
-- App-local auth password hash behavior still needs adapter-level approval before real writes.
+- Local validation uses an in-memory fixture store; production execution still requires approval and live target validation.
+- App-local auth password hash behavior still needs production-target approval before real writes.
 - Verixet non-billable entitlement may require an approved non-Stripe subscription/test entitlement representation because `entitlement_grants` references commerce subscription state.
 - Authenticated screenshots remain separately approval-bound.
 - Provider-backed workflows remain impossible without provider calls and must use stored fixtures or denied-gate checks.

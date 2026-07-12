@@ -233,3 +233,26 @@ npm run phase2f:fixtures:cleanup
 The provisioner now produces a schema-aware dry-run plan for all required identities, the XFlow proof workspace, Verixet billing/entitlement fixtures, and stored app fixtures for RatAiFy, AudAiX, Crevux, and WordGeni. Real production writes remain disabled until the app-specific write adapter is reviewed and explicitly approved. The production execution command surface requires `--environment production --confirm-production-fixtures`.
 
 Current Phase 2F gate: PROVISIONER READY FOR REVIEW; production fixture creation still requires approval and must not be inferred from a passing dry run.
+
+## Phase 2F.4 Write Adapter Status
+
+Phase 2F.4 adds executable bounded write adapters for local validation:
+
+```text
+npm run phase2f:fixtures:validate
+```
+
+The validation mode runs against an in-memory non-production fixture store. It executes the actual adapter `provision`, `verify`, and `cleanup` methods for shared identities, XFlow, Verixet, RatAiFy, AudAiX, Crevux, and WordGeni. It does not use production credentials and does not mutate production.
+
+Latest local validation evidence:
+
+| Step | Result |
+| --- | --- |
+| First provision | 29 created, 0 reused |
+| First verify | 9 verified |
+| Second provision | 0 created, 29 reused |
+| Second verify | 9 verified |
+| Cleanup | 29 deleted |
+| Unrelated rows unchanged | true |
+
+Current Phase 2F gate: WRITE ADAPTERS VALIDATED LOCALLY; production execution still requires explicit approval, required credentials, expected project validation, and `--environment production --confirm-production-fixtures --enable-reviewed-write-adapters`.
