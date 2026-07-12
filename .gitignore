@@ -48,6 +48,7 @@ console.log*
 output/
 output/playwright/
 **/playwright/.cache/
+.phase2f-fixture-state.local.json
 
 # Local databases and generated data
 pgdata/

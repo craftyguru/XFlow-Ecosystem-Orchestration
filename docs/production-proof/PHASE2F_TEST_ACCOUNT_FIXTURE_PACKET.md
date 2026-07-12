@@ -8,6 +8,24 @@ This packet defines the minimum controlled production test-account and fixture s
 
 This is a planning packet only. It does not approve creating users, sessions, workspaces, fixtures, entitlements, screenshots, billing objects, provider calls, or production data mutations.
 
+## Phase 2F.2 Creation Review Result
+
+Phase 2F.2 reviewed the existing repository mechanisms for creating the minimum production proof identities and fixtures. No production fixtures were created because the available mechanisms are local/staging/e2e-oriented, print credentials or internal IDs, perform schema changes, exercise Stripe/provider paths, or require direct production database writes without a bounded approved production fixture contract.
+
+Current creation status:
+
+| Item | Status | Mechanism Reviewed | Reason |
+| --- | --- | --- | --- |
+| Test identities | BLOCKED | XFlow `scripts/seed-qa-account.ts`; Verixet `scripts/create-test-auth-user.ts`; Crevux `artifacts/api-server/scripts/create-smoke-users.ts`; app smoke scripts | Existing scripts print sensitive values or internal IDs, are local/staging oriented, or would require direct production database writes. |
+| Shared proof workspace | BLOCKED | XFlow `scripts/bootstrap-production-workspace.ts`, local browser proof fixture scripts, app-local smoke seeders | Workspace creation would mutate production data and needs a bounded approved admin/UI or fixture mechanism before execution. |
+| Verixet entitlement fixtures | BLOCKED | Verixet e2e/bootstrap and Phase 11 audit fixture scripts | Existing fixture scripts are e2e/local oriented or create synthetic billing/entitlement records without a production-safe non-billable fixture contract. |
+| RatAiFy stored scan/report fixtures | BLOCKED | RatAiFy staging/local proof seeders | Existing mechanisms target staging/local proof data and must not run live scans or insert production scan data without a bounded fixture contract. |
+| AudAiX stored audit/report fixtures | BLOCKED | AudAiX shared Supabase/runtime smoke scripts | Existing mechanisms write and clean smoke rows in safe local/staging mode; production use is not approved. |
+| Crevux project/asset/export fixtures | BLOCKED | Crevux authenticated beta, export studio, Stripe smoke scripts | Existing scripts may create users/assets, alter schemas, or exercise Stripe/provider-adjacent paths; not safe for this production fixture phase. |
+| WordGeni document/source/export fixtures | BLOCKED | WordGeni smoke/live verification and Stripe proof scripts | Existing scripts verify live behavior or require provider/Stripe gates; they are not a bounded production fixture creation path. |
+
+Private fixture state file status: `.phase2f-fixture-state.local.json` is ignored by Git and may record labels/status only. No credentials, private IDs, tokens, or production object IDs are documented in this packet.
+
 ## Approved Scope
 
 - Prepare named test identities and fixture requirements.
@@ -195,8 +213,23 @@ PHASE2F_WORDGENI_SOURCE_SLUG
 | Shared workspace model | READY |
 | App fixture design | PARTIAL |
 | Secret variable design | READY |
-| Production-safe creation execution | REQUIRES APPROVAL |
+| Production-safe creation execution | BLOCKED |
 | Provider-cost prevention | PARTIAL |
 | Billing mutation prevention | READY |
 | Authenticated smoke execution | BLOCKED |
 
+Phase 2F.2 stop point: authenticated smoke testing remains blocked until a production-safe fixture creation mechanism is approved or the fixtures are created manually through an approved admin/UI path and recorded privately.
+
+## Phase 2F.3 Provisioner Status
+
+Phase 2F.3 adds a bounded root-level fixture provisioner:
+
+```text
+npm run phase2f:fixtures:dry-run
+npm run phase2f:fixtures:verify
+npm run phase2f:fixtures:cleanup
+```
+
+The provisioner now produces a schema-aware dry-run plan for all required identities, the XFlow proof workspace, Verixet billing/entitlement fixtures, and stored app fixtures for RatAiFy, AudAiX, Crevux, and WordGeni. Real production writes remain disabled until the app-specific write adapter is reviewed and explicitly approved. The production execution command surface requires `--environment production --confirm-production-fixtures`.
+
+Current Phase 2F gate: PROVISIONER READY FOR REVIEW; production fixture creation still requires approval and must not be inferred from a passing dry run.

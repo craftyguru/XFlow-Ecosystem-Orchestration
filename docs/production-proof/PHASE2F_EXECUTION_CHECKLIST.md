@@ -4,9 +4,13 @@ Date: 2026-07-11
 
 Use this checklist only after `docs/production-proof/PHASE2F_TEST_ACCOUNT_FIXTURE_PACKET.md` is approved and the approved test identities and fixtures exist.
 
+Current Phase 2F gate: PROVISIONER READY FOR REVIEW. The root provisioner can produce a schema-aware dry-run plan, but real production fixture creation remains approval-bound and app-specific writes are disabled until reviewed. Do not start authenticated smoke tests until approved test identities, proof workspace, and app fixtures actually exist.
+
 ## Before Testing
 
 - [ ] Confirm the target environment is production and public health/readiness still expose the expected deployed commit for each app.
+- [ ] Run `npm run phase2f:fixtures:dry-run` and confirm the planned operations match the approved fixture scope.
+- [ ] Confirm any non-dry production provisioner run has explicit approval for `--environment production --confirm-production-fixtures`.
 - [ ] Load credentials securely from an approved secret store or ignored local env file.
 - [ ] Confirm `.env.phase2f.local` or equivalent secret file is not tracked by Git.
 - [ ] Confirm `ecosystem_test_standard` exists and can authenticate.
@@ -129,4 +133,3 @@ Use this checklist only after `docs/production-proof/PHASE2F_TEST_ACCOUNT_FIXTUR
 - [ ] Access to non-test customer data.
 - [ ] Authorization bypass or cross-workspace access.
 - [ ] Secret, cookie, token, session, or private ID exposure in evidence.
-
