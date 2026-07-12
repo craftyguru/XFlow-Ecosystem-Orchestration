@@ -13,7 +13,45 @@ export function redactDatabaseUrl(value) {
 }
 
 export function resolveDatabaseUrl(env = process.env) {
-  return env.PHASE2F_DB_URL || env.DATABASE_URL || DEFAULT_PHASE2F_DB_URL;
+  return env.PHASE2F_DATABASE_URL || env.PHASE2F_DB_URL || env.DATABASE_URL || DEFAULT_PHASE2F_DB_URL;
+}
+
+export function inspectDatabaseTarget(databaseUrl) {
+  const parsed = new URL(databaseUrl);
+  return {
+    protocol: parsed.protocol.replace(":", ""),
+    hostname: parsed.hostname,
+    port: parsed.port || "5432",
+    database: parsed.pathname.replace(/^\//, ""),
+    isLocalhost: ["localhost", "127.0.0.1", "::1"].includes(parsed.hostname),
+  };
+}
+
+export function validateDatabaseTargetIdentity({ environment, databaseUrl, env = process.env }) {
+  const errors = [];
+  const target = inspectDatabaseTarget(databaseUrl);
+  if (environment === "production") {
+    if (!env.PHASE2F_EXPECTED_PROJECT_REF) errors.push("production execution requires PHASE2F_EXPECTED_PROJECT_REF");
+    if (!env.PHASE2F_EXPECTED_DB_HOST) errors.push("production execution requires PHASE2F_EXPECTED_DB_HOST");
+    if (!env.PHASE2F_EXPECTED_DB_NAME) errors.push("production execution requires PHASE2F_EXPECTED_DB_NAME");
+    if (!env.PHASE2F_EXPECTED_ENVIRONMENT_NAME) errors.push("production execution requires PHASE2F_EXPECTED_ENVIRONMENT_NAME");
+    if (target.isLocalhost) errors.push("production execution refuses localhost database targets");
+    if (env.PHASE2F_EXPECTED_PROJECT_REF && !databaseUrl.includes(env.PHASE2F_EXPECTED_PROJECT_REF)) {
+      errors.push("database target does not contain PHASE2F_EXPECTED_PROJECT_REF");
+    }
+    if (env.PHASE2F_EXPECTED_DB_HOST && target.hostname !== env.PHASE2F_EXPECTED_DB_HOST) {
+      errors.push("database host does not match PHASE2F_EXPECTED_DB_HOST");
+    }
+    if (env.PHASE2F_EXPECTED_DB_NAME && target.database !== env.PHASE2F_EXPECTED_DB_NAME) {
+      errors.push("database name does not match PHASE2F_EXPECTED_DB_NAME");
+    }
+    if (env.PHASE2F_EXPECTED_ENVIRONMENT_NAME !== "production") {
+      errors.push("PHASE2F_EXPECTED_ENVIRONMENT_NAME must be production for production execution");
+    }
+  } else if (environment === "local") {
+    if (!target.isLocalhost) errors.push("local execution refuses non-local database targets");
+  }
+  return { target, errors };
 }
 
 export function runPsqlJson({ databaseUrl, sql, label }) {

@@ -1,6 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { buildPlan, parseEnvFile, redactResult, validatePlan, validateRuntime } from "./provisioner-core.mjs";
+import {
+  REVIEWED_ADAPTER_MANIFEST,
+  REQUIRED_PRODUCTION_ENV,
+  buildPlan,
+  parseEnvFile,
+  redactResult,
+  targetBindingFor,
+  validatePlan,
+  validateProviderBillingGuard,
+  validateRuntime,
+  validateStateTargetBinding,
+} from "./provisioner-core.mjs";
+import { validateDatabaseTargetIdentity } from "./postgres-cli-store.mjs";
 import { adapters } from "../adapters/index.mjs";
 import { buildContext, runAdapters, runLocalValidation, validateAdapterInterface } from "./adapter-runner.mjs";
 import { MemoryFixtureStore } from "./fixture-store.mjs";
@@ -30,6 +42,97 @@ test("validateRuntime requires explicit production acknowledgement for writes", 
   assert.ok(errors.some((error) => error.includes("PHASE2F_STANDARD_EMAIL")));
 });
 
+function fullProductionEnv(overrides = {}) {
+  return {
+    PHASE2F_STANDARD_EMAIL: "standard@example.invalid",
+    PHASE2F_STANDARD_PASSWORD: "placeholder",
+    PHASE2F_DENIED_EMAIL: "denied@example.invalid",
+    PHASE2F_DENIED_PASSWORD: "placeholder",
+    PHASE2F_OUTSIDER_EMAIL: "outsider@example.invalid",
+    PHASE2F_OUTSIDER_PASSWORD: "placeholder",
+    PHASE2F_PROOF_WORKSPACE_SLUG: "ecosystem-production-proof-main",
+    PHASE2F_DATABASE_URL: "postgresql://user:pass@db.expected-ref.supabase.co:5432/postgres",
+    PHASE2F_EXPECTED_PROJECT_REF: "expected-ref",
+    PHASE2F_EXPECTED_DB_HOST: "db.expected-ref.supabase.co",
+    PHASE2F_EXPECTED_DB_NAME: "postgres",
+    PHASE2F_EXPECTED_ENVIRONMENT_NAME: "production",
+    PHASE2F_REVIEWED_MANIFEST_VERSION: REVIEWED_ADAPTER_MANIFEST.version,
+    ...overrides,
+  };
+}
+
+test("production gate refuses missing reviewed adapter flag", () => {
+  const errors = validateRuntime(
+    { dryRun: false, environment: "production", confirmProductionFixtures: true, enableReviewedWriteAdapters: false },
+    fullProductionEnv(),
+  );
+  assert.ok(errors.includes("real execution requires --enable-reviewed-write-adapters"));
+});
+
+test("production gate refuses missing production confirmation", () => {
+  const errors = validateRuntime(
+    { dryRun: false, environment: "production", confirmProductionFixtures: false, enableReviewedWriteAdapters: true },
+    fullProductionEnv(),
+  );
+  assert.ok(errors.includes("real execution requires --confirm-production-fixtures"));
+});
+
+test("production gate refuses missing or wrong manifest version", () => {
+  const env = fullProductionEnv({ PHASE2F_REVIEWED_MANIFEST_VERSION: "wrong" });
+  const errors = validateRuntime(
+    { dryRun: false, environment: "production", confirmProductionFixtures: true, enableReviewedWriteAdapters: true },
+    env,
+  );
+  assert.ok(errors.some((error) => error.includes("reviewed manifest version")));
+});
+
+test("production gate refuses missing credentials and target vars", () => {
+  const errors = validateRuntime(
+    { dryRun: false, environment: "production", confirmProductionFixtures: true, enableReviewedWriteAdapters: true },
+    {},
+  );
+  for (const key of REQUIRED_PRODUCTION_ENV) {
+    assert.ok(errors.some((error) => error.includes(key)), `expected missing ${key}`);
+  }
+});
+
+test("target validation refuses mismatch and localhost production", () => {
+  const mismatch = validateDatabaseTargetIdentity({
+    environment: "production",
+    databaseUrl: "postgresql://user:pass@localhost:5432/postgres",
+    env: fullProductionEnv(),
+  });
+  assert.ok(mismatch.errors.some((error) => error.includes("localhost")));
+  assert.ok(mismatch.errors.some((error) => error.toLowerCase().includes("project")));
+});
+
+test("state binding refuses mismatched target", () => {
+  const binding = targetBindingFor({
+    environment: "production",
+    target: { hostname: "db.expected-ref.supabase.co", port: "5432", database: "postgres" },
+  });
+  const errors = validateStateTargetBinding({
+    state: { targetBinding: { ...binding, targetHash: "different" } },
+    binding,
+  });
+  assert.ok(errors.some((error) => error.includes("targetHash")));
+});
+
+test("provider and billing guard detects prohibited operations", () => {
+  const plan = buildPlan();
+  assert.deepEqual(validateProviderBillingGuard(plan), []);
+  const unsafe = { ...plan, operations: [{ ...plan.operations[0], action: "create Stripe customer" }] };
+  assert.ok(validateProviderBillingGuard(unsafe).some((error) => error.includes("prohibited operation")));
+});
+
+test("all production runtime gates allow proceeding to target validation boundary", () => {
+  const errors = validateRuntime(
+    { dryRun: false, environment: "production", confirmProductionFixtures: true, enableReviewedWriteAdapters: true },
+    fullProductionEnv(),
+  );
+  assert.deepEqual(errors, []);
+});
+
 test("dry-run runtime validation does not require credentials", () => {
   assert.deepEqual(validateRuntime({ dryRun: true, environment: "dry-run", confirmProductionFixtures: false }, {}), []);
 });
@@ -53,7 +156,7 @@ test("all write adapters expose the required interface", () => {
 
 test("local validation provisions, reuses, verifies, and cleans up fixtures", async () => {
   const result = await runLocalValidation({
-    args: { dryRun: false, environment: "local", confirmTestFixtures: true, includeOptional: false },
+    args: { dryRun: false, environment: "local", confirmTestFixtures: true, enableReviewedWriteAdapters: true, includeOptional: false },
     env: { PHASE2F_PROOF_WORKSPACE_SLUG: "ecosystem-production-proof-local-validation" },
   });
   assert.equal(result.ok, true);
@@ -69,7 +172,7 @@ test("adapters refuse to reuse non-test collisions", async () => {
     "xflow.workspaces": [{ id: "real-workspace", slug: "ecosystem-production-proof-local-validation", name: "Real Workspace", metadata: {} }],
   });
   const context = buildContext({
-    args: { dryRun: false, environment: "local", confirmTestFixtures: true, includeOptional: false },
+    args: { dryRun: false, environment: "local", confirmTestFixtures: true, enableReviewedWriteAdapters: true, includeOptional: false },
     store,
     env: { PHASE2F_PROOF_WORKSPACE_SLUG: "ecosystem-production-proof-local-validation" },
   });
@@ -78,7 +181,7 @@ test("adapters refuse to reuse non-test collisions", async () => {
 
 test("cleanup preserves reused fixtures", async () => {
   const context = buildContext({
-    args: { dryRun: false, environment: "local", confirmTestFixtures: true, includeOptional: false },
+    args: { dryRun: false, environment: "local", confirmTestFixtures: true, enableReviewedWriteAdapters: true, includeOptional: false },
     env: { PHASE2F_PROOF_WORKSPACE_SLUG: "ecosystem-production-proof-local-validation" },
   });
   await runAdapters(context, "provision");

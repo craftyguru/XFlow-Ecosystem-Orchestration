@@ -121,6 +121,19 @@ Every planned operation has a deterministic key, precondition, idempotency rule,
 Phase 2F.5 did not create production fixtures. The dry-run produced a 12-operation plan, but production execution stopped before any write because `.env.phase2f.local` was absent and the reviewed provisioner still reports `productionWritesEnabled: false`.
 
 Any production-write enablement must be implemented as a separate reviewed code change, validated against the disposable/local database first, and re-approved before retrying production fixture execution.
+
+## Phase 2F.5A Enablement
+
+Phase 2F.5A adds:
+
+- reviewed adapter manifest `phase2f-production-fixtures-v1`;
+- guarded live provision, verify, and cleanup commands;
+- production target identity validation;
+- state-file target binding;
+- executable provider/billing guard;
+- reusable PostgreSQL lifecycle functions shared by validation and live commands.
+
+The unconditional production refusal is replaced by a calculated gate. Production writes still default to false and require explicit flags, private environment values, target validation, and renewed approval.
 - App-local auth password hash behavior still needs production-target approval before real writes.
 - Verixet non-billable entitlement may require an approved non-Stripe subscription/test entitlement representation because `entitlement_grants` references commerce subscription state.
 - Authenticated screenshots remain separately approval-bound.

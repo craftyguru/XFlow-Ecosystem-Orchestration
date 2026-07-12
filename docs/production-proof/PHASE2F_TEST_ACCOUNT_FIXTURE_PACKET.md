@@ -294,3 +294,9 @@ Blocking conditions:
 See `docs/production-proof/PHASE2F_PRODUCTION_FIXTURE_EXECUTION.md` for the full blocked execution record.
 
 Current Phase 2F gate: PRODUCTION FIXTURE EXECUTION BLOCKED; authenticated production smoke testing remains blocked.
+
+## Phase 2F.5A Production Write Enablement Status
+
+Phase 2F.5A enables the guarded production write path technically while leaving production untouched. The live command path was validated against the disposable migrated PostgreSQL database and requires private `.env.phase2f.local` values before production can be retried.
+
+Current Phase 2F gate: PRODUCTION WRITE PATH ENABLED - PRIVATE CONFIGURATION REQUIRED; authenticated production smoke testing remains blocked.

@@ -1,12 +1,61 @@
 #!/usr/bin/env node
-import { buildRunResult, parseArgs, writeStateAtomic } from "./lib/provisioner-core.mjs";
+import {
+  REVIEWED_ADAPTER_MANIFEST,
+  buildRunResult,
+  loadLocalEnv,
+  parseArgs,
+  readState,
+  targetBindingFor,
+  validateStateTargetBinding,
+  writeStateAtomic,
+} from "./lib/provisioner-core.mjs";
+import { resolveDatabaseUrl, validateDatabaseTargetIdentity } from "./lib/postgres-cli-store.mjs";
+import { runDatabaseProvision } from "./validate-production-proof-fixtures-db.mjs";
 
 const args = parseArgs(process.argv.slice(2));
 const result = buildRunResult({ command: "provision", args });
 
 if (!args.dryRun && result.ok) {
-  result.ok = false;
-  result.runtimeErrors.push("production DB writes are intentionally disabled until the app-specific write adapter is reviewed and approved");
+  if (!args.enableReviewedWriteAdapters) {
+    result.ok = false;
+    result.runtimeErrors.push("live database provision requires --enable-reviewed-write-adapters");
+  }
+}
+
+if (!args.dryRun && result.ok) {
+  const env = loadLocalEnv();
+  const databaseUrl = resolveDatabaseUrl(env);
+  const targetValidation = validateDatabaseTargetIdentity({ environment: args.environment, databaseUrl, env });
+  const binding = targetBindingFor({ environment: args.environment, target: targetValidation.target });
+  const stateErrors = validateStateTargetBinding({ state: readState(), binding });
+  result.targetValidation = {
+    ok: targetValidation.errors.length === 0,
+    target: {
+      hostname: targetValidation.target.isLocalhost ? targetValidation.target.hostname : "[REDACTED]",
+      port: targetValidation.target.port,
+      database: targetValidation.target.database,
+      isLocalhost: targetValidation.target.isLocalhost,
+    },
+    errors: targetValidation.errors,
+  };
+  result.stateBinding = { ok: stateErrors.length === 0, errors: stateErrors, binding };
+  if (targetValidation.errors.length || stateErrors.length) {
+    result.ok = false;
+    result.runtimeErrors.push(...targetValidation.errors, ...stateErrors);
+  } else {
+    result.productionGate.productionWritesEnabled = args.environment === "production";
+    result.database = runDatabaseProvision({ databaseUrl, phase: "2F.5A" });
+    writeStateAtomic({
+      phase: "2F.5A",
+      status: args.environment === "production" ? "PRODUCTION_FIXTURE_PROVISIONED" : "LOCAL_FIXTURE_PROVISIONED",
+      updatedAt: new Date().toISOString(),
+      resourcesCreated: true,
+      productionMutation: args.environment === "production",
+      targetBinding: binding,
+      manifestVersion: REVIEWED_ADAPTER_MANIFEST.version,
+      provision: result.database,
+    });
+  }
 }
 
 if (args.dryRun) {

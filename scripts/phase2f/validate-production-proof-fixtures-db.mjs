@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { pathToFileURL } from "node:url";
 import { parseArgs, writeStateAtomic } from "./lib/provisioner-core.mjs";
 import {
   DEFAULT_PHASE2F_DB_URL,
@@ -7,17 +8,6 @@ import {
   runPsqlJson,
   runPsqlText,
 } from "./lib/postgres-cli-store.mjs";
-
-const args = parseArgs(process.argv.slice(2));
-if (args.environment === "production") {
-  throw new Error("phase2f:fixtures:validate-db refuses production targets");
-}
-if (!args.confirmTestFixtures) {
-  throw new Error("phase2f:fixtures:validate-db requires --confirm-test-fixtures");
-}
-
-const databaseUrl = resolveDatabaseUrl();
-const startedAt = new Date().toISOString();
 
 const ids = {
   standardUser: "00000000-0000-4000-8000-000000002f01",
@@ -395,62 +385,160 @@ select jsonb_build_object(
 )::text;
 `;
 
-function assert(condition, message) {
+export function assertDatabaseLifecycle(condition, message) {
   if (!condition) throw new Error(message);
 }
 
-const result = {
-  phase: "2F.4B",
-  target: {
-    kind: databaseUrl === DEFAULT_PHASE2F_DB_URL ? "local-disposable-postgresql" : "configured-non-production-postgresql",
+function target(databaseUrl) {
+  return {
+    kind: databaseUrl === DEFAULT_PHASE2F_DB_URL ? "local-disposable-postgresql" : "configured-postgresql",
     databaseUrl: redactDatabaseUrl(databaseUrl),
-  },
-  startedAt,
-  schemaIdentity: runPsqlJson({ databaseUrl, sql: schemaIdentitySql, label: "schema-identity" }),
-  beforeCounts: runPsqlJson({ databaseUrl, sql: snapshotSql, label: "before-counts" }),
-};
-
-assert(result.schemaIdentity.ecosystemApps === 6, "expected six seeded ecosystem apps");
-assert(result.schemaIdentity.requiredTables >= 48, "expected migrated ecosystem tables");
-
-result.collisionProbe = runPsqlJson({ databaseUrl, sql: collisionProbeSql, label: "collision-probe" });
-assert(result.collisionProbe.unmarkedCollisionDetected === true, "expected unmarked collision probe to be detected");
-
-result.firstProvision = runPsqlJson({ databaseUrl, sql: provisionSql, label: "first-provision" });
-result.firstVerify = runPsqlJson({ databaseUrl, sql: verifySql, label: "first-verify" });
-result.secondProvision = runPsqlJson({ databaseUrl, sql: provisionSql, label: "second-provision" });
-result.secondVerify = runPsqlJson({ databaseUrl, sql: verifySql, label: "second-verify" });
-
-assert(result.firstVerify.countsMatch === true, "first verification counts did not match expected fixture counts");
-assert(result.secondVerify.countsMatch === true, "second verification counts did not match expected fixture counts");
-for (const [adapter, expected] of Object.entries(result.firstProvision.expected)) {
-  assert(result.firstProvision.created[adapter] === expected, `expected ${adapter} first provision to create ${expected}`);
-  assert(result.secondProvision.reused[adapter] === expected, `expected ${adapter} second provision to reuse ${expected}`);
+  };
 }
 
-const rlsOutput = runPsqlText({ databaseUrl, sql: rlsSql, label: "rls-visibility" }).stdout
-  .split(/\r?\n/)
-  .filter(Boolean)
-  .map((line) => JSON.parse(line));
-result.rls = rlsOutput;
-assert(result.rls.find((row) => row.persona === "standard")?.visibleWorkspaceCount === 1, "standard persona should see proof workspace through RLS");
-assert(result.rls.find((row) => row.persona === "outsider")?.visibleWorkspaceCount === 0, "outsider persona should not see proof workspace through RLS");
+export function runDatabaseSchemaIdentity({ databaseUrl }) {
+  const schemaIdentity = runPsqlJson({ databaseUrl, sql: schemaIdentitySql, label: "schema-identity" });
+  assertDatabaseLifecycle(schemaIdentity.ecosystemApps === 6, "expected six seeded ecosystem apps");
+  assertDatabaseLifecycle(schemaIdentity.requiredTables >= 48, "expected migrated ecosystem tables");
+  return schemaIdentity;
+}
 
-result.cleanup = runPsqlJson({ databaseUrl, sql: cleanupSql, label: "cleanup" });
-result.cleanupVerify = runPsqlJson({ databaseUrl, sql: cleanupVerifySql, label: "cleanup-verify" });
-result.afterCounts = runPsqlJson({ databaseUrl, sql: snapshotSql, label: "after-counts" });
-assert(result.cleanupVerify.remainingMarkedRows === 0, "cleanup left marked Phase 2F rows behind");
-assert(JSON.stringify(result.beforeCounts) === JSON.stringify(result.afterCounts), "unrelated table counts changed after cleanup");
+export function runDatabaseProvision({ databaseUrl, phase = "2F.5A" }) {
+  const startedAt = new Date().toISOString();
+  const result = {
+    phase,
+    command: "provision",
+    target: target(databaseUrl),
+    startedAt,
+    schemaIdentity: runDatabaseSchemaIdentity({ databaseUrl }),
+    beforeCounts: runPsqlJson({ databaseUrl, sql: snapshotSql, label: "before-counts" }),
+    collisionProbe: runPsqlJson({ databaseUrl, sql: collisionProbeSql, label: "collision-probe" }),
+  };
+  assertDatabaseLifecycle(result.collisionProbe.unmarkedCollisionDetected === true, "expected unmarked collision probe to be detected");
+  result.provision = runPsqlJson({ databaseUrl, sql: provisionSql, label: "provision" });
+  result.verify = runDatabaseVerify({ databaseUrl, phase }).verify;
+  result.completedAt = new Date().toISOString();
+  result.ok = true;
+  return result;
+}
 
-result.completedAt = new Date().toISOString();
-result.ok = true;
-writeStateAtomic({
-  phase: "2F.4B",
-  status: "DATABASE_ADAPTER_VALIDATION_PASSED",
-  updatedAt: result.completedAt,
-  resourcesCreated: false,
-  productionMutation: false,
-  databaseValidation: result,
-});
+export function runDatabaseVerify({ databaseUrl, phase = "2F.5A" }) {
+  const startedAt = new Date().toISOString();
+  const verify = runPsqlJson({ databaseUrl, sql: verifySql, label: "verify" });
+  assertDatabaseLifecycle(verify.countsMatch === true, "verification counts did not match expected fixture counts");
+  const rls = runPsqlText({ databaseUrl, sql: rlsSql, label: "rls-visibility" }).stdout
+    .split(/\r?\n/)
+    .filter(Boolean)
+    .map((line) => JSON.parse(line));
+  assertDatabaseLifecycle(rls.find((row) => row.persona === "standard")?.visibleWorkspaceCount === 1, "standard persona should see proof workspace through RLS");
+  assertDatabaseLifecycle(rls.find((row) => row.persona === "outsider")?.visibleWorkspaceCount === 0, "outsider persona should not see proof workspace through RLS");
+  return {
+    phase,
+    command: "verify",
+    target: target(databaseUrl),
+    startedAt,
+    verify,
+    rls,
+    completedAt: new Date().toISOString(),
+    ok: true,
+  };
+}
 
-console.log(JSON.stringify(result, null, 2));
+export function runDatabaseCleanup({ databaseUrl, phase = "2F.5A", dryRun = false }) {
+  const startedAt = new Date().toISOString();
+  const beforeCounts = runPsqlJson({ databaseUrl, sql: snapshotSql, label: "cleanup-before-counts" });
+  if (dryRun) {
+    return {
+      phase,
+      command: "cleanup",
+      dryRun: true,
+      target: target(databaseUrl),
+      startedAt,
+      beforeCounts,
+      cleanupSafety: [
+        "delete only Phase 2F marked rows",
+        "delete in dependency order",
+        "refuse unmarked collisions before provision",
+        "preserve unrelated row counts",
+      ],
+      completedAt: new Date().toISOString(),
+      ok: true,
+    };
+  }
+  const cleanup = runPsqlJson({ databaseUrl, sql: cleanupSql, label: "cleanup" });
+  const cleanupVerify = runPsqlJson({ databaseUrl, sql: cleanupVerifySql, label: "cleanup-verify" });
+  const afterCounts = runPsqlJson({ databaseUrl, sql: snapshotSql, label: "cleanup-after-counts" });
+  assertDatabaseLifecycle(cleanupVerify.remainingMarkedRows === 0, "cleanup left marked Phase 2F rows behind");
+  return {
+    phase,
+    command: "cleanup",
+    dryRun: false,
+    target: target(databaseUrl),
+    startedAt,
+    beforeCounts,
+    cleanup,
+    cleanupVerify,
+    afterCounts,
+    completedAt: new Date().toISOString(),
+    ok: true,
+  };
+}
+
+export function runDatabaseLifecycle({ databaseUrl, phase = "2F.4B" }) {
+  const startedAt = new Date().toISOString();
+  const result = {
+    phase,
+    target: target(databaseUrl),
+    startedAt,
+    schemaIdentity: runDatabaseSchemaIdentity({ databaseUrl }),
+    beforeCounts: runPsqlJson({ databaseUrl, sql: snapshotSql, label: "before-counts" }),
+  };
+
+  result.collisionProbe = runPsqlJson({ databaseUrl, sql: collisionProbeSql, label: "collision-probe" });
+  assertDatabaseLifecycle(result.collisionProbe.unmarkedCollisionDetected === true, "expected unmarked collision probe to be detected");
+
+  result.firstProvision = runPsqlJson({ databaseUrl, sql: provisionSql, label: "first-provision" });
+  result.firstVerify = runDatabaseVerify({ databaseUrl, phase }).verify;
+  result.secondProvision = runPsqlJson({ databaseUrl, sql: provisionSql, label: "second-provision" });
+  result.secondVerify = runDatabaseVerify({ databaseUrl, phase }).verify;
+
+  assertDatabaseLifecycle(result.firstVerify.countsMatch === true, "first verification counts did not match expected fixture counts");
+  assertDatabaseLifecycle(result.secondVerify.countsMatch === true, "second verification counts did not match expected fixture counts");
+  for (const [adapter, expected] of Object.entries(result.firstProvision.expected)) {
+    assertDatabaseLifecycle(result.firstProvision.created[adapter] === expected, `expected ${adapter} first provision to create ${expected}`);
+    assertDatabaseLifecycle(result.secondProvision.reused[adapter] === expected, `expected ${adapter} second provision to reuse ${expected}`);
+  }
+
+  result.rls = runDatabaseVerify({ databaseUrl, phase }).rls;
+  result.cleanupDryRun = runDatabaseCleanup({ databaseUrl, phase, dryRun: true });
+  result.cleanup = runDatabaseCleanup({ databaseUrl, phase, dryRun: false }).cleanup;
+  result.cleanupVerify = runPsqlJson({ databaseUrl, sql: cleanupVerifySql, label: "cleanup-verify" });
+  result.afterCounts = runPsqlJson({ databaseUrl, sql: snapshotSql, label: "after-counts" });
+  assertDatabaseLifecycle(result.cleanupVerify.remainingMarkedRows === 0, "cleanup left marked Phase 2F rows behind");
+  assertDatabaseLifecycle(JSON.stringify(result.beforeCounts) === JSON.stringify(result.afterCounts), "unrelated table counts changed after cleanup");
+
+  result.completedAt = new Date().toISOString();
+  result.ok = true;
+  return result;
+}
+
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+  const args = parseArgs(process.argv.slice(2));
+  if (args.environment === "production") {
+    throw new Error("phase2f:fixtures:validate-db refuses production targets");
+  }
+  if (!args.confirmTestFixtures) {
+    throw new Error("phase2f:fixtures:validate-db requires --confirm-test-fixtures");
+  }
+  const databaseUrl = resolveDatabaseUrl();
+  const result = runDatabaseLifecycle({ databaseUrl, phase: "2F.4B" });
+  writeStateAtomic({
+    phase: "2F.4B",
+    status: "DATABASE_ADAPTER_VALIDATION_PASSED",
+    updatedAt: result.completedAt,
+    resourcesCreated: false,
+    productionMutation: false,
+    databaseValidation: result,
+  });
+  console.log(JSON.stringify(result, null, 2));
+}

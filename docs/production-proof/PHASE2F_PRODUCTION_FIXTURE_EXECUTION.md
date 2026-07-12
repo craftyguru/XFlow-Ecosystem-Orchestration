@@ -8,6 +8,8 @@ Phase 2F.5 production fixture execution was attempted only through approved pref
 
 Final decision: BLOCKED.
 
+Phase 2F.5A follow-up: the unconditional production-write refusal has been replaced by a calculated gate and the live PostgreSQL path has been validated locally. Production fixture execution still requires private `.env.phase2f.local` values and renewed approval.
+
 ## Reviewed Commit And Branch
 
 | Field | Value |

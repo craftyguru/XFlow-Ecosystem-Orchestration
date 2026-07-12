@@ -70,3 +70,5 @@ Cleanup must not call Stripe, AI providers, scan/audit providers, media provider
 ## Phase 2F.5 Cleanup Status
 
 Phase 2F.5 created no production fixtures, so no production cleanup was required. The cleanup command was run only in plan-only dry-run mode and reported the expected safety rules.
+
+Phase 2F.5A adds `npm run phase2f:fixtures:cleanup-live` for guarded live PostgreSQL cleanup. It must not be run against production unless cleanup is explicitly approved and target identity/state binding checks pass.

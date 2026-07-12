@@ -4,7 +4,7 @@ Date: 2026-07-11
 
 Use this checklist only after `docs/production-proof/PHASE2F_TEST_ACCOUNT_FIXTURE_PACKET.md` is approved and the approved test identities and fixtures exist.
 
-Current Phase 2F gate: PRODUCTION FIXTURE EXECUTION BLOCKED. The root provisioner can produce a schema-aware dry-run plan, execute create/reuse/verify/cleanup adapters against the local unit validation store, and validate deterministic fixture rows against a disposable PostgreSQL database built from repository Supabase migrations. Phase 2F.5 did not create production fixtures because the ignored env file was absent and the reviewed provisioner still reports `productionWritesEnabled: false`. Do not start authenticated smoke tests until approved test identities, proof workspace, and app fixtures actually exist in production.
+Current Phase 2F gate: PRODUCTION WRITE PATH ENABLED - PRIVATE CONFIGURATION REQUIRED. The root provisioner can produce a schema-aware dry-run plan, execute create/reuse/verify/cleanup adapters against the local unit validation store, validate deterministic fixture rows against a disposable PostgreSQL database, and execute the guarded live PostgreSQL path locally. Phase 2F.5A did not create production fixtures. Do not start authenticated smoke tests until approved test identities, proof workspace, and app fixtures actually exist in production.
 
 ## Before Testing
 
@@ -13,6 +13,9 @@ Current Phase 2F gate: PRODUCTION FIXTURE EXECUTION BLOCKED. The root provisione
 - [ ] Run `npm run phase2f:fixtures:validate-unit` and confirm first-run create, second-run reuse, verify, cleanup, and unrelated-row checks pass.
 - [ ] Run `npm run phase2f:fixtures:validate-db` against an approved non-production database and confirm migrated-table create/reuse/verify/RLS/cleanup checks pass.
 - [ ] Confirm `docs/production-proof/PHASE2F_PRODUCTION_FIXTURE_EXECUTION.md` no longer has a BLOCKED result before starting authenticated proof.
+- [ ] Populate ignored `.env.phase2f.local` from `docs/production-proof/PHASE2F_ENVIRONMENT_VARIABLES.example`.
+- [ ] Confirm `PHASE2F_REVIEWED_MANIFEST_VERSION=phase2f-production-fixtures-v1`.
+- [ ] Confirm production target identity validates before any write.
 - [ ] Confirm any non-dry production provisioner run has explicit approval for `--environment production --confirm-production-fixtures`.
 - [ ] Load credentials securely from an approved secret store or ignored local env file.
 - [ ] Confirm `.env.phase2f.local` or equivalent secret file is not tracked by Git.

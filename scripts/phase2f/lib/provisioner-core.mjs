@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { randomUUID } from "node:crypto";
@@ -12,6 +13,25 @@ export const FIXTURE_MARKER = Object.freeze({
   label: "phase2f-production-proof",
   environment: "production-proof",
   isTest: true,
+});
+
+export const REVIEWED_ADAPTER_MANIFEST = Object.freeze({
+  version: "phase2f-production-fixtures-v1",
+  reviewedCommit: "161a410b8b96849d8790bbd2d857fab01f579928",
+  fixtureMarkerVersion: "phase2f-production-proof",
+  reviewedAdapters: ["auth", "xflow", "verixet", "rataify", "audaix", "crevux", "wordgeni"],
+  schemas: {
+    auth: ["auth.users"],
+    xflow: ["core.workspaces", "core.workspace_members", "core.workspace_app_access", "core.app_connections", "xflow.app_links"],
+    verixet: ["verixet.billing_accounts", "verixet.entitlement_decisions"],
+    rataify: ["rataify.sites", "rataify.reviews", "rataify.issues", "rataify.evidence_items"],
+    audaix: ["audaix.audits", "audaix.audit_reports", "audaix.audit_findings"],
+    crevux: ["crevux.projects", "crevux.assets", "crevux.exports"],
+    wordgeni: ["wordgeni.documents", "wordgeni.document_sources", "wordgeni.provenance_items"],
+  },
+  permittedOperationTypes: ["create-or-reuse-marked-fixture", "verify-marked-fixture", "delete-marked-fixture"],
+  prohibitedOperationTypes: ["stripe-mutation", "provider-call", "checkout", "subscription", "invoice", "payment-method", "crawl", "scan-execution", "audit-execution", "ai-generation", "embedding", "ingestion", "paid-export"],
+  cleanupDependencyOrder: ["wordgeni", "crevux", "audaix", "rataify", "verixet", "xflow", "auth"],
 });
 
 export const IDENTITIES = Object.freeze([
@@ -30,6 +50,16 @@ export const REQUIRED_ENV = Object.freeze([
   "PHASE2F_OUTSIDER_EMAIL",
   "PHASE2F_OUTSIDER_PASSWORD",
   "PHASE2F_PROOF_WORKSPACE_SLUG",
+]);
+
+export const REQUIRED_PRODUCTION_ENV = Object.freeze([
+  ...REQUIRED_ENV,
+  "PHASE2F_DATABASE_URL",
+  "PHASE2F_EXPECTED_PROJECT_REF",
+  "PHASE2F_EXPECTED_DB_HOST",
+  "PHASE2F_EXPECTED_DB_NAME",
+  "PHASE2F_EXPECTED_ENVIRONMENT_NAME",
+  "PHASE2F_REVIEWED_MANIFEST_VERSION",
 ]);
 
 export const OPTIONAL_ENV = Object.freeze([
@@ -83,6 +113,7 @@ export function parseArgs(argv) {
     confirmTestFixtures: flags.has("--confirm-test-fixtures"),
     enableReviewedWriteAdapters: flags.has("--enable-reviewed-write-adapters"),
     includeOptional: flags.has("--include-optional"),
+    manifestVersion: String(flags.get("--manifest-version") || flags.get("--reviewed-manifest-version") || ""),
     json: flags.has("--json"),
   };
 }
@@ -104,10 +135,11 @@ export function parseEnvFile(text) {
 }
 
 export function loadLocalEnv() {
+  const processEnv = Object.fromEntries(Object.entries(process.env).filter(([key]) => key.startsWith("PHASE2F_") || key === "DATABASE_URL"));
   try {
-    return parseEnvFile(readFileSync(ENV_FILE, "utf8"));
+    return { ...parseEnvFile(readFileSync(ENV_FILE, "utf8")), ...processEnv };
   } catch (error) {
-    if (error.code === "ENOENT") return {};
+    if (error.code === "ENOENT") return processEnv;
     throw error;
   }
 }
@@ -118,7 +150,10 @@ export function validateRuntime(args, env) {
     if (args.environment !== "production") errors.push("real execution requires --environment production");
     if (!args.confirmProductionFixtures) errors.push("real execution requires --confirm-production-fixtures");
     if (!args.enableReviewedWriteAdapters) errors.push("real execution requires --enable-reviewed-write-adapters");
-    for (const key of REQUIRED_ENV) {
+    if (env.PHASE2F_REVIEWED_MANIFEST_VERSION !== REVIEWED_ADAPTER_MANIFEST.version && args.manifestVersion !== REVIEWED_ADAPTER_MANIFEST.version) {
+      errors.push(`production execution requires reviewed manifest version ${REVIEWED_ADAPTER_MANIFEST.version}`);
+    }
+    for (const key of REQUIRED_PRODUCTION_ENV) {
       if (!env[key]) errors.push(`missing required environment variable ${key}`);
     }
   } else if (!args.dryRun && args.environment !== "local") {
@@ -131,6 +166,25 @@ export function validateRuntime(args, env) {
     if (!env.PHASE2F_SUPABASE_URL.includes(expected)) {
       errors.push("PHASE2F_SUPABASE_URL does not contain PHASE2F_EXPECTED_SUPABASE_PROJECT_REF");
     }
+  }
+  return errors;
+}
+
+export function targetBindingFor({ environment, target, manifestVersion = REVIEWED_ADAPTER_MANIFEST.version }) {
+  const input = `${environment}:${target.hostname}:${target.port}:${target.database}`;
+  return {
+    environment,
+    manifestVersion,
+    targetHash: createHash("sha256").update(input).digest("hex"),
+    databaseName: target.database,
+  };
+}
+
+export function validateStateTargetBinding({ state, binding }) {
+  if (!state?.targetBinding) return [];
+  const errors = [];
+  for (const key of ["environment", "manifestVersion", "targetHash"]) {
+    if (state.targetBinding[key] !== binding[key]) errors.push(`state-file target binding mismatch for ${key}`);
   }
   return errors;
 }
@@ -298,13 +352,14 @@ export function buildPlan({ includeOptional = false } = {}) {
   ];
   return {
     marker: FIXTURE_MARKER,
+    manifest: REVIEWED_ADAPTER_MANIFEST,
     identities,
     operations,
     summary: {
       operationCount: operations.length,
       apps: [...new Set(operations.map((operation) => operation.app))],
-      productionWritesEnabled: false,
-      realExecutionBoundary: "requires --environment production --confirm-production-fixtures and reviewed app-specific write adapter",
+      productionWritesEnabled: "calculated-at-runtime",
+      realExecutionBoundary: "requires environment confirmation, reviewed adapter manifest, target validation, clean state binding, and provider/billing guard",
     },
   };
 }
@@ -326,6 +381,36 @@ export function validatePlan(plan) {
       } catch {
         errors.push(`${operation.id} schema evidence missing: ${evidence}`);
       }
+    }
+  }
+  return errors;
+}
+
+export function validateProviderBillingGuard(plan) {
+  const prohibited = [
+    /create\s+stripe/i,
+    /mutate\s+stripe/i,
+    /create\s+checkout/i,
+    /create\s+subscription/i,
+    /create\s+invoice/i,
+    /attach\s+payment/i,
+    /enqueue\s+provider/i,
+    /call\s+provider/i,
+    /run\s+ai/i,
+    /create\s+embedding/i,
+    /run\s+crawl/i,
+    /execute\s+scan/i,
+    /execute\s+audit/i,
+    /render\s+media/i,
+    /transcribe/i,
+    /run\s+ingestion/i,
+    /run\s+paid\s+export/i,
+  ];
+  const errors = [];
+  for (const operation of plan.operations) {
+    const text = `${operation.action} ${operation.target} ${operation.idempotencyRule}`.replace(/no [^",\]]+/gi, "");
+    for (const pattern of prohibited) {
+      if (pattern.test(text)) errors.push(`${operation.id} references prohibited operation ${pattern}`);
     }
   }
   return errors;
@@ -359,9 +444,18 @@ export function buildRunResult({ command, args, env = loadLocalEnv() }) {
   const plan = buildPlan({ includeOptional: args.includeOptional });
   const runtimeErrors = validateRuntime(args, env);
   const planErrors = validatePlan(plan);
-  const missingEnv = REQUIRED_ENV.filter((key) => !env[key]);
+  const guardErrors = validateProviderBillingGuard(plan);
+  const missingEnv = (args.environment === "production" ? REQUIRED_PRODUCTION_ENV : REQUIRED_ENV).filter((key) => !env[key]);
+  const productionGate = {
+    defaultDeny: true,
+    manifestVersion: REVIEWED_ADAPTER_MANIFEST.version,
+    reviewedAdapters: REVIEWED_ADAPTER_MANIFEST.reviewedAdapters,
+    providerBillingGuardPassed: guardErrors.length === 0,
+    preTargetChecksPassed: runtimeErrors.length === 0 && planErrors.length === 0 && guardErrors.length === 0,
+    productionWritesEnabled: false,
+  };
   return redactResult({
-    ok: runtimeErrors.length === 0 && planErrors.length === 0,
+    ok: runtimeErrors.length === 0 && planErrors.length === 0 && guardErrors.length === 0,
     command,
     dryRun: args.dryRun,
     environment: args.environment,
@@ -371,6 +465,8 @@ export function buildRunResult({ command, args, env = loadLocalEnv() }) {
     missingEnv: args.dryRun ? missingEnv : [],
     runtimeErrors,
     planErrors,
+    guardErrors,
+    productionGate,
     plan,
   });
 }

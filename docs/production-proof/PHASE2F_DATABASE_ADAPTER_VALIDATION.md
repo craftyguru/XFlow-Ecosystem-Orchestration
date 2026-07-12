@@ -135,3 +135,5 @@ Authenticated production smoke tests remain blocked until approved production te
 ## Phase 2F.5 Follow-Up
 
 Phase 2F.5 did not create production fixtures. The local database validation result remains valid evidence for the adapter shape, but production execution is blocked until the ignored env file exists and the reviewed provisioner has production writes explicitly enabled through a separate reviewed change.
+
+Phase 2F.5A refactored the database validation SQL into reusable lifecycle functions used by both validation and live commands. The exact live local path was validated against the disposable migrated PostgreSQL database: 33 created, 33 reused on second provision, 33 cleaned up, and 0 marked rows remaining.
