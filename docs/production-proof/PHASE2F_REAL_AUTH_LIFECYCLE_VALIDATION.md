@@ -140,6 +140,8 @@ No production mutation occurred. No production project, production Auth, product
 
 ## Required Next Step
 
+Phase 2F.5E.1 attempted non-destructive Docker Desktop/WSL recovery. The Docker context was correct (`desktop-linux`), but the Linux engine continued returning Docker API 500 responses after Docker-only process/service restart and `wsl --shutdown`. See `docs/production-proof/PHASE2F_LOCAL_DOCKER_RECOVERY.md`.
+
 Restore Docker Desktop Linux engine health, then rerun Phase 2F.5E local validation from the beginning.
 
 Minimum acceptance before retry:
