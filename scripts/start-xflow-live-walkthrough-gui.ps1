@@ -168,7 +168,7 @@ $grid.Columns["status"].Width = 130
 $grid.Columns["address"].AutoSizeMode = "Fill"
 $grid.Rows.Add("Stelo rehearsal", "Checking...", "Cue 1 - XFlow Overview") | Out-Null
 $grid.Rows.Add("Connected product scenes", "Checking...", "AudAiX, RatAiFy, WordGeni, Crevux, Verixet") | Out-Null
-$grid.Rows.Add("Rehearsal controller", "Waiting...", "24 cues; Space or Right Arrow advances") | Out-Null
+$grid.Rows.Add("Rehearsal controller", "Waiting...", "40 cues; Space or Right Arrow advances") | Out-Null
 $form.Controls.Add($grid)
 
 $nextLabel = [System.Windows.Forms.Label]::new()
