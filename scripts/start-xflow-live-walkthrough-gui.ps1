@@ -59,11 +59,25 @@ function Open-Url {
 }
 
 function Start-SteloRehearsal {
-  $running = Get-CimInstance Win32_Process | Where-Object {
+  param([switch]$Restart)
+
+  $running = @(Get-CimInstance Win32_Process | Where-Object {
     $_.CommandLine -match "loom:stelo:rehearse|scripts[\\/]loom[\\/]stelo[\\/]rehearse\.ts"
-  }
+  })
   if ($running) {
-    return
+    if (-not $Restart) {
+      return
+    }
+
+    $runningIds = @($running.ProcessId)
+    $roots = @($running | Where-Object { $_.ParentProcessId -notin $runningIds })
+    foreach ($root in $roots) {
+      Start-Process -FilePath "taskkill.exe" `
+        -ArgumentList @("/PID", $root.ProcessId, "/T", "/F") `
+        -WindowStyle Hidden `
+        -Wait | Out-Null
+    }
+    Start-Sleep -Milliseconds 500
   }
 
   $logDir = Join-Path $xflowAppDir ".codex-rehearsal"
@@ -95,7 +109,7 @@ function New-PanelButton {
 }
 
 $form = [System.Windows.Forms.Form]::new()
-$form.Text = "XFlow Live Walkthrough"
+$form.Text = "Stelo Rehearsal Helper"
 $form.StartPosition = "CenterScreen"
 $form.Size = [System.Drawing.Size]::new(760, 410)
 $form.MinimumSize = [System.Drawing.Size]::new(720, 390)
@@ -159,7 +173,7 @@ $form.Controls.Add($nextLabel)
 
 $openWalkthroughButton = New-PanelButton -Text "Start rehearsal - cue 1" -Left 27 -Width 190
 $openWalkthroughButton.Enabled = $false
-$openWalkthroughButton.Add_Click({ Start-SteloRehearsal })
+$openWalkthroughButton.Add_Click({ Start-SteloRehearsal -Restart })
 $form.Controls.Add($openWalkthroughButton)
 
 $openXFlowButton = New-PanelButton -Text "Open XFlow overview" -Left 227 -Width 145
