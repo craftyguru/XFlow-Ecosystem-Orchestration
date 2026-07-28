@@ -9,8 +9,8 @@ $verixetSiteUrl = "https://verixet.com"
 $verixetDashboardUrl = "https://verixet.com/dashboard"
 $connectedProductUrls = @(
   "https://audaix.com/dashboard",
-  "https://rataify.com/dashboard",
-  "https://wordgeni.com/dashboard",
+  "https://rataify.com/sites",
+  "https://wordgeni.com/dashboard/copilot",
   "https://crevux.com/app",
   $verixetDashboardUrl
 )
@@ -133,7 +133,7 @@ $titleLabel.AutoSize = $true
 $form.Controls.Add($titleLabel)
 
 $helpLabel = [System.Windows.Forms.Label]::new()
-$helpLabel.Text = "No terminal is shown. This starts the full 19-cue Stelo rehearsal at cue 1."
+$helpLabel.Text = "No terminal is shown. This starts the full 21-cue Stelo rehearsal at cue 1."
 $helpLabel.ForeColor = [System.Drawing.Color]::FromArgb(151, 171, 200)
 $helpLabel.Location = [System.Drawing.Point]::new(27, 58)
 $helpLabel.AutoSize = $true
@@ -168,7 +168,7 @@ $grid.Columns["status"].Width = 130
 $grid.Columns["address"].AutoSizeMode = "Fill"
 $grid.Rows.Add("Stelo rehearsal", "Checking...", "Cue 1 - XFlow Overview") | Out-Null
 $grid.Rows.Add("Connected product scenes", "Checking...", "AudAiX, RatAiFy, WordGeni, Crevux, Verixet") | Out-Null
-$grid.Rows.Add("Rehearsal controller", "Waiting...", "19 cues; Space or Right Arrow advances") | Out-Null
+$grid.Rows.Add("Rehearsal controller", "Waiting...", "24 cues; Space or Right Arrow advances") | Out-Null
 $form.Controls.Add($grid)
 
 $nextLabel = [System.Windows.Forms.Label]::new()
