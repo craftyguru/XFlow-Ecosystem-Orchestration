@@ -5,14 +5,21 @@ Add-Type -AssemblyName System.Drawing
 
 $xflowSiteUrl = "https://xflowx.com"
 $xflowDashboardUrl = "https://xflowx.com/overview"
+$xflowGuidedTourUrl = "https://xflowx.com/help/ecosystem-guide?tour=1"
 $verixetSiteUrl = "https://verixet.com"
 $verixetDashboardUrl = "https://verixet.com/dashboard"
 $walkthroughWorkspaceId = "4e3d926b-6ff1-42e2-aaee-f17a8559cf9c"
-$walkthroughReturnTo = [Uri]::EscapeDataString($verixetDashboardUrl)
+$walkthroughReturnTo = [Uri]::EscapeDataString($xflowGuidedTourUrl)
 $walkthroughSignInUrl =
+  "https://xflowx.com/auth/start?mode=signin&intent=signin&app=xflow" +
+  "&selectedAppSlug=xflow&sourceApp=xflow" +
+  "&returnTo=$walkthroughReturnTo" +
+  "&desktop_workspace_id=$walkthroughWorkspaceId"
+$verixetReturnTo = [Uri]::EscapeDataString($verixetDashboardUrl)
+$verixetHandoffUrl =
   "https://xflowx.com/auth/start?mode=signin&intent=signin&app=verixet" +
   "&selectedAppSlug=verixet&sourceApp=verixet" +
-  "&returnTo=$walkthroughReturnTo" +
+  "&returnTo=$verixetReturnTo" +
   "&desktop_workspace_id=$walkthroughWorkspaceId"
 
 $script:openedWalkthrough = $false
@@ -92,7 +99,7 @@ $titleLabel.AutoSize = $true
 $form.Controls.Add($titleLabel)
 
 $helpLabel = [System.Windows.Forms.Label]::new()
-$helpLabel.Text = "No local servers or terminal are used. This panel opens the deployed XFlow to Verixet walkthrough."
+$helpLabel.Text = "No local server or terminal is used. Start in XFlow at guided walkthrough step 1."
 $helpLabel.ForeColor = [System.Drawing.Color]::FromArgb(151, 171, 200)
 $helpLabel.Location = [System.Drawing.Point]::new(27, 58)
 $helpLabel.AutoSize = $true
@@ -125,9 +132,9 @@ $grid.Columns.Add("address", "Live address") | Out-Null
 $grid.Columns["service"].Width = 190
 $grid.Columns["status"].Width = 130
 $grid.Columns["address"].AutoSizeMode = "Fill"
-$grid.Rows.Add("XFlow control plane", "Checking...", $xflowDashboardUrl) | Out-Null
-$grid.Rows.Add("Verixet dashboard", "Checking...", $verixetDashboardUrl) | Out-Null
-$grid.Rows.Add("Account handoff", "Waiting...", "XFlow sign-in to Primary workspace to Verixet") | Out-Null
+$grid.Rows.Add("XFlow guided walkthrough", "Checking...", $xflowGuidedTourUrl) | Out-Null
+$grid.Rows.Add("Connected Verixet app", "Checking...", $verixetDashboardUrl) | Out-Null
+$grid.Rows.Add("Walkthrough start", "Waiting...", "XFlow sign-in -> guided tour step 1") | Out-Null
 $form.Controls.Add($grid)
 
 $nextLabel = [System.Windows.Forms.Label]::new()
@@ -137,17 +144,17 @@ $nextLabel.Location = [System.Drawing.Point]::new(27, 274)
 $nextLabel.AutoSize = $true
 $form.Controls.Add($nextLabel)
 
-$openWalkthroughButton = New-PanelButton -Text "Open live walkthrough" -Left 27 -Width 175
+$openWalkthroughButton = New-PanelButton -Text "Start walkthrough - step 1" -Left 27 -Width 190
 $openWalkthroughButton.Enabled = $false
 $openWalkthroughButton.Add_Click({ Open-Url $walkthroughSignInUrl })
 $form.Controls.Add($openWalkthroughButton)
 
-$openXFlowButton = New-PanelButton -Text "Open XFlow" -Left 212 -Width 125
+$openXFlowButton = New-PanelButton -Text "Open XFlow overview" -Left 227 -Width 145
 $openXFlowButton.Add_Click({ Open-Url $xflowDashboardUrl })
 $form.Controls.Add($openXFlowButton)
 
-$openVerixetButton = New-PanelButton -Text "Open Verixet" -Left 347 -Width 130
-$openVerixetButton.Add_Click({ Open-Url $verixetDashboardUrl })
+$openVerixetButton = New-PanelButton -Text "Open connected Verixet" -Left 382 -Width 165
+$openVerixetButton.Add_Click({ Open-Url $verixetHandoffUrl })
 $form.Controls.Add($openVerixetButton)
 
 $closeButton = New-PanelButton -Text "Close panel" -Left 587 -Width 130
@@ -175,7 +182,7 @@ $timer.Add_Tick({
   $openWalkthroughButton.Enabled = $ready
   if ($ready) {
     $titleLabel.Text = "Live walkthrough ready"
-    $nextLabel.Text = "Sign in with XFlow. The connected Primary workspace will open in Verixet."
+    $nextLabel.Text = "Ready: XFlow sign-in will launch guided walkthrough step 1."
     $nextLabel.ForeColor = $green
     if (-not $script:openedWalkthrough) {
       $script:openedWalkthrough = $true
@@ -202,7 +209,7 @@ $form.Add_Shown({
       $row.Cells["status"].Style.ForeColor = $green
     }
     $titleLabel.Text = "Live walkthrough ready"
-    $nextLabel.Text = "Sign in with XFlow. The connected Primary workspace will open in Verixet."
+    $nextLabel.Text = "Ready: XFlow sign-in will launch guided walkthrough step 1."
     $nextLabel.ForeColor = $green
     $openWalkthroughButton.Enabled = $true
     $script:openedWalkthrough = $true
