@@ -5,16 +5,11 @@ Add-Type -AssemblyName System.Drawing
 
 $xflowSiteUrl = "https://xflowx.com"
 $xflowDashboardUrl = "https://xflowx.com/overview"
-$xflowGuidedTourUrl = "https://xflowx.com/help/ecosystem-guide?tour=1"
 $verixetSiteUrl = "https://verixet.com"
 $verixetDashboardUrl = "https://verixet.com/dashboard"
+$workspaceRoot = Split-Path -Parent $PSScriptRoot
+$xflowAppDir = Join-Path $workspaceRoot "apps\XFlow"
 $walkthroughWorkspaceId = "4e3d926b-6ff1-42e2-aaee-f17a8559cf9c"
-$walkthroughReturnTo = [Uri]::EscapeDataString($xflowGuidedTourUrl)
-$walkthroughSignInUrl =
-  "https://xflowx.com/auth/start?mode=signin&intent=signin&app=xflow" +
-  "&selectedAppSlug=xflow&sourceApp=xflow" +
-  "&returnTo=$walkthroughReturnTo" +
-  "&desktop_workspace_id=$walkthroughWorkspaceId"
 $verixetReturnTo = [Uri]::EscapeDataString($verixetDashboardUrl)
 $verixetHandoffUrl =
   "https://xflowx.com/auth/start?mode=signin&intent=signin&app=verixet" +
@@ -63,6 +58,24 @@ function Open-Url {
   Start-Process $Url | Out-Null
 }
 
+function Start-SteloRehearsal {
+  $running = Get-CimInstance Win32_Process | Where-Object {
+    $_.CommandLine -match "loom:stelo:rehearse|scripts[\\/]loom[\\/]stelo[\\/]rehearse\.ts"
+  }
+  if ($running) {
+    return
+  }
+
+  $logDir = Join-Path $xflowAppDir ".codex-rehearsal"
+  New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+  Start-Process -FilePath "npm.cmd" `
+    -ArgumentList @("run", "loom:stelo:rehearse") `
+    -WorkingDirectory $xflowAppDir `
+    -WindowStyle Hidden `
+    -RedirectStandardOutput (Join-Path $logDir "rehearsal.out.log") `
+    -RedirectStandardError (Join-Path $logDir "rehearsal.err.log") | Out-Null
+}
+
 function New-PanelButton {
   param(
     [string]$Text,
@@ -99,7 +112,7 @@ $titleLabel.AutoSize = $true
 $form.Controls.Add($titleLabel)
 
 $helpLabel = [System.Windows.Forms.Label]::new()
-$helpLabel.Text = "No local server or terminal is used. Start in XFlow at guided walkthrough step 1."
+$helpLabel.Text = "No terminal is shown. This starts the full 17-cue Stelo rehearsal at cue 1."
 $helpLabel.ForeColor = [System.Drawing.Color]::FromArgb(151, 171, 200)
 $helpLabel.Location = [System.Drawing.Point]::new(27, 58)
 $helpLabel.AutoSize = $true
@@ -132,9 +145,9 @@ $grid.Columns.Add("address", "Live address") | Out-Null
 $grid.Columns["service"].Width = 190
 $grid.Columns["status"].Width = 130
 $grid.Columns["address"].AutoSizeMode = "Fill"
-$grid.Rows.Add("XFlow guided walkthrough", "Checking...", $xflowGuidedTourUrl) | Out-Null
+$grid.Rows.Add("Stelo rehearsal", "Checking...", "Cue 1 - XFlow Overview") | Out-Null
 $grid.Rows.Add("Connected Verixet app", "Checking...", $verixetDashboardUrl) | Out-Null
-$grid.Rows.Add("Walkthrough start", "Waiting...", "XFlow sign-in -> guided tour step 1") | Out-Null
+$grid.Rows.Add("Rehearsal controller", "Waiting...", "17 cues; Space or Right Arrow advances") | Out-Null
 $form.Controls.Add($grid)
 
 $nextLabel = [System.Windows.Forms.Label]::new()
@@ -144,9 +157,9 @@ $nextLabel.Location = [System.Drawing.Point]::new(27, 274)
 $nextLabel.AutoSize = $true
 $form.Controls.Add($nextLabel)
 
-$openWalkthroughButton = New-PanelButton -Text "Start walkthrough - step 1" -Left 27 -Width 190
+$openWalkthroughButton = New-PanelButton -Text "Start rehearsal - cue 1" -Left 27 -Width 190
 $openWalkthroughButton.Enabled = $false
-$openWalkthroughButton.Add_Click({ Open-Url $walkthroughSignInUrl })
+$openWalkthroughButton.Add_Click({ Start-SteloRehearsal })
 $form.Controls.Add($openWalkthroughButton)
 
 $openXFlowButton = New-PanelButton -Text "Open XFlow overview" -Left 227 -Width 145
@@ -182,11 +195,11 @@ $timer.Add_Tick({
   $openWalkthroughButton.Enabled = $ready
   if ($ready) {
     $titleLabel.Text = "Live walkthrough ready"
-    $nextLabel.Text = "Ready: XFlow sign-in will launch guided walkthrough step 1."
+    $nextLabel.Text = "Ready: rehearsal starts at Cue 1 - XFlow Overview."
     $nextLabel.ForeColor = $green
     if (-not $script:openedWalkthrough) {
       $script:openedWalkthrough = $true
-      Open-Url $walkthroughSignInUrl
+      Start-SteloRehearsal
     }
   } else {
     $titleLabel.Text = "Waiting for the live sites..."
@@ -209,11 +222,11 @@ $form.Add_Shown({
       $row.Cells["status"].Style.ForeColor = $green
     }
     $titleLabel.Text = "Live walkthrough ready"
-    $nextLabel.Text = "Ready: XFlow sign-in will launch guided walkthrough step 1."
+    $nextLabel.Text = "Ready: rehearsal starts at Cue 1 - XFlow Overview."
     $nextLabel.ForeColor = $green
     $openWalkthroughButton.Enabled = $true
     $script:openedWalkthrough = $true
-    Open-Url $walkthroughSignInUrl
+    Start-SteloRehearsal
   }
 })
 
