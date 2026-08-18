@@ -20,6 +20,8 @@ The core ecosystem is limited to XFlow, Verixet, Rataify, AudAiX, Crevux, and Wo
 
 ## Quick Navigation
 
+- [Cursor + Codex development workflow](docs/development-workflow.md)
+- [Contributing](CONTRIBUTING.md)
 - [Central ecosystem docs hub](docs/ecosystem/README.md)
 - [Product map](docs/ecosystem/product-map.md)
 - [Architecture map](docs/ecosystem/architecture.md)

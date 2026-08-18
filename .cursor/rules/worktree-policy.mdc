@@ -1,0 +1,33 @@
+---
+description: Isolated worktrees for parallel Cursor/Codex work; nested apps are separate git repos
+alwaysApply: true
+---
+
+# Worktree Policy
+
+Prefer an isolated Git worktree for meaningful parallel implementation, Codex-owned work while Cursor is dirty, or risky refactors.
+
+Do not create worktrees for tiny single-owner edits.
+
+## This workspace is not one git tree
+
+Root git tracks docs, scripts, shared packages, Supabase, and CI. Nested apps under `apps/` are independent git repos and are gitignored by the root. A root worktree does **not** contain app source.
+
+- Root orchestration work → root branch/worktree
+- XFlow/Verixet/Crevux/etc. implementation → that app's own repo, branch, or worktree
+
+## Setup
+
+Cursor reads `.cursor/worktrees.json`. Setup copies env **templates** only, never secrets, and never runs migrations.
+
+Manual create from repo root:
+
+```text
+git worktree add .worktrees/<name> -b <branch>
+```
+
+Then run the matching setup script under `.cursor/` if Cursor did not.
+
+## Single-owner files (serialize)
+
+Auth/identity, shared routing, `package.json` / lockfiles, `supabase/migrations/**`, CI workflows, env templates, global config, native packaging, and any file another agent is already editing.

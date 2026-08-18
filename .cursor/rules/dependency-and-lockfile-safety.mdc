@@ -1,0 +1,19 @@
+---
+description: Intentional dependency and lockfile changes; one owner at a time
+globs: "**/package.json,**/package-lock.json,**/pnpm-lock.yaml,**/yarn.lock,**/Cargo.toml,**/Cargo.lock,**/Podfile.lock"
+alwaysApply: false
+---
+
+# Dependency And Lockfile Safety
+
+Manifests and lockfiles are coordination-sensitive. Only one agent may change the same dependency state at a time.
+
+Root orchestration uses npm (`package-lock.json`). CreVux and WordGeni use pnpm. Some apps also have Cargo/Gradle lockfiles. Root `.gitignore` ignores `/pnpm-lock.yaml` because root orchestration is npm-owned.
+
+## Rules
+
+- Do not add a dependency if an existing package already covers the need
+- Keep lockfile updates in the same commit as the manifest change
+- Do not mix unrelated app lockfiles into a root commit
+- Nested `apps/` repos have their own lockfiles; change them in that app repo
+- Never commit `.env`, keys, or production secrets with dependency work

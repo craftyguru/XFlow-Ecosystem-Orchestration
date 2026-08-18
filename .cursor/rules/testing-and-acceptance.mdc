@@ -1,0 +1,34 @@
+---
+description: Real validation commands, truthful gate reporting, and phase completion bars
+alwaysApply: true
+---
+
+# Testing And Acceptance
+
+This root is an orchestration repo, not a unified app workspace. Do not invent `npm run typecheck`, `lint`, `test`, or `build` at the root; those scripts do not exist here.
+
+App commands live in each nested app repo. See `docs/ecosystem-root-runbook.md`.
+
+## Root fast validation
+
+- `node scripts/dev-workflow/inspect-repo.mjs`
+- `node --test scripts/dev-workflow/verify-workflow-setup.test.mjs` when workflow files change
+- `node scripts/validate-ecosystem-contracts.mjs` when contracts change
+- Targeted `node --test` for the scripts you touched
+
+## Root implementation validation (only if the change needs it)
+
+- `npm run validate:ecosystem-contracts`
+- `npm run supabase:validate` for shared Supabase work
+- `npm run proof:security-static` for auth/RLS/service-role boundaries
+- `npm run proof:ecosystem:static` for static ecosystem proof
+
+## App validation (run inside the app repo with that app's package manager)
+
+XFlow, Verixet, AudAix, RatAiFy: `npm run lint`, `npm run typecheck`, `npm run test`, `npm run build`.
+
+WordGeni, CreVux: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`.
+
+## Reporting
+
+Use PASS, FAIL, BLOCKED, NOT RUN, or MANUAL VERIFICATION REQUIRED. Do not downgrade a failed gate to declare a phase complete. Compiling is not completion.

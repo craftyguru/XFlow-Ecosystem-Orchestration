@@ -66,6 +66,12 @@ supabase/.temp/
 .codex-lander-smoke/
 .playwright-cli/
 .tmp-public-smoke/
+.cursor/ownership.local.md
+.worktrees/
+.codex/
+.codex-temp/
+.codex-production-desktop-backend-deploy/
+.tmp-phase2a-release/
 
 # OS and editor files
 .DS_Store

@@ -1,6 +1,27 @@
+# XFlow Agent Instructions
+
+## Development workflow (all coding agents)
+
+This root repository is ecosystem orchestration: docs, proof scripts, shared packages, `supabase/`, and CI. Nested apps under `apps/` are independent git repos and are gitignored here.
+
+Follow `.cursor/rules/` and `docs/development-workflow.md`. Spoken commands (`Start Phase X`, `Continue Phase X`, `Close Phase X`, `Give this task to Codex`, `Take ownership in Cursor`, `Prepare a Codex handoff`, `Create an isolated worktree for this`) are defined there.
+
+Hard constraints:
+
+- One implementation owner per task per worktree. Cursor and Codex must not edit the same implementation area in the same worktree at the same time.
+- Pre-existing dirty files are protected. Never `git reset --hard`, `git clean -fd`, `git checkout -- .`, `git restore .`, or `git stash` unless the user names that operation.
+- Do not invent root scripts. Root has no `typecheck`, `lint`, `test`, or `build`. Use documented `npm run` proof/validate scripts here, and each app's own package manager in `apps/<App>`.
+- Serialize schema/migrations, lockfiles, auth, CI, and shared config. Never auto-migrate in worktree setup.
+- Never expose, commit, or request credentials. XFlow Builder integration stays on the test environment.
+- Report validation as PASS, FAIL, BLOCKED, NOT RUN, or MANUAL VERIFICATION REQUIRED. Do not fabricate completion.
+
+Inspect before editing: `node scripts/dev-workflow/inspect-repo.mjs`.
+
+The remainder of this file is XFlow Builder routing policy. It does not authorize application source edits.
+
 # XFlow Builder workspace policy
 
-These instructions apply to all work in this repository.
+These instructions apply to XFlow Builder integration work in this repository.
 
 ## Environment and credentials
 

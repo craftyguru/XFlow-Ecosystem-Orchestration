@@ -1,0 +1,22 @@
+---
+description: Serialized shared-schema and migration safety for Supabase and app databases
+globs: supabase/**,**/drizzle/**,**/*migration*
+alwaysApply: false
+---
+
+# Database And Migrations
+
+Shared ecosystem schema lives in `supabase/migrations/**`. App schemas (for example XFlow Drizzle) live inside nested app repos.
+
+Never let Cursor and Codex create competing migrations in parallel. Schema work is serialized unless the user explicitly coordinates ordering.
+
+## Before any schema change
+
+1. Inspect current schema and existing migrations
+2. Confirm ordering and forward-only history
+3. Identify backwards compatibility and rollback implications
+4. Checkpoint before applying
+
+Do not rewrite applied migrations. Do not modify production data as part of ordinary development. Do not run destructive reset/seed scripts unless the user names that operation and the target is clearly non-production.
+
+Worktree setup must not auto-migrate. Apply migrations only as an explicit, in-scope step of the task.

@@ -1,0 +1,35 @@
+---
+description: Phase commands, inspect-first behavior, and scaled process for Cursor/Codex work
+alwaysApply: true
+---
+
+# Development Workflow
+
+Canonical human doc: `docs/development-workflow.md`. Agent constraints: `AGENTS.md`. Do not duplicate long checklists here.
+
+## Command conventions
+
+Interpret these as workflow requests, not product implementation:
+
+- `Start Phase X` / `Start the next phase` / `Start Phase NEXT` → phase-start workflow only
+- `Continue Phase X` → resume the named phase without expanding scope
+- `Close Phase X` → closeout report; never mark complete if blocked
+- `Give this task to Codex` / `Prepare a Codex handoff` → checkpoint + handoff
+- `Take ownership in Cursor` → inspect status/diff, then take implementation ownership
+- `Create an isolated worktree for this` → isolated branch/worktree, do not edit the dirty main checkout
+
+Do not start feature implementation from a phase-start command unless the user also asked to implement.
+
+## Scale to risk
+
+Tiny low-risk change: inspect → edit → targeted test → review diff.
+
+Full phase: inspect → protect dirty work → define scope/acceptance → isolate if needed → implement bounded slices → checkpoint → validate → QA → closeout.
+
+## Always
+
+1. Inspect surrounding architecture before editing.
+2. Preserve unrelated dirty files.
+3. Prefer the smallest compatible change.
+4. Run validation that matches the risk; report PASS / FAIL / BLOCKED / NOT RUN / MANUAL VERIFICATION REQUIRED.
+5. Never fabricate completion.

@@ -51,6 +51,10 @@ Phase 4 audit docs define the target product-family experience without changing 
 - [Dashboard standard](dashboard-standard.md)
 - [UI state standard](ui-state-standard.md)
 
+## Development Workflow
+
+Cursor, Cursor Agents, and Codex follow [development-workflow.md](../development-workflow.md) and `.cursor/rules/`. The root repo is orchestration only; product apps remain independent git repositories under `apps/`.
+
 ## Shared Standards
 
 - Canonical core product names: XFlow, Verixet, Rataify, AudAiX, Crevux, WordGeni.

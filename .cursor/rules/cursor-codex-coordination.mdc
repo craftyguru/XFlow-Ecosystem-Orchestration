@@ -1,0 +1,38 @@
+---
+description: One implementation owner per task per worktree; Cursor and Codex collision prevention
+alwaysApply: true
+---
+
+# Cursor + Codex Ownership
+
+One implementation owner per task per working tree.
+
+Cursor and Codex must not independently modify the same implementation area in the same worktree at the same time.
+
+## Cursor-owned
+
+Cursor may inspect, modify, test, and commit.
+
+Codex may review, analyze, investigate, or implement only from a different worktree/branch.
+
+## Codex-owned
+
+Treat Codex's active files as protected. Do not format, restructure, revert, or rewrite them in this worktree.
+
+Cursor may still inspect, review, search, explain, and identify issues.
+
+Parallel Cursor implementation requires an isolated branch/worktree.
+
+## Transfer ownership
+
+Before switching implementation owner:
+
+1. `git status` and `git diff`
+2. Run relevant validation
+3. Checkpoint when the slice is coherent
+4. Write a handoff (OWNER, TASK, BRANCH, WORKTREE, COMMIT, FILES CHANGED, VALIDATION RUN, CURRENT STATUS, KNOWN ISSUES, NEXT ACTION)
+5. Transfer only when the state is understandable
+
+Do not leave mixed ownership. Serialize overlapping work (auth, schema, lockfiles, shared config). Parallelize only separable surfaces.
+
+Template: `docs/templates/agent-handoff.md`.
