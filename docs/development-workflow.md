@@ -12,7 +12,9 @@ This folder is a **parent orchestration repo**, not a single application and not
 | --- | --- | --- |
 | Root | Docs, proof scripts, shared packages, `supabase/`, CI | This repository |
 | `apps/XFlow`, `apps/Verixet`, `apps/RatAiFy`, `apps/AudAix`, `apps/CreVux`, `apps/WordGeni` | Core product apps | Independent git repos; ignored by root `.gitignore` |
-| Other `apps/` entries | Adjacent or experimental products | Independent; not part of the six-app core |
+| Personal user-connected apps (including `apps/PitStrike`) | Not part of this ecosystem | Do not configure, phase, or treat as a sixth-plus product. The only valid reference is a user-connected personal app. |
+
+Do not roll out Cursor/Codex ecosystem workflow into PitStrike. Do not add PitStrike to six-app proof, capability catalogs, or phase tracks.
 
 Authority (do not blur):
 

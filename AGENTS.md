@@ -2,7 +2,9 @@
 
 ## Development workflow (all coding agents)
 
-This root repository is ecosystem orchestration: docs, proof scripts, shared packages, `supabase/`, and CI. Nested apps under `apps/` are independent git repos and are gitignored here.
+This root repository is ecosystem orchestration: docs, proof scripts, shared packages, `supabase/`, and CI. Nested core apps under `apps/` are independent git repos (XFlow, Verixet, RatAiFy, AudAix, CreVux, WordGeni) and are gitignored here.
+
+PitStrike and other personal user-connected apps are **not** ecosystem products. Do not configure them as part of this workflow, do not start ecosystem phases against them, and do not treat them as core apps. The only valid reference is a user-connected personal app.
 
 Follow `.cursor/rules/` and `docs/development-workflow.md`. Spoken commands (`Start Phase X`, `Continue Phase X`, `Close Phase X`, `Give this task to Codex`, `Take ownership in Cursor`, `Prepare a Codex handoff`, `Create an isolated worktree for this`) are defined there.
 

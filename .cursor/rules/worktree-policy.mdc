@@ -14,7 +14,8 @@ Do not create worktrees for tiny single-owner edits.
 Root git tracks docs, scripts, shared packages, Supabase, and CI. Nested apps under `apps/` are independent git repos and are gitignored by the root. A root worktree does **not** contain app source.
 
 - Root orchestration work → root branch/worktree
-- XFlow/Verixet/Crevux/etc. implementation → that app's own repo, branch, or worktree
+- XFlow/Verixet/RatAiFy/AudAix/Crevux/WordGeni implementation → that app's own repo, branch, or worktree
+- Never use this workflow to modify PitStrike. It is a personal user-connected app, not an ecosystem product.
 
 ## Setup
 

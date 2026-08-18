@@ -5,7 +5,8 @@ This workspace is a six-app ecosystem plus a root orchestration repository.
 ## Where to work
 
 - Root repo: docs, proof scripts, shared packages, `supabase/`, CI.
-- Product apps: independent git repositories under `apps/`. They are not part of the root git tree.
+- Product apps: independent git repositories for the six core apps under `apps/` (XFlow, Verixet, RatAiFy, AudAix, CreVux, WordGeni). They are not part of the root git tree.
+- PitStrike is a personal user-connected app, not an ecosystem product. Do not treat it as a rollout or phase target.
 
 ## Agent workflow
 

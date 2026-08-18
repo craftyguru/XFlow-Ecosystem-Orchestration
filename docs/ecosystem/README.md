@@ -6,7 +6,7 @@ The XFlow ecosystem is a six-app portfolio for controlling workflows, validating
 
 XFlow connects six specialized apps through shared identity, governance, verification, and release discipline so each product can stand alone while still proving it belongs to a larger operating system.
 
-The core ecosystem is limited to XFlow, Verixet, Rataify, AudAiX, Crevux, and WordGeni. Other apps in the workspace are personal projects, experiments, or separate portfolio products and are not part of the core ecosystem narrative.
+The core ecosystem is limited to XFlow, Verixet, Rataify, AudAiX, Crevux, and WordGeni. Personal user-connected apps (including PitStrike) are not ecosystem products and are not part of the core ecosystem narrative.
 
 ## What The Platform Does
 
