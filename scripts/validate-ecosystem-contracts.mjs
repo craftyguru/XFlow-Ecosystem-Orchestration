@@ -56,6 +56,23 @@ const routes = Array.isArray(routesContract.routes) ? routesContract.routes : []
 const tokenTypes = Array.isArray(tokensContract.tokenTypes) ? tokensContract.tokenTypes : [];
 
 if (apps.length === 0) fail("apps.json must contain a non-empty apps array.");
+const expectedCanonicalSlugs = ["xflow", "verixet", "audaix", "rataify", "wordgeni", "crevux"];
+if (!Array.isArray(appsContract.canonicalSlugs)) fail("apps.json must declare canonicalSlugs.");
+if (appsContract.canonicalSlugs.length !== 6) {
+  fail(`apps.json canonicalSlugs must contain exactly 6 ecosystem products, found ${appsContract.canonicalSlugs.length}.`);
+}
+if (apps.length !== 6) fail(`apps.json apps must contain exactly 6 ecosystem products, found ${apps.length}.`);
+for (const slug of expectedCanonicalSlugs) {
+  if (!appsContract.canonicalSlugs.includes(slug)) fail(`apps.json canonicalSlugs missing ${slug}.`);
+}
+if (apps.some((app) => app.slug === "pitstrike") || appsContract.canonicalSlugs.includes("pitstrike")) {
+  fail("PitStrike must not appear in ecosystem product membership (canonicalSlugs/apps).");
+}
+const personal = Array.isArray(appsContract.externalPersonalApps) ? appsContract.externalPersonalApps : [];
+const pitstrikePersonal = personal.find((app) => app.slug === "pitstrike");
+if (!pitstrikePersonal || pitstrikePersonal.ecosystemProduct !== false) {
+  fail("apps.json must declare PitStrike as an externalPersonalApp with ecosystemProduct false.");
+}
 if (envRows.length === 0) fail("env-contract.json must contain a non-empty env array.");
 if (routes.length === 0) fail("routes.json must contain a non-empty routes array.");
 if (tokenTypes.length === 0) fail("token-types.json must contain a non-empty tokenTypes array.");

@@ -1,0 +1,16 @@
+---
+description: Canonical six ecosystem products; PitStrike is external/personal only
+alwaysApply: true
+---
+
+# Ecosystem Product Boundary
+
+Authoritative registry: `ecosystem-contracts/apps.json`.
+
+Ecosystem products (exactly six): XFlow, Verixet, AudAiX, RatAiFy, WordGeni, Crevux.
+
+PitStrike is a user-connected **external/personal** app only. It is not product #7.
+
+Do not infer membership from `apps/` folders, Git discovery, Cursor repo lists, or extra XFlow worktrees (`xflow-master-release`, `XFlow-phase4b-pr`, `XFlow-push-through`). Canonical XFlow is `apps/XFlow`.
+
+Do not modify PitStrike source during ecosystem work. Preserve XFlow connection adapters that treat `pitstrike` as a connected user app.

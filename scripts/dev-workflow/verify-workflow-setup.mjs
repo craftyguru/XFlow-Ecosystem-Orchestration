@@ -12,6 +12,7 @@ const REQUIRED_RULES = [
   "phase-management.mdc",
   "testing-and-acceptance.mdc",
   "worktree-policy.mdc",
+  "ecosystem-product-boundary.mdc",
   "database-and-migrations.mdc",
   "dependency-and-lockfile-safety.mdc",
 ];
@@ -117,6 +118,15 @@ export function verifyWorkflowSetup() {
     if (!gitignore.includes(token)) {
       errors.push(`.gitignore missing ${token}`);
     }
+  }
+
+  const appsContract = loadJson("ecosystem-contracts/apps.json");
+  const slugs = Array.isArray(appsContract.canonicalSlugs) ? appsContract.canonicalSlugs : [];
+  if (slugs.length !== 6 || slugs.includes("pitstrike")) {
+    errors.push("ecosystem-contracts/apps.json must list exactly six products and must not include pitstrike");
+  }
+  if (appsContract.apps?.some((app) => app.slug === "pitstrike")) {
+    errors.push("PitStrike must not be an ecosystem-contracts apps[] member");
   }
 
   return errors;
