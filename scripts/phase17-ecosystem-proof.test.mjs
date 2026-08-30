@@ -61,6 +61,7 @@ test(
 
 test("GitHub static proof materializes every required nested app repository", () => {
   const workflow = fs.readFileSync(path.join(root, ".github", "workflows", "ecosystem-proof.yml"), "utf8");
+  const proofScript = fs.readFileSync(script, "utf8");
 
   for (const [repository, appPath] of requiredNestedApps) {
     assert.match(workflow, new RegExp(`repository: ${repository.replace("/", "\\/")}`));
@@ -69,6 +70,7 @@ test("GitHub static proof materializes every required nested app repository", ()
 
   assert.match(workflow, /ECOSYSTEM_APP_REPO_READ_TOKEN/);
   assert.match(workflow, /node-version: 22\.18\.0/);
+  assert.doesNotMatch(proofScript, /apps\/Crevux/);
 });
 
 test("http mode fails closed when required proof HTTP env is missing", (t) => {
