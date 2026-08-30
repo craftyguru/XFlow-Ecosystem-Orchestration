@@ -98,6 +98,9 @@ See [security-model.md](security-model.md).
 | Cross-app release evidence packet | in progress |
 | Portfolio screenshots and media proof refresh | in progress; see [product-proof.md](product-proof.md) |
 | Public docs URL | needs verification |
+| Crevux Android MOBILE-0 architecture and contracts | in progress; automated gates plus owner review required |
+
+Mobile phase specifications are indexed in [`docs/phases/README.md`](../phases/README.md).
 
 ## Portfolio Positioning
 

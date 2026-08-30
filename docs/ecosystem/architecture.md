@@ -73,3 +73,9 @@ sequenceDiagram
 - Do not duplicate billing, identity, or release authority inside satellite apps.
 - Document unverified production claims as needs verification.
 - Treat each core app as a standalone product with a clear ecosystem role.
+
+## Mobile architecture
+
+The approved first ecosystem mobile product is a separately delivered Crevux Android application built on a reusable mobile foundation. XFlow remains the identity/account authority, Verixet remains the billing/entitlement/usage authority, and Crevux owns mobile projects, media, editing history, generation jobs, and providers.
+
+See [Crevux Android architecture](../mobile/crevux-android-architecture.md) and the [mobile v1 API contract](../mobile/crevux-mobile-v1-contract.md). Runtime implementation begins in MOBILE-1; these documents do not claim the target endpoints are already implemented.

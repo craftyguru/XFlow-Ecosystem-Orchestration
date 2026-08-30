@@ -1,6 +1,8 @@
 // GENERATED FILE. Do not edit by hand.
 // Source: ecosystem-contracts/*.json
 
+export * from "./crevux-mobile-v1.js";
+
 export type CanonicalAppSlug = "xflow" | "verixet" | "audaix" | "rataify" | "wordgeni" | "crevux";
 export type TokenTypeId = "control_plane_service_token" | "ucl_connection_token" | "verixet_usage_ingest_token" | "oauth_access_token" | "oauth_client_secret" | "stripe_secret_key" | "stripe_webhook_secret" | "turnstile_secret_key" | "sendgrid_api_key" | "db_connection_string" | "sentry_dsn" | "media_download_signing_secret" | "jwt_secret";
 export type ContractEnvironment = "local" | "staging" | "production" | "all";
@@ -128,7 +130,7 @@ export const ecosystemApps = [
   },
   {
     "slug": "rataify",
-    "displayName": "RatAiFy",
+    "displayName": "Rataify",
     "folderName": "apps/RatAiFy",
     "domain": "trust.reviews.rataify",
     "role": "Trust, reviews, risk, privacy, reputation workflows",
@@ -141,7 +143,9 @@ export const ecosystemApps = [
       "verixet"
     ],
     "legacyAliases": [
-      "Rataify"
+      "RatAiFy",
+      "Rataify",
+      "rest-express"
     ]
   },
   {
@@ -336,6 +340,48 @@ export const ecosystemEnv = [
   },
   {
     "app": "xflow",
+    "name": "VERIXET_ECOSYSTEM_STATUS_URL",
+    "required": true,
+    "environment": "production",
+    "secret": false,
+    "safePlaceholderAllowed": false,
+    "purpose": "Verixet service-to-service ecosystem status endpoint for XFlow settings display.",
+    "sourceOfTruth": "Verixet deployment",
+    "usedBy": [
+      "/settings ecosystem status client"
+    ],
+    "notes": "Must point to Verixet /api/platform/v1/ecosystem/status, not localhost or a browser route."
+  },
+  {
+    "app": "xflow",
+    "name": "VERIXET_ECOSYSTEM_STATUS_SERVICE_TOKEN",
+    "required": true,
+    "environment": "production",
+    "secret": true,
+    "safePlaceholderAllowed": false,
+    "purpose": "Bearer token for XFlow to read Verixet ecosystem status.",
+    "sourceOfTruth": "Verixet secret manager",
+    "usedBy": [
+      "/settings ecosystem status client"
+    ],
+    "notes": "Server only; never expose to browser payloads."
+  },
+  {
+    "app": "xflow",
+    "name": "VERIXET_PORTAL_SESSION_URL",
+    "required": true,
+    "environment": "production",
+    "secret": false,
+    "safePlaceholderAllowed": false,
+    "purpose": "Verixet service-to-service customer portal session endpoint.",
+    "sourceOfTruth": "Verixet deployment",
+    "usedBy": [
+      "/settings customer portal handoff"
+    ],
+    "notes": "Must point to Verixet /api/platform/v1/billing/portal-session, not localhost or a browser route."
+  },
+  {
+    "app": "xflow",
     "name": "UPSTASH_REDIS_REST_URL",
     "required": false,
     "environment": "production",
@@ -505,6 +551,34 @@ export const ecosystemEnv = [
       "control-plane/XFlow modules"
     ],
     "notes": "Must not replace per-connection UCL tokens."
+  },
+  {
+    "app": "verixet",
+    "name": "VERIXET_ECOSYSTEM_STATUS_SERVICE_TOKEN",
+    "required": true,
+    "environment": "production",
+    "secret": true,
+    "safePlaceholderAllowed": false,
+    "purpose": "Authorizes trusted XFlow service-to-service reads of /api/platform/v1/ecosystem/status.",
+    "sourceOfTruth": "Verixet secret manager",
+    "usedBy": [
+      "ecosystem status route"
+    ],
+    "notes": "Server only; missing or invalid token must fail closed in production."
+  },
+  {
+    "app": "verixet",
+    "name": "VERIXET_PORTAL_RETURN_ORIGINS",
+    "required": true,
+    "environment": "production",
+    "secret": false,
+    "safePlaceholderAllowed": false,
+    "purpose": "Comma-separated trusted XFlow origins accepted as customer portal returnUrl origins.",
+    "sourceOfTruth": "Verixet deployment",
+    "usedBy": [
+      "platform portal-session route"
+    ],
+    "notes": "Production values must be HTTPS public origins such as https://xflowx.com; no localhost."
   },
   {
     "app": "verixet",
@@ -740,7 +814,7 @@ export const ecosystemEnv = [
     "environment": "production",
     "secret": false,
     "safePlaceholderAllowed": false,
-    "purpose": "Public RatAiFy URL.",
+    "purpose": "Public Rataify URL.",
     "sourceOfTruth": "Railway/public domain",
     "usedBy": [
       "auth",
@@ -870,7 +944,7 @@ export const ecosystemEnv = [
     "environment": "production",
     "secret": true,
     "safePlaceholderAllowed": false,
-    "purpose": "RatAiFy app-scoped usage token.",
+    "purpose": "Rataify app-scoped usage token.",
     "sourceOfTruth": "Verixet secret manager",
     "usedBy": [
       "usage ingest service"
@@ -898,7 +972,7 @@ export const ecosystemEnv = [
     "environment": "production",
     "secret": true,
     "safePlaceholderAllowed": false,
-    "purpose": "RatAiFy database connection.",
+    "purpose": "Rataify database connection.",
     "sourceOfTruth": "Railway/Supabase",
     "usedBy": [
       "server DB"
@@ -1163,6 +1237,62 @@ export const ecosystemEnv = [
   },
   {
     "app": "crevux",
+    "name": "XFLOW_BASE_URL",
+    "required": true,
+    "environment": "production",
+    "secret": false,
+    "safePlaceholderAllowed": false,
+    "purpose": "XFlow authority origin for UCL confirmation allowlisting.",
+    "sourceOfTruth": "XFlow deployment",
+    "usedBy": [
+      "Crevux UCL link callback"
+    ],
+    "notes": "Production value must be the deployed XFlow origin, not localhost."
+  },
+  {
+    "app": "crevux",
+    "name": "XFLOW_UCL_CONFIRM_ALLOWED_ORIGIN",
+    "required": false,
+    "environment": "production",
+    "secret": false,
+    "safePlaceholderAllowed": false,
+    "purpose": "Explicit allowed origin for XFlow UCL confirm_uri validation.",
+    "sourceOfTruth": "XFlow deployment",
+    "usedBy": [
+      "Crevux UCL link callback"
+    ],
+    "notes": "Use only when XFLOW_BASE_URL is not the canonical confirm origin; production must not be localhost."
+  },
+  {
+    "app": "crevux",
+    "name": "CREVUX_UCL_CONFIRMATION_PRIVATE_KEY_PEM",
+    "required": true,
+    "environment": "production",
+    "secret": true,
+    "safePlaceholderAllowed": false,
+    "purpose": "Private key used by Crevux to sign XFlow UCL link confirmations.",
+    "sourceOfTruth": "secret manager",
+    "usedBy": [
+      "Crevux UCL link callback"
+    ],
+    "notes": "Register the matching public key in XFlow app trust before production linking."
+  },
+  {
+    "app": "crevux",
+    "name": "CREVUX_UCL_DEV_SHARED_LINKING_SECRET",
+    "required": false,
+    "environment": "local",
+    "secret": true,
+    "safePlaceholderAllowed": true,
+    "purpose": "Local-only shared HS256 secret for UCL linking tests/dev.",
+    "sourceOfTruth": "local developer env",
+    "usedBy": [
+      "Crevux UCL link callback"
+    ],
+    "notes": "Never use as the production signing mechanism."
+  },
+  {
+    "app": "crevux",
     "name": "WORDGENI_SHARED_SECRET",
     "required": true,
     "environment": "production",
@@ -1220,6 +1350,26 @@ export const ecosystemEnv = [
 ] as const satisfies readonly EcosystemEnvContract[];
 
 export const ecosystemRoutes = [
+  {
+    "ownerApp": "crevux",
+    "consumerApps": [
+      "xflow"
+    ],
+    "method": "POST",
+    "path": "/api/xflow/ucl/link",
+    "purpose": "Complete XFlow UCL app linking and persist a verified ecosystem workspace UUID mapping for Crevux server requests.",
+    "requiredHeaders": [
+      "Authorization"
+    ],
+    "requiredBodyFields": [
+      "xflow_link_challenge"
+    ],
+    "authType": "oauth-user",
+    "tokenType": "oauth_access_token",
+    "responseEnvelope": "json:{linked:boolean,source:\"xflow_handoff\"}",
+    "productionFailureMode": "400 for invalid/untrusted challenge or confirm URL; 503 when Crevux signing is not configured; no mapping is persisted until XFlow confirms server-to-server.",
+    "notes": "Does not return service tokens. Crevux stores XFlow workspace UUID only after XFlow confirms the signed app proof."
+  },
   {
     "ownerApp": "xflow",
     "consumerApps": [
@@ -1494,6 +1644,69 @@ export const ecosystemRoutes = [
   {
     "ownerApp": "verixet",
     "consumerApps": [
+      "xflow",
+      "browser"
+    ],
+    "method": "POST",
+    "path": "/api/billing/plan-change/preview",
+    "purpose": "Preview billing lifecycle impact before creating Stripe checkout sessions.",
+    "requiredHeaders": [
+      "Content-Type"
+    ],
+    "requiredBodyFields": [
+      "selectedPlanSlug",
+      "billingInterval",
+      "scopeType"
+    ],
+    "authType": "oauth-user",
+    "tokenType": "oauth_access_token",
+    "responseEnvelope": "json:{ok:true,actionType,affectedApps,warnings,blockers,recommendedAlternative?}",
+    "productionFailureMode": "401/403 for unauthorized dashboard users; blocked_conflict or redundant_selection must not create checkout.",
+    "notes": "Deterministic preview only. Does not call Stripe and does not mutate subscriptions."
+  },
+  {
+    "ownerApp": "verixet",
+    "consumerApps": [
+      "xflow",
+      "browser"
+    ],
+    "method": "POST",
+    "path": "/api/billing/plan-change/execute",
+    "purpose": "Execute safe billing lifecycle changes after preview validation.",
+    "requiredHeaders": [
+      "Content-Type"
+    ],
+    "requiredBodyFields": [
+      "selectedPlanSlug",
+      "billingInterval",
+      "scopeType"
+    ],
+    "authType": "oauth-user",
+    "tokenType": "oauth_access_token",
+    "responseEnvelope": "json:{ok:true,status,actionType,url?,stripeSubscriptionId?,stripeSubscriptionItemId?,warnings,blockers}",
+    "productionFailureMode": "401/403 for unauthorized dashboard users; 409 for blocked/redundant/missing-context transitions; no silent duplicate subscription creation.",
+    "notes": "Runs plan-change preview first. Direct Stripe updates require one persisted subscription id and subscription item id; otherwise returns portal/manual resolution guidance."
+  },
+  {
+    "ownerApp": "verixet",
+    "consumerApps": [
+      "xflow"
+    ],
+    "method": "GET",
+    "path": "/checkout/handoff",
+    "purpose": "Validate public XFlow pricing handoff and redirect into Verixet signup-first checkout flow.",
+    "requiredHeaders": [],
+    "requiredBodyFields": [],
+    "authType": "public",
+    "tokenType": null,
+    "responseEnvelope": "redirect:/auth/sign-up or json:{error}",
+    "productionFailureMode": "400 for unknown planSlug, unsupported billingInterval, mismatched scope/bundle/app, or unsupported sourceApp.",
+    "notes": "Accepts canonical Verixet plan slugs plus documented legacy XFlow bundle aliases; public intervals are monthly/yearly only. Bundle scope values include main4_bundle, creator_bundle, and ecosystem_bundle.",
+    "public": true
+  },
+  {
+    "ownerApp": "verixet",
+    "consumerApps": [
       "audaix",
       "rataify",
       "wordgeni",
@@ -1548,6 +1761,51 @@ export const ecosystemRoutes = [
   {
     "ownerApp": "verixet",
     "consumerApps": [
+      "xflow"
+    ],
+    "method": "POST",
+    "path": "/api/platform/v1/ecosystem/status",
+    "purpose": "Stable service-to-service ecosystem account, billing lifecycle, app access, entitlement, usage, warning, and display status DTO for XFlow settings.",
+    "requiredHeaders": [
+      "Authorization",
+      "Content-Type"
+    ],
+    "requiredBodyFields": [
+      "workspaceId",
+      "sourceApp"
+    ],
+    "authType": "service",
+    "tokenType": "control_plane_service_token",
+    "responseEnvelope": "json:{contractVersion,source,generatedAt,workspaceId,authority,effectiveAccess,billingLifecycle,planChange,usage,links,warnings,errors}",
+    "productionFailureMode": "401/403 for missing or invalid service token; 400 for invalid sourceApp/workspace; 503 safe error when Verixet status cannot be composed.",
+    "notes": "Contract version 2026-05-ecosystem-status-v1. Usage is real Verixet ledger data when available, otherwise explicit unavailable state. Response must not expose raw Stripe customer, subscription, subscription item, payment method, or secret values."
+  },
+  {
+    "ownerApp": "verixet",
+    "consumerApps": [
+      "xflow"
+    ],
+    "method": "POST",
+    "path": "/api/platform/v1/billing/portal-session",
+    "purpose": "Trusted XFlow service handoff for Verixet-owned customer portal sessions or safe billing dashboard fallback.",
+    "requiredHeaders": [
+      "Authorization",
+      "Content-Type"
+    ],
+    "requiredBodyFields": [
+      "workspaceId",
+      "sourceApp",
+      "returnUrl"
+    ],
+    "authType": "service",
+    "tokenType": "control_plane_service_token",
+    "responseEnvelope": "json:{ok:true,mode,redirectUrl,expiresAt,warnings}",
+    "productionFailureMode": "401/403 for missing or invalid service token; 400 for invalid sourceApp or unsafe returnUrl; fallback to Verixet billing dashboard when Stripe/customer context is missing.",
+    "notes": "Verixet creates portal sessions server-side. XFlow receives only redirectUrl and never receives Stripe customer, subscription, subscription item, payment method, or secret values."
+  },
+  {
+    "ownerApp": "verixet",
+    "consumerApps": [
       "xflow",
       "audaix",
       "rataify",
@@ -1576,7 +1834,7 @@ export const ecosystemRoutes = [
     "tokenType": "verixet_usage_ingest_token",
     "responseEnvelope": "json:{success:boolean,data?:{accepted,usageEventId},error?:{code,message}}",
     "productionFailureMode": "401/403/409/422; reject unscoped or mismatched app tokens.",
-    "notes": "Validator requires usage ingest routes to use an app-scoped token type."
+    "notes": "Validated against ecosystem-contracts/types/usage-metrics.ts. Validator requires usage ingest routes to use an app-scoped token type."
   },
   {
     "ownerApp": "verixet",

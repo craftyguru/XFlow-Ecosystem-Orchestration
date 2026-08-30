@@ -7,9 +7,12 @@ const rootDir = path.resolve(__dirname, "..");
 const contractsDir = path.join(rootDir, "ecosystem-contracts");
 const generatedPackageDir = path.join(rootDir, "packages", "ecosystem-contracts");
 const generatedIndexPath = path.join(generatedPackageDir, "src", "index.ts");
+const crevuxMobileSourcePath = path.join(generatedPackageDir, "src", "crevux-mobile-v1.ts");
+const crevuxMobileContractOverride = process.env.XFLOW_CREVUX_MOBILE_CONTRACT_PATH;
 
 const files = {
   apps: "apps.json",
+  crevuxMobile: "crevux-mobile-v1.json",
   env: "env-contract.json",
   routes: "routes.json",
   tokenTypes: "token-types.json",
@@ -19,7 +22,9 @@ const errors = [];
 const warnings = [];
 
 function readJson(name) {
-  const filePath = path.join(contractsDir, files[name]);
+  const filePath = name === "crevuxMobile" && crevuxMobileContractOverride
+    ? path.resolve(crevuxMobileContractOverride)
+    : path.join(contractsDir, files[name]);
   try {
     return JSON.parse(fs.readFileSync(filePath, "utf8"));
   } catch (error) {
@@ -41,11 +46,12 @@ function isNonEmptyString(value) {
 }
 
 const appsContract = readJson("apps");
+const crevuxMobileContract = readJson("crevuxMobile");
 const envContract = readJson("env");
 const routesContract = readJson("routes");
 const tokensContract = readJson("tokenTypes");
 
-if (!appsContract || !envContract || !routesContract || !tokensContract) {
+if (!appsContract || !crevuxMobileContract || !envContract || !routesContract || !tokensContract) {
   printReport();
   process.exit(1);
 }
@@ -54,6 +60,8 @@ const apps = Array.isArray(appsContract.apps) ? appsContract.apps : [];
 const envRows = Array.isArray(envContract.env) ? envContract.env : [];
 const routes = Array.isArray(routesContract.routes) ? routesContract.routes : [];
 const tokenTypes = Array.isArray(tokensContract.tokenTypes) ? tokensContract.tokenTypes : [];
+
+validateCrevuxMobileContract(crevuxMobileContract);
 
 if (apps.length === 0) fail("apps.json must contain a non-empty apps array.");
 const expectedCanonicalSlugs = ["xflow", "verixet", "audaix", "rataify", "wordgeni", "crevux"];
@@ -210,6 +218,7 @@ function printReport() {
   console.log(`Env rows: ${envRows.length}`);
   console.log(`Routes: ${routes.length}`);
   console.log(`Token types: ${tokenTypes.length}`);
+  console.log(`Crevux mobile: ${crevuxMobileContract?.schemaVersion || "missing"}`);
 
   if (warnings.length > 0) {
     console.log("\nWarnings:");
@@ -252,6 +261,39 @@ function validateGeneratedContractPackage() {
   if (!generatedSource.includes("GENERATED FILE")) {
     fail("Generated contract package index.ts is missing the generated-file marker.");
   }
+  if (!fs.existsSync(crevuxMobileSourcePath)) {
+    fail("Generated contract package is missing packages/ecosystem-contracts/src/crevux-mobile-v1.ts.");
+    return;
+  }
+  if (!generatedSource.includes('export * from "./crevux-mobile-v1.js"')) {
+    fail("Generated contract package index.ts does not export the Crevux mobile v1 contract.");
+  }
+  const crevuxMobileSource = fs.readFileSync(crevuxMobileSourcePath, "utf8");
+  const parityValues = collectStringLeaves({
+    schemaVersion: crevuxMobileContract.schemaVersion,
+    apiNamespace: crevuxMobileContract.apiNamespace,
+    delivery: crevuxMobileContract.delivery,
+    authorities: crevuxMobileContract.authorities,
+    authentication: crevuxMobileContract.authentication,
+    identifiers: crevuxMobileContract.identifiers,
+    idempotency: crevuxMobileContract.idempotency,
+    endpoints: crevuxMobileContract.endpoints,
+    jobStatuses: crevuxMobileContract.jobStatuses,
+    cancellationPolicy: crevuxMobileContract.cancellationPolicy,
+    errorCodes: crevuxMobileContract.errorCodes,
+    errorTaxonomy: crevuxMobileContract.errorTaxonomy,
+    mediaSecurity: crevuxMobileContract.mediaSecurity,
+    signedMedia: crevuxMobileContract.signedMedia,
+    galleryExport: crevuxMobileContract.galleryExport,
+    accountDeletion: crevuxMobileContract.accountDeletion,
+    lineage: crevuxMobileContract.lineage,
+    unsupportedClaims: crevuxMobileContract.unsupportedClaims,
+  });
+  for (const value of parityValues) {
+    if (!crevuxMobileSource.includes(JSON.stringify(value))) {
+      fail(`Crevux mobile TypeScript contract is missing ${value}.`);
+    }
+  }
 
   for (const slug of appSlugs) {
     if (!generatedSource.includes(JSON.stringify(slug))) {
@@ -264,4 +306,229 @@ function validateGeneratedContractPackage() {
       fail(`Generated contract package index.ts is missing token type ${tokenId}.`);
     }
   }
+}
+
+function validateCrevuxMobileContract(contract) {
+  if (contract.schemaVersion !== "2026-08-crevux-mobile-v1") {
+    fail("crevux-mobile-v1.json has an unexpected schemaVersion.");
+  }
+  if (contract.apiNamespace !== "/api/mobile/v1") {
+    fail("Crevux mobile API namespace must be /api/mobile/v1.");
+  }
+  if (contract.delivery?.boundary !== "shared-mobile-foundation-separate-product-app" || contract.delivery?.framework !== "expo-react-native-with-first-party-kotlin-modules") {
+    fail("Crevux Android delivery must use the approved shared foundation, separate app, and Expo/React Native plus first-party Kotlin boundary.");
+  }
+  if (contract.authorities?.identityAndAccounts !== "xflow") {
+    fail("XFlow must own Crevux mobile identity and accounts.");
+  }
+  if (contract.authorities?.billingEntitlementsAndUsage !== "verixet") {
+    fail("Verixet must own Crevux mobile billing, entitlements, and usage.");
+  }
+  if (contract.authorities?.projectsMediaEditingJobsAndProviders !== "crevux") {
+    fail("Crevux must own mobile projects, media, editing jobs, and providers.");
+  }
+  if (contract.authentication?.pkceMethod !== "S256" || contract.authentication?.clientType !== "public") {
+    fail("Crevux Android auth must be a public OAuth client using PKCE S256.");
+  }
+  if (contract.authentication?.embeddedClientSecretAllowed !== false) {
+    fail("The Crevux Android contract must prohibit embedded client secrets.");
+  }
+  for (const prohibited of ["provider_keys_in_apk", "confidential_oauth_client_secret_in_apk"]) {
+    if (!contract.unsupportedClaims?.includes(prohibited)) fail(`Crevux Android must prohibit ${prohibited}.`);
+  }
+  if (contract.authentication?.redirectKind !== "verified_https_app_link") {
+    fail("The Crevux Android callback must use a verified HTTPS App Link.");
+  }
+  const state = contract.authentication?.statePolicy;
+  if (state?.required !== true || state?.singleUse !== true || state?.validation !== "exact_constant_time_match") {
+    fail("Crevux Android OAuth state must be required, exact-match validated, and single-use.");
+  }
+  for (const binding of ["authorization_request", "pkce_code_verifier", "redirect_uri", "client_instance"]) {
+    if (!state?.transactionBinding?.includes(binding)) fail(`OAuth state is not bound to ${binding}.`);
+  }
+  if (!state?.expiry || !state?.failureBehavior) fail("OAuth state must define expiry and fail-closed behavior.");
+  const tokenLifecycle = contract.authentication?.tokenLifecycle;
+  if (tokenLifecycle?.refreshReplayBehavior !== "revoke_token_family_and_require_reauthentication") {
+    fail("Refresh-token replay must revoke the token family and require reauthentication.");
+  }
+  if (tokenLifecycle?.revocationRequired !== true || !Array.isArray(tokenLifecycle?.logoutOrder)) {
+    fail("Token-family revocation and ordered logout are required.");
+  }
+  for (const step of ["stop_new_authenticated_work", "request_refresh_token_family_revocation", "delete_local_access_and_refresh_tokens"]) {
+    if (!tokenLifecycle?.logoutOrder?.includes(step)) fail(`Logout order is missing ${step}.`);
+  }
+  if (contract.identifiers?.format !== "uuid" || contract.identifiers?.authorizationScope !== "authenticated_user_and_workspace") {
+    fail("Crevux mobile identifiers must be UUIDs scoped to user and workspace authorization.");
+  }
+  if (contract.idempotency?.sameKeyDifferentFingerprint !== "IDEMPOTENCY_CONFLICT") {
+    fail("Crevux mobile idempotency must reject key reuse with a different request fingerprint.");
+  }
+  const retry = contract.idempotency?.userRetryPolicy;
+  if (contract.idempotency?.providerAttemptsRemainChildrenOfOneLogicalJob !== true || contract.idempotency?.infrastructureRetryIdentity !== "same_logical_job_and_idempotency_identity") {
+    fail("Infrastructure and provider-attempt retries must retain one logical job and idempotency identity.");
+  }
+  for (const flag of [
+    "createsNewChildJob", "newJobIdRequired", "newIdempotencyKeyRequired", "recordsParentJob", "preservesLineage",
+    "freshEntitlementCheckRequired", "freshUsageAndCostEstimateRequired", "explicitUserSubmissionRequired", "mayIncurNewCharge",
+  ]) {
+    if (retry?.[flag] !== true) fail(`User retry policy must require ${flag}.`);
+  }
+  if (retry?.reusePriorChargeAuthorizationAllowed !== false) {
+    fail("User retry must never silently reuse a prior charge authorization.");
+  }
+  for (const status of ["failed", "cancelled"]) {
+    if (!retry?.eligibleParentStatuses?.includes(status)) fail(`User retry policy must record a ${status} parent job.`);
+  }
+  const operations = new Set((contract.endpoints || []).map((endpoint) => endpoint.operation));
+  for (const operation of [
+    "create_project",
+    "initiate_upload",
+    "complete_upload",
+    "create_mask_asset",
+    "create_generation_job",
+    "get_generation_job",
+    "request_job_cancellation",
+    "list_project_versions",
+    "get_gallery_export_metadata",
+    "get_mobile_entitlements",
+  ]) {
+    if (!operations.has(operation)) fail(`Crevux mobile contract is missing operation ${operation}.`);
+  }
+  const expectedScopes = new Map([
+    ["create_project", "crevux.write"],
+    ["list_projects", "crevux.read"],
+    ["get_project", "crevux.read"],
+    ["initiate_upload", "crevux.write"],
+    ["complete_upload", "crevux.write"],
+    ["create_mask_asset", "crevux.write"],
+    ["create_generation_job", "crevux.generate"],
+    ["get_generation_job", "crevux.read"],
+    ["request_job_cancellation", "crevux.generate"],
+    ["create_retry_job", "crevux.generate"],
+    ["list_project_versions", "crevux.read"],
+    ["get_gallery_export_metadata", "crevux.read"],
+    ["get_mobile_entitlements", "workspace.read"],
+    ["stream_job_events_optional", "crevux.read"],
+  ]);
+  for (const endpoint of contract.endpoints || []) {
+    if (endpoint.authentication !== "xflow_oauth_access_token") fail(`${endpoint.operation} must require an XFlow OAuth access token.`);
+    if (endpoint.workspaceAuthorization !== "selected_workspace_membership_required") fail(`${endpoint.operation} must require selected-workspace membership.`);
+    if (!isNonEmptyString(endpoint.resourceOwnership)) fail(`${endpoint.operation} must define resource ownership.`);
+    const expectedScope = expectedScopes.get(endpoint.operation);
+    if (!expectedScope || endpoint.requiredScopes?.length !== 1 || endpoint.requiredScopes[0] !== expectedScope) {
+      fail(`${endpoint.operation} must require exactly ${expectedScope || "its approved scope"}.`);
+    }
+  }
+  const createProject = (contract.endpoints || []).find((endpoint) => endpoint.operation === "create_project");
+  if (createProject?.ordinaryWorkspaceMemberAllowed !== true) {
+    fail("Ordinary authorized workspace members must be allowed to create projects without workspace-admin role.");
+  }
+  const cancellation = contract.cancellationPolicy;
+  if (cancellation?.queuedBeforeProviderExecution !== "cancel_without_provider_execution") {
+    fail("Queued jobs must cancel before provider execution.");
+  }
+  if (cancellation?.providerStartedCancellationRequest !== "only_when_adapter_supports_cancellation") {
+    fail("Provider-started cancellation may be requested only when the adapter supports it.");
+  }
+  if (cancellation?.localStateMayClaimProviderCancellationWithoutEvidence !== false) {
+    fail("Local cancellation state must not claim provider cancellation without evidence.");
+  }
+  if (cancellation?.unsupportedProviderCancellation !== "JOB_NOT_CANCELLABLE") {
+    fail("Unsupported provider cancellation must return or record JOB_NOT_CANCELLABLE.");
+  }
+  if (cancellation?.lateProviderResults !== "quarantine_not_expose_as_normal_completed_results") {
+    fail("Late provider results after cancellation must be quarantined.");
+  }
+  if (cancellation?.usageAndRefundAccounting !== "authoritative_provider_execution_evidence") {
+    fail("Cancellation usage/refund accounting must follow authoritative provider execution evidence.");
+  }
+  const errors = new Set(contract.errorCodes || []);
+  const requiredErrorTaxonomy = {
+    authentication: ["AUTH_REQUIRED"],
+    tokenExpiration: ["TOKEN_EXPIRED"],
+    scopeFailure: ["INSUFFICIENT_SCOPE"],
+    workspaceAuthorization: ["WORKSPACE_FORBIDDEN"],
+    validationAndMedia: ["VALIDATION_FAILED", "INVALID_MEDIA", "MEDIA_TOO_LARGE", "DIMENSIONS_TOO_LARGE"],
+    uploadIntegrity: ["UPLOAD_EXPIRED", "CHECKSUM_MISMATCH"],
+    idempotency: ["IDEMPOTENCY_CONFLICT"],
+    entitlement: ["ENTITLEMENT_REQUIRED"],
+    usage: ["USAGE_LIMIT"],
+    payment: ["PAYMENT_REQUIRED"],
+    billingAuthority: ["BILLING_AUTHORITY_UNAVAILABLE"],
+    rateLimit: ["RATE_LIMITED"],
+    safety: ["SAFETY_REFUSAL"],
+    provider: ["PROVIDER_UNAVAILABLE", "PROVIDER_FAILURE"],
+    cancellation: ["JOB_NOT_CANCELLABLE"],
+    retryableInfrastructure: ["INFRASTRUCTURE_RETRYABLE"],
+    internal: ["INTERNAL_ERROR"],
+  };
+  for (const code of Object.values(requiredErrorTaxonomy).flat()) {
+    if (!errors.has(code)) fail(`Crevux mobile contract is missing distinct error ${code}.`);
+  }
+  for (const [category, expectedCodes] of Object.entries(requiredErrorTaxonomy)) {
+    const actualCodes = contract.errorTaxonomy?.[category];
+    if (!Array.isArray(actualCodes) || actualCodes.length !== expectedCodes.length || expectedCodes.some((code, index) => actualCodes[index] !== code)) {
+      fail(`Crevux mobile error taxonomy category ${category} must contain exactly ${expectedCodes.join(", ")}.`);
+    }
+  }
+  const media = contract.mediaSecurity;
+  for (const limit of ["maxCompressedBytes", "maxDecodedPixels", "maxWidth", "maxHeight", "maxFrameCount"]) {
+    if (!media?.requiredLimits?.includes(limit)) fail(`Crevux mobile upload policy is missing ${limit}.`);
+  }
+  if (media?.limitSource !== "server_configured_and_returned_by_entitlements" || media?.missingLimitsBehavior !== "fail_closed_before_upload") {
+    fail("Upload limits must be server-configured/capability-returned and fail closed when unavailable.");
+  }
+  for (const flag of [
+    "rejectMimeMagicMismatch", "rejectMalformedDecode", "rejectPolyglotFiles", "rejectUnsupportedAnimationOrFrameCount",
+    "rejectDecompressionBombs", "scanBeforeAssetFinalization", "checksumRequiredBeforeCompletion", "rejectChecksumMismatch",
+    "resumableCheckpointsRequired", "uploadExpiryRequired", "rejectExpiredUploadSession", "completionIsIdempotent", "orphanPartCleanupRequired",
+    "crossWorkspaceCompletionRejected", "stripExifLocationByDefault", "privateStorageByDefault",
+  ]) {
+    if (media?.[flag] !== true) fail(`Crevux mobile media security must require ${flag}.`);
+  }
+  if (media?.checksumAlgorithm !== "sha256") fail("Crevux mobile uploads must use SHA-256 checksums.");
+  if (contract.signedMedia?.lifetime !== "minutes" || contract.signedMedia?.renewalRequiresFreshAuthentication !== true || contract.signedMedia?.renewalRechecksUserWorkspaceAndResourceAuthorization !== true) {
+    fail("Signed media must be short-lived and reauthorize every renewal.");
+  }
+  if (contract.galleryExport?.explicitUserInitiated !== true || contract.galleryExport?.boundary !== "private_workspace_to_device_visible_media") {
+    fail("Gallery export must be explicit and disclose the private-to-device-visible boundary.");
+  }
+  const deletion = contract.accountDeletion;
+  for (const action of ["revoke_token_family", "block_new_work"]) {
+    if (!deletion?.immediateActions?.includes(action)) fail(`Account deletion is missing immediate action ${action}.`);
+  }
+  if (deletion?.newWorkAfterDeletionBegins !== "blocked_immediately" || deletion?.queuedJobs !== "cancel" || deletion?.providerCancellationRequest !== "when_supported_by_adapter") {
+    fail("Account deletion must immediately block work, cancel queued jobs, and request only supported provider cancellation.");
+  }
+  if (deletion?.lateProviderResults !== "quarantine_not_expose_as_normal_completed_results") {
+    fail("Account deletion must quarantine late provider results.");
+  }
+  if (deletion?.activeJobs !== "request_provider_cancellation_when_supported_otherwise_quarantine_late_results" || deletion?.assetDeletion !== "delete_private_project_assets_after_terminal_state_or_bounded_cleanup_timeout" || deletion?.assetCleanupDeadline !== "after_terminal_state_or_bounded_cleanup_timeout" || deletion?.tombstone !== "content_free_minimal_audit_record" || deletion?.completion !== "auditable_terminal_deletion_state") {
+    fail("Account deletion must define queued/active job, asset deletion, content-free tombstone, and auditable completion behavior.");
+  }
+  if (deletion?.tombstoneRetention !== "owner_legal_policy_required_no_default_in_contract") {
+    fail("Tombstone retention must remain owner/legal policy-controlled without an invented default.");
+  }
+  const lineage = contract.lineage;
+  for (const flag of ["originalsAreImmutable", "versionsAreImmutable", "projectVersionRelationshipRequired", "refinementsRequireParentVersion", "versionsRecordParentSourceMaskPromptAndResults", "providerAttemptsAreAuditable"]) {
+    if (lineage?.[flag] !== true) fail(`Crevux mobile lineage must require ${flag}.`);
+  }
+  if (lineage?.inPlaceOverwriteAllowed !== false) fail("Crevux mobile lineage must prohibit in-place overwrite of originals and versions.");
+  for (const field of ["projectId", "sourceAssetId", "promptSnapshot", "resultAssetIds", "providerProvenance", "modelProvenance", "jobId"]) {
+    if (!lineage?.requiredVersionFields?.includes(field)) fail(`Crevux mobile version lineage is missing required field ${field}.`);
+  }
+  for (const field of ["parentVersionId", "maskAssetId"]) {
+    if (!lineage?.optionalVersionFields?.includes(field)) fail(`Crevux mobile version lineage must represent optional field ${field}.`);
+  }
+}
+
+function collectStringLeaves(value, output = new Set()) {
+  if (typeof value === "string") {
+    output.add(value);
+  } else if (Array.isArray(value)) {
+    for (const entry of value) collectStringLeaves(entry, output);
+  } else if (value && typeof value === "object") {
+    for (const entry of Object.values(value)) collectStringLeaves(entry, output);
+  }
+  return output;
 }
