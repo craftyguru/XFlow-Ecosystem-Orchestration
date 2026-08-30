@@ -71,6 +71,7 @@ test("GitHub static proof materializes every required nested app repository", ()
   assert.match(workflow, /ECOSYSTEM_APP_REPO_READ_TOKEN/);
   assert.match(workflow, /node-version: 22\.18\.0/);
   assert.doesNotMatch(proofScript, /apps\/Crevux/);
+  assert.doesNotMatch(proofScript, /apps\/AudAiX/);
 });
 
 test("http mode fails closed when required proof HTTP env is missing", (t) => {

@@ -204,7 +204,7 @@ function extractUsageMetricCatalog() {
 function plannedMetricUsage(planned) {
   const files = [
     ...collectFiles("apps/RatAiFy/server", [".ts"]),
-    ...collectFiles("apps/AudAiX/src", [".ts"]),
+    ...collectFiles("apps/AudAix/src", [".ts"]),
     ...collectFiles("apps/WordGeni/apps/api/src", [".ts"]),
     ...collectFiles("apps/CreVux/artifacts/api-server/src", [".ts"]),
   ].filter((file) => !/\.test\.|tests\//.test(file));
@@ -426,7 +426,7 @@ function runStaticProof() {
   sourceCheck("usageIngestion", "apps/Verixet/src/app/api/ecosystem/usage/ingest/route.test.ts", /usageEventId|not\.toHaveProperty|internal/i, "Usage ingest does not return internal event id", "missing internal id proof");
   sourceCheck("usageIngestion", "apps/Verixet/src/app/api/ecosystem/usage/ingest/route.ts", /rejectsSecretLikeMetadata|secret-like|metadata/i, "Usage ingest rejects secret-like metadata", "missing metadata guard");
 
-  sourceCheck("satelliteWriters", "apps/AudAiX/src/lib/billing/verixet-usage.ts", /audaix\.live_audit|idempotency|metadata|token/i, "AudAiX reporter canonicalizes and sanitizes usage", "missing reporter evidence");
+  sourceCheck("satelliteWriters", "apps/AudAix/src/lib/billing/verixet-usage.ts", /audaix\.live_audit|idempotency|metadata|token/i, "AudAiX reporter canonicalizes and sanitizes usage", "missing reporter evidence");
   sourceCheck("satelliteWriters", "apps/WordGeni/apps/api/src/services/verixet-usage-admission.ts", /wordgeni\.ai_generation|idempotency|metadata|prompt|raw/i, "WordGeni reporter canonicalizes and sanitizes usage", "missing reporter evidence");
   sourceCheck("satelliteWriters", "apps/RatAiFy/server/lib/verixetUsageReporter.ts", /resolveEcosystemWorkspaceIdentity|idempotency|sanitize|reputation_scan/i, "Rataify reporter uses UUID resolver and canonical metrics", "missing reporter evidence");
   sourceCheck("satelliteWriters", "apps/RatAiFy/server/routes/audaix-proof.ts", /proof_import|proof_refresh|proof_visibility_update|audit_proof_badge/i, "Rataify proof metrics split", "missing proof split");
