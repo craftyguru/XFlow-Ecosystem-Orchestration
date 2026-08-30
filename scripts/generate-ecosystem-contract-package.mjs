@@ -42,6 +42,10 @@ writeFile(
       },
     },
     sideEffects: false,
+    files: [
+      "dist",
+      "package.json",
+    ],
     scripts: {
       build: "tsc -p tsconfig.json",
       typecheck: "tsc -p tsconfig.json --noEmit",
@@ -74,6 +78,8 @@ writeFile(
 
 const content = `// GENERATED FILE. Do not edit by hand.
 // Source: ecosystem-contracts/*.json
+
+export * from "./crevux-mobile-v1.js";
 
 export type CanonicalAppSlug = ${apps.apps.map((app) => JSON.stringify(app.slug)).join(" | ")};
 export type TokenTypeId = ${tokenTypes.tokenTypes.map((token) => JSON.stringify(token.id)).join(" | ")};

@@ -204,9 +204,9 @@ function extractUsageMetricCatalog() {
 function plannedMetricUsage(planned) {
   const files = [
     ...collectFiles("apps/RatAiFy/server", [".ts"]),
-    ...collectFiles("apps/AudAiX/src", [".ts"]),
+    ...collectFiles("apps/AudAix/src", [".ts"]),
     ...collectFiles("apps/WordGeni/apps/api/src", [".ts"]),
-    ...collectFiles("apps/Crevux/artifacts/api-server/src", [".ts"]),
+    ...collectFiles("apps/CreVux/artifacts/api-server/src", [".ts"]),
   ].filter((file) => !/\.test\.|tests\//.test(file));
   const offenders = [];
   for (const file of files) {
@@ -426,17 +426,17 @@ function runStaticProof() {
   sourceCheck("usageIngestion", "apps/Verixet/src/app/api/ecosystem/usage/ingest/route.test.ts", /usageEventId|not\.toHaveProperty|internal/i, "Usage ingest does not return internal event id", "missing internal id proof");
   sourceCheck("usageIngestion", "apps/Verixet/src/app/api/ecosystem/usage/ingest/route.ts", /rejectsSecretLikeMetadata|secret-like|metadata/i, "Usage ingest rejects secret-like metadata", "missing metadata guard");
 
-  sourceCheck("satelliteWriters", "apps/AudAiX/src/lib/billing/verixet-usage.ts", /audaix\.live_audit|idempotency|metadata|token/i, "AudAiX reporter canonicalizes and sanitizes usage", "missing reporter evidence");
+  sourceCheck("satelliteWriters", "apps/AudAix/src/lib/billing/verixet-usage.ts", /audaix\.live_audit|idempotency|metadata|token/i, "AudAiX reporter canonicalizes and sanitizes usage", "missing reporter evidence");
   sourceCheck("satelliteWriters", "apps/WordGeni/apps/api/src/services/verixet-usage-admission.ts", /wordgeni\.ai_generation|idempotency|metadata|prompt|raw/i, "WordGeni reporter canonicalizes and sanitizes usage", "missing reporter evidence");
   sourceCheck("satelliteWriters", "apps/RatAiFy/server/lib/verixetUsageReporter.ts", /resolveEcosystemWorkspaceIdentity|idempotency|sanitize|reputation_scan/i, "Rataify reporter uses UUID resolver and canonical metrics", "missing reporter evidence");
   sourceCheck("satelliteWriters", "apps/RatAiFy/server/routes/audaix-proof.ts", /proof_import|proof_refresh|proof_visibility_update|audit_proof_badge/i, "Rataify proof metrics split", "missing proof split");
   sourceCheck("satelliteWriters", "apps/RatAiFy/tests/rataify-usage-guards.node.test.ts", /public badge|does not report|anonymous|audit_proof_badge/i, "Rataify public badge fetch remains unwired", "missing public badge proof");
-  sourceCheck("satelliteWriters", "apps/Crevux/artifacts/api-server/src/routes/xflowUclLink.ts", /xflow_handoff|upsertEcosystemWorkspaceMapping|confirmation_jwt/i, "Crevux UCL callback persists verified mapping", "missing UCL callback");
-  sourceCheck("satelliteWriters", "apps/Crevux/lib/db/migrations/0063_ecosystem_workspace_mappings.sql", /ecosystem_workspace_mappings|ecosystem_workspace_id/i, "Crevux durable mapping migration exists", "missing migration");
-  sourceCheck("satelliteWriters", "apps/Crevux/artifacts/api-server/src/middleware/requireAuth.ts", /ecosystemWorkspaceId|resolveVerifiedEcosystemIdentity/i, "Crevux request auth loads verified ecosystem UUID", "missing auth propagation");
-  sourceCheck("satelliteWriters", "apps/Crevux/artifacts/api-server/src/routes/openai/generateImage.ts", /crevux\.image_credit|ecosystemWorkspaceId|:success/i, "Crevux image success usage gated by verified UUID", "missing image writer");
-  sourceCheck("satelliteWriters", "apps/Crevux/artifacts/api-server/src/routes/video.ts", /crevux\.video_credit|ecosystemWorkspaceId|video-parent/i, "Crevux video queued usage gated by verified UUID", "missing video writer");
-  sourceCheck("satelliteWriters", "apps/Crevux/artifacts/api-server/src/lib/verixetUsageAdmission.test.ts", /missing_ecosystem_workspace_id|fails soft|Verixet usage ingest is unavailable/i, "Crevux missing UUID/outage skips reporting", "missing fail-soft tests");
+  sourceCheck("satelliteWriters", "apps/CreVux/artifacts/api-server/src/routes/xflowUclLink.ts", /xflow_handoff|upsertEcosystemWorkspaceMapping|confirmation_jwt/i, "Crevux UCL callback persists verified mapping", "missing UCL callback");
+  sourceCheck("satelliteWriters", "apps/CreVux/lib/db/migrations/0063_ecosystem_workspace_mappings.sql", /ecosystem_workspace_mappings|ecosystem_workspace_id/i, "Crevux durable mapping migration exists", "missing migration");
+  sourceCheck("satelliteWriters", "apps/CreVux/artifacts/api-server/src/middleware/requireAuth.ts", /ecosystemWorkspaceId|resolveVerifiedEcosystemIdentity/i, "Crevux request auth loads verified ecosystem UUID", "missing auth propagation");
+  sourceCheck("satelliteWriters", "apps/CreVux/artifacts/api-server/src/routes/openai/generateImage.ts", /crevux\.image_credit|ecosystemWorkspaceId|:success/i, "Crevux image success usage gated by verified UUID", "missing image writer");
+  sourceCheck("satelliteWriters", "apps/CreVux/artifacts/api-server/src/routes/video.ts", /crevux\.video_credit|ecosystemWorkspaceId|video-parent/i, "Crevux video queued usage gated by verified UUID", "missing video writer");
+  sourceCheck("satelliteWriters", "apps/CreVux/artifacts/api-server/src/lib/verixetUsageAdmission.test.ts", /missing_ecosystem_workspace_id|fails soft|Verixet usage ingest is unavailable/i, "Crevux missing UUID/outage skips reporting", "missing fail-soft tests");
 
   checkSourceSetForLeaks(publicMarketingFiles, "Public XFlow marketing/source files have no frontend-safe leaks");
 }

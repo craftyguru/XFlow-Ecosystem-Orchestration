@@ -1,0 +1,302 @@
+export type CrevuxMobileAuthority = "xflow" | "verixet" | "crevux";
+export type CrevuxMobileScope = "profile.read" | "workspace.read" | "crevux.read" | "crevux.write" | "crevux.generate" | "offline_access";
+
+export type CrevuxMobileJobStatus =
+  | "queued"
+  | "processing"
+  | "cancelling"
+  | "completed"
+  | "failed"
+  | "failed_partial"
+  | "cancelled"
+  | "blocked_policy";
+
+export type CrevuxMobileErrorCode =
+  | "AUTH_REQUIRED"
+  | "TOKEN_EXPIRED"
+  | "INSUFFICIENT_SCOPE"
+  | "WORKSPACE_FORBIDDEN"
+  | "VALIDATION_FAILED"
+  | "INVALID_MEDIA"
+  | "MEDIA_TOO_LARGE"
+  | "DIMENSIONS_TOO_LARGE"
+  | "UPLOAD_EXPIRED"
+  | "CHECKSUM_MISMATCH"
+  | "IDEMPOTENCY_CONFLICT"
+  | "ENTITLEMENT_REQUIRED"
+  | "USAGE_LIMIT"
+  | "PAYMENT_REQUIRED"
+  | "BILLING_AUTHORITY_UNAVAILABLE"
+  | "SAFETY_REFUSAL"
+  | "PROVIDER_UNAVAILABLE"
+  | "PROVIDER_FAILURE"
+  | "JOB_NOT_CANCELLABLE"
+  | "RATE_LIMITED"
+  | "INFRASTRUCTURE_RETRYABLE"
+  | "INTERNAL_ERROR";
+
+export interface CrevuxMobileApiError {
+  code: CrevuxMobileErrorCode;
+  message: string;
+  retryable: boolean;
+  requestId: string;
+  details?: Readonly<Record<string, unknown>>;
+}
+
+export interface CrevuxMobileErrorEnvelope {
+  error: CrevuxMobileApiError;
+}
+
+export interface CrevuxMobileEndpointContract {
+  method: "GET" | "POST";
+  path: string;
+  operation: string;
+  successStatus: 200 | 201 | 202;
+  authentication: "xflow_oauth_access_token";
+  requiredScopes: readonly CrevuxMobileScope[];
+  workspaceAuthorization: "selected_workspace_membership_required";
+  resourceOwnership: string;
+  ordinaryWorkspaceMemberAllowed?: true;
+}
+
+export interface CrevuxMobileGenerationRequest {
+  projectId: string;
+  operation: "image_generate" | "image_edit" | "masked_image_edit";
+  sourceAssetId?: string;
+  maskAssetId?: string;
+  prompt: string;
+  negativePrompt?: string;
+  variantCount: number;
+  parentVersionId?: string;
+  output: {
+    aspect: "source" | "square" | "landscape" | "portrait";
+    quality: "low" | "medium" | "high";
+  };
+}
+
+export interface CrevuxMobileJobSummary {
+  id: string;
+  projectId: string;
+  status: CrevuxMobileJobStatus;
+  requestFingerprint: string;
+  estimatedUsage?: {
+    unit: "credits";
+    amount: number;
+  };
+}
+
+export const crevuxMobileV1 = {
+  schemaVersion: "2026-08-crevux-mobile-v1",
+  apiNamespace: "/api/mobile/v1",
+  redirectUri: "https://crevux.com/mobile/oauth/callback",
+  delivery: {
+    product: "crevux",
+    applicationId: "com.crevux.mobile",
+    boundary: "shared-mobile-foundation-separate-product-app",
+    framework: "expo-react-native-with-first-party-kotlin-modules",
+  },
+  authorities: {
+    identityAndAccounts: "xflow",
+    billingEntitlementsAndUsage: "verixet",
+    projectsMediaEditingJobsAndProviders: "crevux",
+  },
+  authentication: {
+    flow: "authorization_code",
+    pkceMethod: "S256",
+    clientType: "public",
+    embeddedClientSecretAllowed: false,
+    browser: "external_system_browser",
+    redirectKind: "verified_https_app_link",
+    accessTokenLifetime: "short_lived",
+    refreshTokenPolicy: "single_use_rotation",
+    statePolicy: {
+      required: true,
+      generation: "cryptographically_random_per_authorization_attempt",
+      transactionBinding: ["authorization_request", "pkce_code_verifier", "redirect_uri", "client_instance"],
+      validation: "exact_constant_time_match",
+      singleUse: true,
+      expiry: "short_lived_server_defined",
+      failureBehavior: "reject_callback_clear_transaction_and_require_new_authorization",
+    },
+    tokenLifecycle: {
+      refreshReplayBehavior: "revoke_token_family_and_require_reauthentication",
+      revocationRequired: true,
+      logoutOrder: [
+        "stop_new_authenticated_work",
+        "request_refresh_token_family_revocation",
+        "invalidate_server_session",
+        "delete_local_access_and_refresh_tokens",
+        "clear_auth_bound_local_state",
+      ],
+      revocationFailureBehavior: "clear_local_tokens_fail_closed_mark_remote_revocation_pending_and_require_reauthentication",
+    },
+    requiredScopes: ["profile.read", "workspace.read", "crevux.read", "crevux.write", "crevux.generate", "offline_access"],
+  },
+  identifiers: {
+    format: "uuid",
+    authorizationScope: "authenticated_user_and_workspace",
+  },
+  idempotency: {
+    header: "Idempotency-Key",
+    scope: ["workspaceId", "key"],
+    fingerprint: "sha256_of_canonical_request",
+    sameKeySameFingerprint: "return_original_resource",
+    sameKeyDifferentFingerprint: "IDEMPOTENCY_CONFLICT",
+    providerAttemptsRemainChildrenOfOneLogicalJob: true,
+    infrastructureRetryIdentity: "same_logical_job_and_idempotency_identity",
+    userRetryPolicy: {
+      createsNewChildJob: true,
+      newJobIdRequired: true,
+      newIdempotencyKeyRequired: true,
+      recordsParentJob: true,
+      eligibleParentStatuses: ["failed", "cancelled"],
+      preservesLineage: true,
+      freshEntitlementCheckRequired: true,
+      freshUsageAndCostEstimateRequired: true,
+      explicitUserSubmissionRequired: true,
+      mayIncurNewCharge: true,
+      reusePriorChargeAuthorizationAllowed: false,
+    },
+  },
+  endpoints: [
+    { method: "POST", path: "/projects", operation: "create_project", successStatus: 201, authentication: "xflow_oauth_access_token", requiredScopes: ["crevux.write"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "new_resource_in_selected_workspace", ordinaryWorkspaceMemberAllowed: true },
+    { method: "GET", path: "/projects", operation: "list_projects", successStatus: 200, authentication: "xflow_oauth_access_token", requiredScopes: ["crevux.read"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "filter_to_authorized_user_and_selected_workspace" },
+    { method: "GET", path: "/projects/{projectId}", operation: "get_project", successStatus: 200, authentication: "xflow_oauth_access_token", requiredScopes: ["crevux.read"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "project_belongs_to_selected_workspace_and_user_has_access" },
+    { method: "POST", path: "/uploads", operation: "initiate_upload", successStatus: 201, authentication: "xflow_oauth_access_token", requiredScopes: ["crevux.write"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "target_project_belongs_to_selected_workspace_and_user_has_access" },
+    { method: "POST", path: "/uploads/{uploadId}/complete", operation: "complete_upload", successStatus: 200, authentication: "xflow_oauth_access_token", requiredScopes: ["crevux.write"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "upload_belongs_to_authenticated_user_and_selected_workspace" },
+    { method: "POST", path: "/assets/{sourceAssetId}/masks", operation: "create_mask_asset", successStatus: 201, authentication: "xflow_oauth_access_token", requiredScopes: ["crevux.write"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "source_asset_belongs_to_selected_workspace_and_user_has_access" },
+    { method: "POST", path: "/jobs", operation: "create_generation_job", successStatus: 202, authentication: "xflow_oauth_access_token", requiredScopes: ["crevux.generate"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "project_and_referenced_assets_belong_to_selected_workspace_and_user_has_access" },
+    { method: "GET", path: "/jobs/{jobId}", operation: "get_generation_job", successStatus: 200, authentication: "xflow_oauth_access_token", requiredScopes: ["crevux.read"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "job_belongs_to_selected_workspace_and_user_has_access" },
+    { method: "POST", path: "/jobs/{jobId}/cancel", operation: "request_job_cancellation", successStatus: 202, authentication: "xflow_oauth_access_token", requiredScopes: ["crevux.generate"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "job_belongs_to_selected_workspace_and_user_has_access" },
+    { method: "POST", path: "/jobs/{jobId}/retry", operation: "create_retry_job", successStatus: 202, authentication: "xflow_oauth_access_token", requiredScopes: ["crevux.generate"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "job_and_source_assets_belong_to_selected_workspace_and_user_has_access" },
+    { method: "GET", path: "/projects/{projectId}/versions", operation: "list_project_versions", successStatus: 200, authentication: "xflow_oauth_access_token", requiredScopes: ["crevux.read"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "project_and_versions_belong_to_selected_workspace_and_user_has_access" },
+    { method: "GET", path: "/assets/{assetId}/export", operation: "get_gallery_export_metadata", successStatus: 200, authentication: "xflow_oauth_access_token", requiredScopes: ["crevux.read"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "asset_belongs_to_selected_workspace_and_user_has_access" },
+    { method: "GET", path: "/me/entitlements", operation: "get_mobile_entitlements", successStatus: 200, authentication: "xflow_oauth_access_token", requiredScopes: ["workspace.read"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "selected_workspace_only" },
+    { method: "GET", path: "/jobs/{jobId}/events", operation: "stream_job_events_optional", successStatus: 200, authentication: "xflow_oauth_access_token", requiredScopes: ["crevux.read"], workspaceAuthorization: "selected_workspace_membership_required", resourceOwnership: "job_belongs_to_selected_workspace_and_user_has_access" },
+  ],
+  jobStatuses: ["queued", "processing", "cancelling", "completed", "failed", "failed_partial", "cancelled", "blocked_policy"],
+  cancellationPolicy: {
+    queuedBeforeProviderExecution: "cancel_without_provider_execution",
+    providerStartedCancellationRequest: "only_when_adapter_supports_cancellation",
+    localStateMayClaimProviderCancellationWithoutEvidence: false,
+    unsupportedProviderCancellation: "JOB_NOT_CANCELLABLE",
+    lateProviderResults: "quarantine_not_expose_as_normal_completed_results",
+    usageAndRefundAccounting: "authoritative_provider_execution_evidence",
+  },
+  errorCodes: [
+    "AUTH_REQUIRED", "TOKEN_EXPIRED", "INSUFFICIENT_SCOPE", "WORKSPACE_FORBIDDEN", "VALIDATION_FAILED", "INVALID_MEDIA",
+    "MEDIA_TOO_LARGE", "DIMENSIONS_TOO_LARGE", "UPLOAD_EXPIRED", "CHECKSUM_MISMATCH", "IDEMPOTENCY_CONFLICT",
+    "ENTITLEMENT_REQUIRED", "USAGE_LIMIT", "PAYMENT_REQUIRED", "BILLING_AUTHORITY_UNAVAILABLE", "RATE_LIMITED",
+    "SAFETY_REFUSAL", "PROVIDER_UNAVAILABLE", "PROVIDER_FAILURE", "JOB_NOT_CANCELLABLE",
+    "INFRASTRUCTURE_RETRYABLE", "INTERNAL_ERROR",
+  ],
+  errorTaxonomy: {
+    authentication: ["AUTH_REQUIRED"],
+    tokenExpiration: ["TOKEN_EXPIRED"],
+    scopeFailure: ["INSUFFICIENT_SCOPE"],
+    workspaceAuthorization: ["WORKSPACE_FORBIDDEN"],
+    validationAndMedia: ["VALIDATION_FAILED", "INVALID_MEDIA", "MEDIA_TOO_LARGE", "DIMENSIONS_TOO_LARGE"],
+    uploadIntegrity: ["UPLOAD_EXPIRED", "CHECKSUM_MISMATCH"],
+    idempotency: ["IDEMPOTENCY_CONFLICT"],
+    entitlement: ["ENTITLEMENT_REQUIRED"],
+    usage: ["USAGE_LIMIT"],
+    payment: ["PAYMENT_REQUIRED"],
+    billingAuthority: ["BILLING_AUTHORITY_UNAVAILABLE"],
+    rateLimit: ["RATE_LIMITED"],
+    safety: ["SAFETY_REFUSAL"],
+    provider: ["PROVIDER_UNAVAILABLE", "PROVIDER_FAILURE"],
+    cancellation: ["JOB_NOT_CANCELLABLE"],
+    retryableInfrastructure: ["INFRASTRUCTURE_RETRYABLE"],
+    internal: ["INTERNAL_ERROR"],
+  },
+  mediaSecurity: {
+    limitSource: "server_configured_and_returned_by_entitlements",
+    requiredLimits: ["maxCompressedBytes", "maxDecodedPixels", "maxWidth", "maxHeight", "maxFrameCount"],
+    missingLimitsBehavior: "fail_closed_before_upload",
+    trustDeclaredMimeType: false,
+    requireMagicByteAndDecodeValidation: true,
+    requireCompressedAndDecodedSizeLimits: true,
+    rejectMimeMagicMismatch: true,
+    rejectMalformedDecode: true,
+    rejectPolyglotFiles: true,
+    rejectUnsupportedAnimationOrFrameCount: true,
+    rejectDecompressionBombs: true,
+    scanBeforeAssetFinalization: true,
+    checksumAlgorithm: "sha256",
+    checksumRequiredBeforeCompletion: true,
+    rejectChecksumMismatch: true,
+    resumableCheckpointsRequired: true,
+    uploadExpiryRequired: true,
+    rejectExpiredUploadSession: true,
+    completionIsIdempotent: true,
+    orphanPartCleanupRequired: true,
+    crossWorkspaceCompletionRejected: true,
+    stripExifLocationByDefault: true,
+    privateStorageByDefault: true,
+    signedDownloadLifetime: "minutes",
+    maskMustMatchSourceDimensions: true,
+  },
+  signedMedia: {
+    lifetime: "minutes",
+    renewalRequiresFreshAuthentication: true,
+    renewalRechecksUserWorkspaceAndResourceAuthorization: true,
+  },
+  galleryExport: {
+    explicitUserInitiated: true,
+    boundary: "private_workspace_to_device_visible_media",
+    checksumVerificationRequiredBeforeMediaStoreCommit: true,
+  },
+  accountDeletion: {
+    authority: "xflow",
+    immediateActions: ["revoke_token_family", "block_new_work"],
+    newWorkAfterDeletionBegins: "blocked_immediately",
+    queuedJobs: "cancel",
+    providerCancellationRequest: "when_supported_by_adapter",
+    activeJobs: "request_provider_cancellation_when_supported_otherwise_quarantine_late_results",
+    lateProviderResults: "quarantine_not_expose_as_normal_completed_results",
+    assetDeletion: "delete_private_project_assets_after_terminal_state_or_bounded_cleanup_timeout",
+    assetCleanupDeadline: "after_terminal_state_or_bounded_cleanup_timeout",
+    tombstone: "content_free_minimal_audit_record",
+    completion: "auditable_terminal_deletion_state",
+    tombstoneRetention: "owner_legal_policy_required_no_default_in_contract",
+  },
+  lineage: {
+    originalsAreImmutable: true,
+    versionsAreImmutable: true,
+    inPlaceOverwriteAllowed: false,
+    projectVersionRelationshipRequired: true,
+    refinementsRequireParentVersion: true,
+    requiredVersionFields: ["projectId", "sourceAssetId", "promptSnapshot", "resultAssetIds", "providerProvenance", "modelProvenance", "jobId"],
+    optionalVersionFields: ["parentVersionId", "maskAssetId"],
+    versionsRecordParentSourceMaskPromptAndResults: true,
+    providerAttemptsAreAuditable: true,
+  },
+  unsupportedClaims: [
+    "provider_keys_in_apk",
+    "confidential_oauth_client_secret_in_apk",
+    "guaranteed_identity_preservation",
+    "provider_cancellation_without_adapter_proof",
+    "samsung_photo_assist_api",
+    "galaxy_z_fold8_s_pen_compatibility",
+  ],
+} as const satisfies {
+  schemaVersion: string;
+  apiNamespace: "/api/mobile/v1";
+  redirectUri: string;
+  delivery: Readonly<Record<string, string>>;
+  authorities: Readonly<Record<string, CrevuxMobileAuthority>>;
+  authentication: Readonly<Record<string, unknown>>;
+  identifiers: Readonly<Record<string, string>>;
+  idempotency: Readonly<Record<string, unknown>>;
+  endpoints: readonly CrevuxMobileEndpointContract[];
+  jobStatuses: readonly CrevuxMobileJobStatus[];
+  cancellationPolicy: Readonly<Record<string, unknown>>;
+  errorCodes: readonly CrevuxMobileErrorCode[];
+  errorTaxonomy: Readonly<Record<string, readonly CrevuxMobileErrorCode[]>>;
+  mediaSecurity: Readonly<Record<string, unknown>>;
+  signedMedia: Readonly<Record<string, unknown>>;
+  galleryExport: Readonly<Record<string, unknown>>;
+  accountDeletion: Readonly<Record<string, unknown>>;
+  lineage: Readonly<Record<string, unknown>>;
+  unsupportedClaims: readonly string[];
+};
