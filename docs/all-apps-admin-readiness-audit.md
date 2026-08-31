@@ -17,7 +17,7 @@ Target production apps:
 | RatAiFy | `apps/RatAiFy` | `apps/RatAiFy` | `main` | `origin https://github.com/craftyguru/Rataify.git` | `client/src/pages/superadmin/*`, `server/routes/admin-tools.ts`, `server/routes/superadmin-*.ts` |
 | CreVux | `apps/CreVux` | `apps/CreVux` | `main` | `origin https://github.com/craftyguru/Crevux.git` | `artifacts/image-gen/src/pages/AdminDashboardPage.tsx`, API server admin/internal routes |
 
-Extra app directories found but not treated as the six production targets: `ASO-Audit-Agent`, `PitStrike`, `xflow-master-release`, `XFlow-phase4b-pr`, `XFlow-push-through`.
+Extra app directories found but not treated as the six production targets: `ASO-Audit-Agent` (standalone tooling, not a git product), `PitStrike` (personal user-connected app only, not an ecosystem product), `xflow-master-release`, `XFlow-phase4b-pr`, `XFlow-push-through` (extra XFlow git worktrees, not additional products).
 
 The workspace root also has a Git repository on `master`, but `git remote -v` returned no configured remote.
 

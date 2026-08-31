@@ -6,7 +6,7 @@ The XFlow ecosystem is a six-app portfolio for controlling workflows, validating
 
 XFlow connects six specialized apps through shared identity, governance, verification, and release discipline so each product can stand alone while still proving it belongs to a larger operating system.
 
-The core ecosystem is limited to XFlow, Verixet, Rataify, AudAiX, Crevux, and WordGeni. Other apps in the workspace are personal projects, experiments, or separate portfolio products and are not part of the core ecosystem narrative.
+The core ecosystem is limited to XFlow, Verixet, Rataify, AudAiX, Crevux, and WordGeni. Personal user-connected apps (including PitStrike) are not ecosystem products and are not part of the core ecosystem narrative.
 
 ## What The Platform Does
 
@@ -51,6 +51,10 @@ Phase 4 audit docs define the target product-family experience without changing 
 - [Dashboard standard](dashboard-standard.md)
 - [UI state standard](ui-state-standard.md)
 
+## Development Workflow
+
+Cursor, Cursor Agents, and Codex follow [development-workflow.md](../development-workflow.md) and `.cursor/rules/`. The root repo is orchestration only; product apps remain independent git repositories under `apps/`.
+
 ## Shared Standards
 
 - Canonical core product names: XFlow, Verixet, Rataify, AudAiX, Crevux, WordGeni.
@@ -94,6 +98,9 @@ See [security-model.md](security-model.md).
 | Cross-app release evidence packet | in progress |
 | Portfolio screenshots and media proof refresh | in progress; see [product-proof.md](product-proof.md) |
 | Public docs URL | needs verification |
+| Crevux Android MOBILE-0 architecture and contracts | in progress; automated gates plus owner review required |
+
+Mobile phase specifications are indexed in [`docs/phases/README.md`](../phases/README.md).
 
 ## Portfolio Positioning
 

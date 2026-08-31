@@ -1,0 +1,40 @@
+---
+description: Git hygiene, dirty-tree protection, checkpoints, and forbidden destructive operations
+alwaysApply: true
+---
+
+# Git Safety
+
+This checkout is often dirty. Pre-existing modifications are protected.
+
+## Forbidden unless the user names that exact operation
+
+- `git reset --hard`
+- `git clean -fd` / `git clean -fdx`
+- `git checkout -- .` / `git restore .`
+- `git stash` (including `-u`)
+- force push to `main`/`master`
+
+Do not discard, overwrite, or silently absorb unrelated work.
+
+## Before any commit
+
+Run `git status`, `git diff`, and `git diff --stat`. Commit only intended files. Exclude secrets, generated junk, and unrelated dirty files.
+
+## Checkpoints
+
+Commit when the user asks, or when a coherent slice is ready and the user wants a recovery point: before risky architecture, migrations, dependency upgrades, ownership transfer, or release validation. Do not checkpoint after every tiny edit.
+
+Message style: `feat(scope): why`, `fix(scope): why`, `chore(workflow): why`.
+
+## Branch names
+
+Prefer existing repo convention. Otherwise:
+
+- `phase/<n>-<short-description>`
+- `feature/<short-description>`
+- `fix/<short-description>`
+- `chore/<short-description>`
+- parallel agents: `cursor/phase-<n>-<desc>` or `codex/phase-<n>-<desc>`
+
+Do not proliferate branches for trivial edits on an already correct branch.

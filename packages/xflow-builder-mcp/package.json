@@ -1,0 +1,19 @@
+{
+  "name": "@xflow-ecosystem/builder-mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "MCP bridge that exposes scoped WordGeni and Crevux builder APIs to Codex and other MCP clients.",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "smoke:live": "node scripts/smoke-live.mjs"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "zod": "4.4.3"
+  }
+}

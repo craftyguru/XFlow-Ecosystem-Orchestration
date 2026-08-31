@@ -1,0 +1,32 @@
+---
+description: Start, continue, and close numbered or named development phases
+alwaysApply: true
+---
+
+# Phase Management
+
+Phases in this workspace are named (Chronicle Phase 9, Phase 2F, Phase 17 proof, etc.). Do not invent a single global increment. Inspect existing `docs/**` phase reports before numbering.
+
+## Start Phase X / next / NEXT
+
+1. Inspect repo: `node scripts/dev-workflow/inspect-repo.mjs` plus `git status` / `git worktree list`
+2. Protect unrelated dirty files; do not reset or stash
+3. Read the previous phase closeout if it exists
+4. Define goal, in scope, out of scope, acceptance criteria, risks, validation plan
+5. Choose implementation owner (Cursor or Codex)
+6. Choose branch/worktree only if isolation is needed
+7. Stop at implementation readiness unless the user asked to implement
+
+Do not begin broad implementation until those boundaries are written in the reply (use `docs/templates/phase-plan.md`).
+
+## Continue Phase X
+
+Stay inside the existing scope. Re-read acceptance criteria. Do not expand into neighboring systems.
+
+## Close Phase X
+
+A phase is complete only when acceptance is checked, relevant tests/builds have real results, the diff is reviewed, blockers are documented, Git state is understood, and checkpoints exist.
+
+Closeout fields: PHASE, STATUS, SUMMARY, ACCEPTANCE RESULTS, TEST RESULTS, BUILD RESULTS, MANUAL QA, COMMITS, KNOWN LIMITATIONS, REMAINING BLOCKERS, NEXT RECOMMENDED PHASE.
+
+Never mark a blocked phase complete. Template: `docs/templates/phase-closeout.md`.

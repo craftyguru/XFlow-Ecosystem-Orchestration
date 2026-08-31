@@ -1,0 +1,221 @@
+Hey, how's it going? I'm Rob.
+
+My path into engineering is a little unconventional. I've spent close to ten years in hospitality, and for the last three years I've been teaching myself full-stack software engineering outside of work.
+
+I didn't want to stop at tutorials or small practice apps. I wanted to understand how complete products work, so I started building them. That pulled me into product design, frontend and backend engineering, databases, authentication, permissions, billing, AI workflows, testing, desktop software, and deployment.
+
+I use Codex and other AI tools throughout that process, but I don't hand them the judgment. I define the architecture and constraints, review what they produce, test the behavior, and make the final decisions.
+
+The clearest way to show you how I work is through XFlow, the control plane I built for a six-product ecosystem. This is the live, authenticated production workspace, and it starts with one practical question: what deserves attention right now?
+
+...CUE 1
+
+Instead of making someone inspect every product separately, XFlow pulls the important signals into one place and turns them into an ordered path.
+
+The recommendation isn't a black box. The reasoning stays visible, so the operator can understand why something was suggested before deciding what to do.
+
+...CUE 2
+
+This portfolio includes XFlow, AudAiX, Verixet, RatAiFy, WordGeni, and Crevux.
+
+Each product has a real job and its own workflow. XFlow doesn't replace them; it coordinates identity, workspace health, connections, evidence, and the next actions across the portfolio.
+
+Now I'll open the shared ecosystem assistant.
+
+...CUE 3
+
+The assistant understands the current workspace and screen, but it doesn't get unrestricted access.
+
+...CUE 4
+
+The server decides what context it receives, permissions stay bounded, and higher-risk actions use a separate confirmation path. Here I'm only showing its connected context, without submitting a prompt or triggering an action.
+
+...CUE 5
+
+The Apps view shows what belongs to this workspace, what's connected, and what still needs attention.
+
+...CUE 6
+
+I wanted ownership to be obvious, connections to be inspectable, and unfinished handoffs to be hard to miss. Those same problems appear in any product that coordinates multiple services, external partners, or transaction stages.
+
+...CUE 7
+
+Activity gives the workspace a history instead of only showing its current state.
+
+...CUE 8
+
+Each event keeps its source, severity, timestamp, and application context. In a real-estate product, that same model could explain what changed an offer, document, deadline, payment, or partner handoff.
+
+...CUE 9
+
+Jobs separates long-running work from the request that started it.
+
+...CUE 10
+
+Pending, completed, and failed operations stay visible, which gives the product a clean way to support retries, recovery, debugging, and honest user feedback when something doesn't finish.
+
+Now I'll open AudAiX.
+
+...CUE 11
+
+AudAiX is a complete audit-readiness product inside the ecosystem, not just a status card.
+
+...CUE 12
+
+This live workspace completed its connected scan across nineteen monitored surfaces. It now shows one hundred percent readiness, thirty-eight evidence items, nineteen of nineteen passing controls, zero critical blockers, and an exportable report.
+
+AudAiX owns that experience and its records; XFlow supplies the shared identity and operational connection. Next I'll show the evidence and remediation layer beneath the score.
+
+...CUE 13
+
+This is where the score becomes inspectable.
+
+AudAiX organizes screenshots, logs, scan artifacts, blockers, security risks, and a recommended fix order. The operator can move from a summary into the proof and then into a concrete remediation path.
+
+Now I'll return to XFlow and move into trust and verification.
+
+...CUE 14
+
+RatAiFy is a portfolio trust product, so I want to show the sites it actually manages instead of stopping at one table.
+
+...CUE 15
+
+This live workspace has verified sites with an average trust score of one hundred. Each site keeps its own posture, scan freshness, monitoring focus, and recommended next move.
+
+Next I'll show the proof and action layer for an individual site.
+
+...CUE 16
+
+From here, a site can move into issue review, rescanning, a professional report, and a recommended remediation path.
+
+RatAiFy also shows where AudAiX supplies connected audit proof. That demonstrates how two substantial products can collaborate without becoming the same application. Risk and approval decisions stay tied to evidence and a next action.
+
+Now I'll show how the AI workflow stays grounded.
+
+...CUE 17
+
+WordGeni is a full writing studio, not a generic prompt box.
+
+...CUE 18
+
+This control center brings drafting, verification, project scope, memory, source checks, and operator decisions into one authenticated workspace. The user can load a task and establish the context that should govern the next draft or review.
+
+Next I'll show how the product decides whether that work is ready.
+
+...CUE 19
+
+Writing readiness makes missing context visible before generation begins.
+
+Project scope, memory and voice DNA, source grounding, verification, and the draft corpus remain separate requirements. Unsupported claims and incomplete grounding can be reviewed before export instead of being hidden behind a confident answer.
+
+Next I'll show the operator controls beneath the readiness score.
+
+...CUE 20
+
+The bound-context view shows what the assistant actually knows and what is still missing.
+
+The action queue, recommendations, readiness matrix, memory snapshot, and verification status make the workflow inspectable. The goal isn't to remove human judgment; it's to make AI assistance useful and accountable while the operator keeps the final decision.
+
+Now I'll open Crevux.
+
+...CUE 21
+
+Crevux is the ecosystem's creative-production workspace.
+
+...CUE 22
+
+It supports image creation, enhancement, galleries, projects, exports, review queues, workflow history, and operational status behind one authenticated XFlow handoff. Crevux keeps its own visual language, production rules, assets, and delivery experience while participating in the shared identity model.
+
+Next I'll show the actual workflow entry points instead of stopping at the product title.
+
+...CUE 23
+
+Quick Start exposes the real product breadth: create with AI, enhance an image, open the gallery, and organize work in projects.
+
+...CUE 24
+
+Below that, Crevux tracks active projects, recent activity, exports, tools, system status, and the recent gallery. XFlow coordinates identity and context, while Crevux remains a substantial end-to-end creative application.
+
+Now I'll return to XFlow's AI context and evaluation layer.
+
+...CUE 25
+
+The AI Context Engine makes the AI workflow observable.
+
+...CUE 26
+
+It shows retrieval, traces, evaluation results, latency, and cost. Provider authority stays on the server, so AI behavior can be measured and tested like any other product capability instead of being treated like an unexplained prompt box.
+
+I'm switching briefly to sanitized local engineering evidence.
+
+...CUE 27
+
+This is not a live production database view.
+
+Across the ecosystem, PostgreSQL and Supabase policies derive access from authenticated workspace membership. Negative tests verify that one workspace can't read another workspace's records, and privileged authority stays on the server.
+
+To me, tenant isolation isn't just a setting. It's a product boundary that has to be tested under failure conditions. The next layer is safe action execution.
+
+...CUE 28
+
+Chronicle separates every stage of an action: proposal, user confirmation, permission validation, execution, idempotency, and the final receipt.
+
+If the approved target or authorization is missing, the executor fails closed. I'm not claiming unrestricted autonomous action. I'm showing the boundary between recommending something and having permission to execute it.
+
+...CUE 29
+
+I also built a native XFlow desktop application.
+
+...CUE 30
+
+One authenticated workspace connects the six product areas without embedding their remote websites inside a desktop frame. For this walkthrough, it stays read-only while using the connected workspace and read model.
+
+...CUE 31
+
+Chronicle persists across those product areas as a permission-aware companion.
+
+...CUE 32
+
+It can carry authorized context, memory, search, and prepared workflows as the user moves between products, but every application still controls its own permissions and actions.
+
+Now I'll show the commercial authority.
+
+...CUE 33
+
+The companion keeps that continuity without taking authority away from the product the user is operating.
+
+...CUE 34
+
+Commerce is separated into catalog, checkout, subscriptions, and entitlements because those states can fail independently.
+
+...CUE 35
+
+A payment can succeed while access fails, or access can remain active while a subscription changes or recovers. Those situations need separate handling and separate recovery paths because payment state and access state can fail independently.
+
+...CUE 36
+
+Verixet is the authority for entitlements, usage admission, and policy decisions.
+
+...CUE 37
+
+Connected products ask whether a workspace or user can use a capability, and the server enforces the answer. Billing therefore becomes part of the permission system, not simply whether a button appears on the screen.
+
+...CUE 38
+
+Its connected apps, verified checks, monitoring coverage, and governance checklist show whether that authority is working across the portfolio.
+
+...CUE 39
+
+Bringing this back to Stelo, I've already worked through many of the underlying patterns a real-estate transaction platform has to solve: stateful workflows, payments, partner handoffs, evidence, AI assistance, tenant boundaries, operational controls, and recovery when something goes wrong.
+
+I also have some prior exposure to real estate. During COVID, I completed and passed an online real-estate course, although I didn't pursue the license. It gave me a basic grounding in the terminology, agency relationships, documents, deadlines, and the way a transaction moves between buyers, sellers, and agents.
+
+I'd still need to refresh that knowledge and learn more about MLS and IDX integrations, state-specific compliance, brokerage operations, and Stelo's marketplace. I want to be direct about that.
+
+What I can bring immediately is broad product ownership, strong technical curiosity, and the ability to turn an unclear operational problem into something that can be built, tested, inspected, and improved.
+
+I built this ecosystem independently across the interface, architecture, data model, authentication, permissions, billing, AI workflows, testing, desktop software, and release operations. My path wasn't traditional, but it taught me how to learn quickly, investigate hard problems, use modern tools responsibly, and keep moving without waiting for perfect instructions.
+
+That is the ownership, adaptability, and technical range I would bring as an early or founding engineer at Stelo.
+
+...CUE 40

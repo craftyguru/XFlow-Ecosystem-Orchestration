@@ -1,6 +1,20 @@
 {
   "version": 1,
   "canonicalSlugs": ["xflow", "verixet", "audaix", "rataify", "wordgeni", "crevux"],
+  "membershipPolicy": {
+    "source": "explicit-registry-only",
+    "directoryLocationDoesNotConferMembership": true,
+    "workspaceVisibilityDoesNotConferMembership": true
+  },
+  "externalPersonalApps": [
+    {
+      "slug": "pitstrike",
+      "displayName": "PitStrike",
+      "relationship": "user-connected-external-personal-app",
+      "ecosystemProduct": false,
+      "note": "May connect as a user app. Never treat as a seventh ecosystem product. Do not infer membership from apps/PitStrike."
+    }
+  ],
   "apps": [
     {
       "slug": "xflow",

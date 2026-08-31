@@ -16,10 +16,12 @@ This workspace demonstrates how a connected product ecosystem can be governed, v
 | AudAiX | Audit and evidence intelligence layer | implemented | [AudAiX README](apps/AudAix/README.md) |
 | Crevux | Creative production and asset workflow studio | implemented | [Crevux README](apps/CreVux/README.md) |
 | WordGeni | AI writing and research workspace | implemented | [WordGeni README](apps/WordGeni/README.md) |
-The core ecosystem is limited to XFlow, Verixet, Rataify, AudAiX, Crevux, and WordGeni. Other apps in the workspace are personal projects, experiments, or separate portfolio products and are not part of the core ecosystem narrative.
+The core ecosystem is limited to XFlow, Verixet, Rataify, AudAiX, Crevux, and WordGeni. Personal user-connected apps (including PitStrike) are not ecosystem products and are not part of the core narrative.
 
 ## Quick Navigation
 
+- [Cursor + Codex development workflow](docs/development-workflow.md)
+- [Contributing](CONTRIBUTING.md)
 - [Central ecosystem docs hub](docs/ecosystem/README.md)
 - [Product map](docs/ecosystem/product-map.md)
 - [Architecture map](docs/ecosystem/architecture.md)

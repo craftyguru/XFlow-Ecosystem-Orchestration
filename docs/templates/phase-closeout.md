@@ -1,0 +1,17 @@
+# Phase closeout
+
+A blocked phase is not complete.
+
+```text
+PHASE:
+STATUS: complete | blocked | in progress
+SUMMARY:
+ACCEPTANCE RESULTS:
+TEST RESULTS:
+BUILD RESULTS:
+MANUAL QA:
+COMMITS:
+KNOWN LIMITATIONS:
+REMAINING BLOCKERS:
+NEXT RECOMMENDED PHASE:
+```

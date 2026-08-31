@@ -1,0 +1,43 @@
+# Phase 2F Private Environment Template
+
+# Copy variable names into the ignored `.env.phase2f.local` file.
+# Replace placeholders privately. Do not commit real values.
+# Runtime preflight treats replace_me and REQUIRES_PRIVATE_INPUT as missing values.
+
+# Production database connection secret.
+PHASE2F_DATABASE_URL=replace_me
+
+# Non-secret production target identity checks.
+PHASE2F_EXPECTED_PROJECT_REF=replace_me
+PHASE2F_EXPECTED_DB_HOST=replace_me
+PHASE2F_EXPECTED_DB_NAME=replace_me
+PHASE2F_EXPECTED_ENVIRONMENT_NAME=production
+
+# Reviewed adapter manifest acknowledgement.
+PHASE2F_REVIEWED_MANIFEST_VERSION=phase2f-production-fixtures-v1
+
+# Required Supabase Auth Admin target.
+# URL must match the expected project reference. Keys are private and must never be printed.
+PHASE2F_SUPABASE_URL=replace_me
+PHASE2F_SUPABASE_SERVICE_ROLE_KEY=replace_me
+PHASE2F_SUPABASE_ANON_KEY=replace_me
+PHASE2F_EXPECTED_SUPABASE_PROJECT_REF=replace_me
+
+# Required deterministic production proof identities.
+PHASE2F_STANDARD_EMAIL=replace_me
+PHASE2F_STANDARD_PASSWORD=replace_me
+PHASE2F_DENIED_EMAIL=replace_me
+PHASE2F_DENIED_PASSWORD=replace_me
+PHASE2F_OUTSIDER_EMAIL=replace_me
+PHASE2F_OUTSIDER_PASSWORD=replace_me
+
+# Required proof workspace configuration.
+PHASE2F_PROOF_WORKSPACE_SLUG=replace_me
+
+# Optional non-billable allowed-path proof identity.
+PHASE2F_ENTITLED_EMAIL=replace_me_optional
+PHASE2F_ENTITLED_PASSWORD=replace_me_optional
+
+# Optional scoped admin proof identity.
+PHASE2F_ADMIN_EMAIL=replace_me_optional
+PHASE2F_ADMIN_PASSWORD=replace_me_optional

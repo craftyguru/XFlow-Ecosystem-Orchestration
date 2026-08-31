@@ -1,0 +1,36 @@
+name: Shared schema bootstrap proof
+
+on:
+  pull_request:
+    paths:
+      - "supabase/migrations/**"
+      - "scripts/canonical-shared-schema-bootstrap.mjs"
+      - "scripts/lib/canonical-shared-schema-bootstrap.mjs"
+      - "scripts/lib/canonical-shared-schema-bootstrap.test.mjs"
+      - ".github/workflows/shared-schema-bootstrap.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  canonical-bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: craftyguru/xflowx
+          ref: master
+          path: apps/XFlow
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+          cache: npm
+      - run: npm ci
+      - run: npm ci
+        working-directory: apps/XFlow
+      - run: npm run test:shared-schema-bootstrap
+      - run: npm run prove:shared-schema-bootstrap -- --xflow-dir=apps/XFlow
