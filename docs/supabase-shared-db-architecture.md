@@ -6,6 +6,8 @@ Date: 2026-05-04
 
 The shared Supabase project uses one database with clear schema boundaries:
 
+- This orchestration repository is the sole canonical migration authority for shared `auth`,
+  `core`, profile/onboarding, RLS, grant, and function structures.
 - `core.*` stores ecosystem-wide source-of-truth records.
 - `xflow.*`, `verixet.*`, `audaix.*`, `rataify.*`, `wordgeni.*`, and `crevux.*` store app-owned product data.
 - Browser clients do not directly access app schemas by default.
@@ -91,6 +93,10 @@ Server routes are required for:
 Verixet remains the billing, entitlement, usage, credit, plan, and Stripe authority. Other apps may read Verixet-authored decisions through helper/API boundaries, but must not reimplement entitlement logic with direct SQL.
 
 XFlow remains the app connection, link state, control-plane, and orchestration authority. Other apps must not directly mutate XFlow-owned connection/control-plane state.
+
+XFlow's own Drizzle chain is applied only after the orchestration shared schema and validation
+gates. In particular, XFlow migration `0052_first_run_onboarding_state.sql` depends on the canonical
+`core.profiles` table. XFlow's local navigation-QA compatibility shim is not hosted schema authority.
 
 ## Schema Boundaries
 
