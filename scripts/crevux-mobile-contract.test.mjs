@@ -72,6 +72,52 @@ test("requires public-client PKCE, transaction-bound state, and safe token lifec
   assert.ok(contract.unsupportedClaims.includes("confidential_oauth_client_secret_in_apk"));
 });
 
+test("locks separate production and MOBILE-1 test OAuth trust domains", () => {
+  assert.equal(contract.authentication.redirectUri, "https://crevux.com/mobile/oauth/callback");
+  assert.deepEqual(contract.authentication.environmentSelection, {
+    source: "explicit_build_configuration",
+    missingUnknownOrMismatchedBehavior: "fail_closed_before_authorization_or_token_use",
+    runtimeFallbackAllowed: false,
+    crossEnvironmentTokenAcceptanceAllowed: false,
+  });
+  assert.deepEqual(contract.authentication.environmentProfiles, {
+    production: {
+      deploymentClassification: "production",
+      clientId: "crevux-android",
+      xflowOrigin: "https://xflowx.com",
+      issuer: "https://xflowx.com",
+      clientAudience: "crevux-android",
+      redirectUri: "https://crevux.com/mobile/oauth/callback",
+      packageName: "com.crevux.mobile",
+      exactRedirectMatchRequired: true,
+      wildcardOriginOrRedirectAllowed: false,
+      digitalAssetLinksHost: "crevux.com",
+      digitalAssetLinksCertificateProfile: "production_release_certificate",
+    },
+    test: {
+      deploymentClassification: "staging",
+      clientId: "crevux-android-test",
+      xflowOrigin: "https://mobile-test.xflowx.com",
+      issuer: "https://mobile-test.xflowx.com",
+      clientAudience: "crevux-android-test",
+      redirectUri: "https://mobile-test.crevux.com/mobile/oauth/callback",
+      packageName: "com.crevux.mobile",
+      exactRedirectMatchRequired: true,
+      wildcardOriginOrRedirectAllowed: false,
+      digitalAssetLinksHost: "mobile-test.crevux.com",
+      digitalAssetLinksCertificateProfile: "dedicated_mobile_1_test_certificate",
+    },
+  });
+  assert.deepEqual(contract.authentication.environmentIsolation, {
+    separateClientRegistrationsRequired: true,
+    issuerAndClientAudienceMustMatchSelectedProfile: true,
+    crossEnvironmentTokensRejected: true,
+    digitalAssetLinksCertificatesMustDiffer: true,
+    testCertificateAllowedOnProductionHost: false,
+    productionCertificateAllowedOnTestHost: false,
+  });
+});
+
 test("specifies authentication, scope, workspace authorization, and ownership for every endpoint", () => {
   const expectedScopes = new Map([
     ["create_project", "crevux.write"],
@@ -265,4 +311,29 @@ test("validator rejects removal of cancellation late-result quarantine", async (
 
 test("validator rejects removal of deletion late-result quarantine", async () => {
   await assertValidatorRejects((mutated) => { delete mutated.accountDeletion.lateProviderResults; }, /Account deletion must quarantine late provider results/);
+});
+
+test("validator rejects a wildcard callback", async () => {
+  await assertValidatorRejects((mutated) => { mutated.authentication.environmentProfiles.test.redirectUri = "https://mobile-test.crevux.com/*"; }, /test OAuth environment profile must match its exact approved registration/);
+});
+
+test("validator rejects a wildcard XFlow origin", async () => {
+  await assertValidatorRejects((mutated) => { mutated.authentication.environmentProfiles.test.xflowOrigin = "https://*.xflowx.com"; }, /test OAuth environment profile must match its exact approved registration/);
+});
+
+test("validator rejects cross-environment token acceptance", async () => {
+  await assertValidatorRejects((mutated) => { mutated.authentication.environmentSelection.crossEnvironmentTokenAcceptanceAllowed = true; }, /reject cross-environment tokens/);
+});
+
+test("validator rejects a shared production and test client registration", async () => {
+  await assertValidatorRejects((mutated) => { mutated.authentication.environmentProfiles.test.clientId = "crevux-android"; }, /test OAuth environment profile must match its exact approved registration/);
+});
+
+test("validator rejects production issuer or audience in the test profile", async () => {
+  await assertValidatorRejects((mutated) => { mutated.authentication.environmentProfiles.test.issuer = "https://xflowx.com"; }, /test OAuth environment profile must match its exact approved registration/);
+  await assertValidatorRejects((mutated) => { mutated.authentication.environmentProfiles.test.clientAudience = "crevux-android"; }, /test OAuth environment profile must match its exact approved registration/);
+});
+
+test("validator rejects a shared Digital Asset Links certificate profile", async () => {
+  await assertValidatorRejects((mutated) => { mutated.authentication.environmentProfiles.test.digitalAssetLinksCertificateProfile = "production_release_certificate"; }, /test OAuth environment profile must match its exact approved registration/);
 });

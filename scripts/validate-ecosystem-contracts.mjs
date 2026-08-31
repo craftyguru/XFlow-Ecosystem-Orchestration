@@ -339,6 +339,82 @@ function validateCrevuxMobileContract(contract) {
   if (contract.authentication?.redirectKind !== "verified_https_app_link") {
     fail("The Crevux Android callback must use a verified HTTPS App Link.");
   }
+  const expectedEnvironmentProfiles = {
+    production: {
+      deploymentClassification: "production",
+      clientId: "crevux-android",
+      xflowOrigin: "https://xflowx.com",
+      issuer: "https://xflowx.com",
+      clientAudience: "crevux-android",
+      redirectUri: "https://crevux.com/mobile/oauth/callback",
+      packageName: "com.crevux.mobile",
+      exactRedirectMatchRequired: true,
+      wildcardOriginOrRedirectAllowed: false,
+      digitalAssetLinksHost: "crevux.com",
+      digitalAssetLinksCertificateProfile: "production_release_certificate",
+    },
+    test: {
+      deploymentClassification: "staging",
+      clientId: "crevux-android-test",
+      xflowOrigin: "https://mobile-test.xflowx.com",
+      issuer: "https://mobile-test.xflowx.com",
+      clientAudience: "crevux-android-test",
+      redirectUri: "https://mobile-test.crevux.com/mobile/oauth/callback",
+      packageName: "com.crevux.mobile",
+      exactRedirectMatchRequired: true,
+      wildcardOriginOrRedirectAllowed: false,
+      digitalAssetLinksHost: "mobile-test.crevux.com",
+      digitalAssetLinksCertificateProfile: "dedicated_mobile_1_test_certificate",
+    },
+  };
+  if (contract.authentication?.redirectUri !== expectedEnvironmentProfiles.production.redirectUri) {
+    fail("The canonical production callback must remain https://crevux.com/mobile/oauth/callback.");
+  }
+  for (const [environment, expectedProfile] of Object.entries(expectedEnvironmentProfiles)) {
+    const actualProfile = contract.authentication?.environmentProfiles?.[environment];
+    if (JSON.stringify(actualProfile) !== JSON.stringify(expectedProfile)) {
+      fail(`The Crevux Android ${environment} OAuth environment profile must match its exact approved registration, origin, issuer, audience, callback, package, and certificate boundary.`);
+    }
+    for (const exactValue of [actualProfile?.xflowOrigin, actualProfile?.redirectUri]) {
+      if (typeof exactValue !== "string" || exactValue.includes("*")) {
+        fail(`The Crevux Android ${environment} OAuth origin and callback must be exact and contain no wildcard.`);
+      }
+    }
+  }
+  const environmentSelection = contract.authentication?.environmentSelection;
+  if (
+    environmentSelection?.source !== "explicit_build_configuration"
+    || environmentSelection?.missingUnknownOrMismatchedBehavior !== "fail_closed_before_authorization_or_token_use"
+    || environmentSelection?.runtimeFallbackAllowed !== false
+    || environmentSelection?.crossEnvironmentTokenAcceptanceAllowed !== false
+  ) {
+    fail("Crevux Android environment selection must be explicit, reject cross-environment tokens, and fail closed without runtime fallback.");
+  }
+  const environmentIsolation = contract.authentication?.environmentIsolation;
+  for (const requiredFlag of [
+    "separateClientRegistrationsRequired",
+    "issuerAndClientAudienceMustMatchSelectedProfile",
+    "crossEnvironmentTokensRejected",
+    "digitalAssetLinksCertificatesMustDiffer",
+  ]) {
+    if (environmentIsolation?.[requiredFlag] !== true) {
+      fail(`Crevux Android environment isolation must require ${requiredFlag}.`);
+    }
+  }
+  if (environmentIsolation?.testCertificateAllowedOnProductionHost !== false || environmentIsolation?.productionCertificateAllowedOnTestHost !== false) {
+    fail("Production and MOBILE-1 test Digital Asset Links certificate associations must remain host-isolated.");
+  }
+  const productionProfile = contract.authentication?.environmentProfiles?.production;
+  const testProfile = contract.authentication?.environmentProfiles?.test;
+  if (
+    productionProfile?.clientId === testProfile?.clientId
+    || productionProfile?.issuer === testProfile?.issuer
+    || productionProfile?.clientAudience === testProfile?.clientAudience
+    || productionProfile?.redirectUri === testProfile?.redirectUri
+    || productionProfile?.digitalAssetLinksCertificateProfile === testProfile?.digitalAssetLinksCertificateProfile
+  ) {
+    fail("Production and MOBILE-1 test OAuth and Digital Asset Links identities must be distinct.");
+  }
   const state = contract.authentication?.statePolicy;
   if (state?.required !== true || state?.singleUse !== true || state?.validation !== "exact_constant_time_match") {
     fail("Crevux Android OAuth state must be required, exact-match validated, and single-use.");

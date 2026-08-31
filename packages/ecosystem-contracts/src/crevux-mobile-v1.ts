@@ -88,7 +88,6 @@ export interface CrevuxMobileJobSummary {
 export const crevuxMobileV1 = {
   schemaVersion: "2026-08-crevux-mobile-v1",
   apiNamespace: "/api/mobile/v1",
-  redirectUri: "https://crevux.com/mobile/oauth/callback",
   delivery: {
     product: "crevux",
     applicationId: "com.crevux.mobile",
@@ -107,6 +106,49 @@ export const crevuxMobileV1 = {
     embeddedClientSecretAllowed: false,
     browser: "external_system_browser",
     redirectKind: "verified_https_app_link",
+    redirectUri: "https://crevux.com/mobile/oauth/callback",
+    environmentSelection: {
+      source: "explicit_build_configuration",
+      missingUnknownOrMismatchedBehavior: "fail_closed_before_authorization_or_token_use",
+      runtimeFallbackAllowed: false,
+      crossEnvironmentTokenAcceptanceAllowed: false,
+    },
+    environmentProfiles: {
+      production: {
+        deploymentClassification: "production",
+        clientId: "crevux-android",
+        xflowOrigin: "https://xflowx.com",
+        issuer: "https://xflowx.com",
+        clientAudience: "crevux-android",
+        redirectUri: "https://crevux.com/mobile/oauth/callback",
+        packageName: "com.crevux.mobile",
+        exactRedirectMatchRequired: true,
+        wildcardOriginOrRedirectAllowed: false,
+        digitalAssetLinksHost: "crevux.com",
+        digitalAssetLinksCertificateProfile: "production_release_certificate",
+      },
+      test: {
+        deploymentClassification: "staging",
+        clientId: "crevux-android-test",
+        xflowOrigin: "https://mobile-test.xflowx.com",
+        issuer: "https://mobile-test.xflowx.com",
+        clientAudience: "crevux-android-test",
+        redirectUri: "https://mobile-test.crevux.com/mobile/oauth/callback",
+        packageName: "com.crevux.mobile",
+        exactRedirectMatchRequired: true,
+        wildcardOriginOrRedirectAllowed: false,
+        digitalAssetLinksHost: "mobile-test.crevux.com",
+        digitalAssetLinksCertificateProfile: "dedicated_mobile_1_test_certificate",
+      },
+    },
+    environmentIsolation: {
+      separateClientRegistrationsRequired: true,
+      issuerAndClientAudienceMustMatchSelectedProfile: true,
+      crossEnvironmentTokensRejected: true,
+      digitalAssetLinksCertificatesMustDiffer: true,
+      testCertificateAllowedOnProductionHost: false,
+      productionCertificateAllowedOnTestHost: false,
+    },
     accessTokenLifetime: "short_lived",
     refreshTokenPolicy: "single_use_rotation",
     statePolicy: {
@@ -282,7 +324,6 @@ export const crevuxMobileV1 = {
 } as const satisfies {
   schemaVersion: string;
   apiNamespace: "/api/mobile/v1";
-  redirectUri: string;
   delivery: Readonly<Record<string, string>>;
   authorities: Readonly<Record<string, CrevuxMobileAuthority>>;
   authentication: Readonly<Record<string, unknown>>;
