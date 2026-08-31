@@ -37,26 +37,12 @@ Existing app migrations remain in place as legacy references until the shared pa
 
 ## Order
 
-Apply migrations in filename order:
+The orchestration repository is the sole shared `auth`/`core` schema authority. Apply every SQL
+file currently present in `supabase/migrations` in strict filename order, then run the shared-schema
+validation/RLS gates. Only after those gates pass may XFlow apply its Drizzle journal in order.
 
-1. `001_core_schema.sql`
-2. `002_core_rls.sql`
-3. `010_xflow_schema.sql`
-4. `011_xflow_rls.sql`
-5. `020_verixet_schema.sql`
-6. `021_verixet_rls.sql`
-7. `030_audaix_schema.sql`
-8. `031_audaix_rls.sql`
-9. `040_rataify_schema.sql`
-10. `041_rataify_rls.sql`
-11. `050_wordgeni_schema.sql`
-12. `051_wordgeni_rls.sql`
-13. `060_crevux_schema.sql`
-14. `061_crevux_rls.sql`
-15. `090_storage_buckets.sql`
-16. `091_seed_ecosystem_apps.sql`
-17. `099_validation_checks.sql`
-18. `100_api_role_grants.sql`
+The executable, empty-database proof and compatibility matrix are documented in
+`docs/canonical-shared-schema-bootstrap.md`.
 
 ## Before Applying
 

@@ -1,6 +1,8 @@
 {
   "private": true,
   "scripts": {
+    "test:shared-schema-bootstrap": "node --test scripts/lib/canonical-shared-schema-bootstrap.test.mjs",
+    "prove:shared-schema-bootstrap": "node scripts/canonical-shared-schema-bootstrap.mjs",
     "validate:ecosystem-contracts": "node scripts/validate-ecosystem-contracts.mjs",
     "validate:shared-package-devendor": "node scripts/validate-shared-package-devendor.mjs",
     "validate:shared-package-release-units": "node scripts/validate-shared-package-release-units.mjs",
