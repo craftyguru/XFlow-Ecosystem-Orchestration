@@ -24,6 +24,7 @@ jobs:
           repository: craftyguru/xflowx
           ref: master
           path: apps/XFlow
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22.18.0
