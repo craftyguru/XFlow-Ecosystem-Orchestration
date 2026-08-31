@@ -91,6 +91,10 @@ Galaxy Z Fold8 must not be described as S Pen compatible. Generic stylus input m
 
 Register a public `crevux-android` OAuth client with no secret, require Authorization Code with PKCE S256, exact redirect matching, one-time authorization codes, short-lived access tokens, single-use refresh rotation, token-family revocation, and account-deletion propagation. Each authorization attempt uses fresh cryptographically random state bound to the authorization request, PKCE verifier, redirect URI, and client instance; callbacks require an exact one-time match before expiry and fail closed by clearing the transaction.
 
+Production and non-production authorization are separate trust domains. The production profile is client `crevux-android`, XFlow origin and issuer `https://xflowx.com`, client audience `crevux-android`, and callback `https://crevux.com/mobile/oauth/callback`. The single MOBILE-1 proof profile is staging-classified client `crevux-android-test`, XFlow origin and issuer `https://mobile-test.xflowx.com`, client audience `crevux-android-test`, and callback `https://mobile-test.crevux.com/mobile/oauth/callback`. Both profiles use package `com.crevux.mobile`.
+
+Registrations and callbacks are exact and separate; wildcard origins or callbacks are forbidden. Build configuration must select one known profile before authorization or token use. Missing, unknown, or mismatched selection fails closed, and neither issuer, client audience, authorization code, access token, refresh token, nor token family crosses environments. `crevux.com` and `mobile-test.crevux.com` publish separate Digital Asset Links associations using different certificate identities. The dedicated MOBILE-1 test certificate is never valid on the production host, and the production certificate is never valid on the test host.
+
 ### Crevux
 
 Expose `/api/mobile/v1`, validate XFlow identity server-side, authorize every resource by user and workspace, broker resumable private uploads, create durable jobs, maintain immutable lineage, isolate provider behavior behind adapters, and issue short-lived signed downloads.

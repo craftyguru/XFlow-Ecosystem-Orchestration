@@ -12,7 +12,16 @@ Machine-readable invariants live in `ecosystem-contracts/crevux-mobile-v1.json`.
 - List endpoints use opaque cursor pagination. Clients must not infer ordering or IDs from cursors.
 - Ordinary project creation must not require workspace-admin privileges.
 
-Android obtains authorization through XFlow using the external system browser, Authorization Code with PKCE S256, a public client, and `https://crevux.com/mobile/oauth/callback` as a verified HTTPS App Link. Required scopes are `profile.read`, `workspace.read`, `crevux.read`, `crevux.write`, `crevux.generate`, and `offline_access`.
+Android obtains authorization through XFlow using the external system browser, Authorization Code with PKCE S256, a public client, and an exact verified HTTPS App Link. Required scopes are `profile.read`, `workspace.read`, `crevux.read`, `crevux.write`, `crevux.generate`, and `offline_access`.
+
+The two allowed authorization profiles are:
+
+| Profile | Deployment classification | Client | XFlow origin and issuer | Required client audience | Exact callback | App package | Digital Asset Links certificate profile |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Production | `production` | `crevux-android` | `https://xflowx.com` | `crevux-android` | `https://crevux.com/mobile/oauth/callback` | `com.crevux.mobile` | Production release certificate, published only by `crevux.com`. |
+| MOBILE-1 test | `staging` | `crevux-android-test` | `https://mobile-test.xflowx.com` | `crevux-android-test` | `https://mobile-test.crevux.com/mobile/oauth/callback` | `com.crevux.mobile` | Dedicated MOBILE-1 test certificate, published only by `mobile-test.crevux.com`. |
+
+Each profile requires its own public-client registration and exact callback; wildcard origins and callbacks are forbidden. Explicit build configuration selects the profile. A missing, unknown, or internally mismatched profile fails closed before authorization or token use, with no production fallback. Authorization codes, access tokens, refresh tokens, and token families are accepted only when both issuer and client audience match the selected profile; cross-environment acceptance is prohibited. The production and test Digital Asset Links certificate sets must differ, and neither host may publish the other environment's certificate association.
 
 Every authorization attempt generates fresh cryptographically random state bound to the authorization request, PKCE verifier, exact redirect URI, and client instance. The callback requires an exact constant-time state match, one-time consumption, and validation before the short server-defined expiry. A missing, mismatched, expired, or replayed state rejects the callback, clears the local authorization transaction, and requires a new attempt.
 
