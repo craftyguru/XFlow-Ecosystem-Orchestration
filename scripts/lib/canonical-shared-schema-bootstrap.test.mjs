@@ -49,3 +49,18 @@ test("the private RLS helper prerequisite precedes the storyboard policy migrati
   assert.match(sql, /security definer[\s\S]*auth\.uid\(\)/);
   assert.match(sql, /revoke all on function private\.has_workspace_app_access\(uuid, text\) from public, anon/);
 });
+
+test("shared-schema helper functions have an immutable search path", () => {
+  const migrations = fs.readdirSync(path.join(root, "supabase", "migrations")).sort();
+  const migrationName = migrations.find((name) => name.endsWith("_harden_shared_function_search_paths.sql"));
+  assert.ok(migrationName, "expected the forward-only function hardening migration");
+
+  const sql = fs.readFileSync(path.join(root, "supabase", "migrations", migrationName), "utf8");
+  for (const signature of [
+    "core.current_user_id()",
+    "core.is_service_role()",
+    "core.set_updated_at()",
+  ]) {
+    assert.match(sql, new RegExp(`alter function ${signature.replace(/[().]/g, "\\$&")}\\s+set search_path = pg_catalog`, "i"));
+  }
+});
