@@ -1,50 +1,126 @@
-# XFlow Ecosystem Workspace
+# XFlow Ecosystem
 
-The XFlow ecosystem is a professional six-app platform for workflow orchestration, execution validation, trust analysis, audit evidence, creative production, and writing workflows.
+A six-product full-stack and AI systems portfolio focused on orchestration, agent workflows, verification, trust, audit evidence, creative tooling, and research-backed content.
 
-## Ecosystem Pitch
+This workspace is the best starting point for reviewing how I design and operate connected software systems across product UI, APIs, workers, PostgreSQL-backed services, AI runtimes, security boundaries, observability, and release verification.
 
-This workspace demonstrates how a connected product ecosystem can be governed, verified, documented, and presented without hiding behind demo-only claims.
+## Start Here
 
-## App Map
+If you are reviewing this portfolio for a software or AI engineering role, start with these three areas:
 
-| Product | Role | Status | App README |
+1. **XFlow** — control plane, workflow orchestration, API contracts, RBAC, auditability, provider integrations, and agent/MCP-facing workflows.
+2. **WordGeni** — AI runtime, retrieval, provenance, prompts, safety, model routing, source ingestion, and human review.
+3. **AudAiX** — evidence-driven audit automation using browser tooling, workers, security/accessibility checks, and production-readiness workflows.
+
+For a concise overview, see the [Recruiter Brief](docs/ecosystem/recruiter-brief.md). For deeper implementation evidence, use the [case-study index](docs/ecosystem/case-studies/README.md).
+
+## Engineering Profile
+
+This ecosystem demonstrates practical work across:
+
+- **Agentic AI systems** — dedicated agent runtimes, prompt and retrieval layers, tool-oriented workflows, context handling, model routing, and human-review boundaries.
+- **MCP and tool integration** — XFlow includes builder-agent and MCP-facing developer flows for external tool consumption and controlled API access.
+- **Full-stack product engineering** — React/Next.js frontends, API layers, workers, background jobs, typed contracts, auth, billing, and multi-surface product workflows.
+- **PostgreSQL and data boundaries** — relational persistence, workspace isolation, schema ownership, audit trails, usage/entitlement data, and production verification paths.
+- **Reliability and release engineering** — smoke tests, route integrity checks, RBAC matrices, environment validation, CI gates, live verification, and fail-closed production checks.
+- **Security and governance** — explicit auth boundaries, encrypted token handling, audit events, secret-management rules, tenant isolation, and documented release standards.
+
+The goal is not to present disconnected demos. The portfolio shows how multiple applications can share engineering standards while retaining clear product, security, data, and deployment boundaries.
+
+## Core Products
+
+| Product | Engineering focus | Status | Case study |
 | --- | --- | --- | --- |
-| XFlow | Ecosystem control plane and workflow orchestration | implemented | [XFlow README](apps/XFlow/README.md) |
-| Verixet | Execution validation and release gate | implemented | [Verixet README](apps/Verixet/README.md) |
-| Rataify | Trust, risk, scam detection, and credibility layer | implemented | [Rataify README](apps/RatAiFy/README.md) |
-| AudAiX | Audit and evidence intelligence layer | implemented | [AudAiX README](apps/AudAix/README.md) |
-| Crevux | Creative production and asset workflow studio | implemented | [Crevux README](apps/CreVux/README.md) |
-| WordGeni | AI writing and research workspace | implemented | [WordGeni README](apps/WordGeni/README.md) |
-The core ecosystem is limited to XFlow, Verixet, Rataify, AudAiX, Crevux, and WordGeni. Other apps in the workspace are personal projects, experiments, or separate portfolio products and are not part of the core ecosystem narrative.
+| **XFlow** | Control plane, workflow orchestration, provider contracts, RBAC, auditability, agent/MCP workflows | Implemented | [XFlow](docs/ecosystem/case-studies/xflow.md) |
+| **WordGeni** | AI runtime, retrieval, provenance, prompt/safety layers, model routing, source-backed writing | Implemented | [WordGeni](docs/ecosystem/case-studies/wordgeni.md) |
+| **AudAiX** | Automated audits, browser evidence, workers, monitoring, accessibility/security checks | Implemented | [AudAiX](docs/ecosystem/case-studies/audaix.md) |
+| **Verixet** | Execution validation, release gates, billing/entitlement authority, verification | Implemented | [Verixet](docs/ecosystem/case-studies/verixet.md) |
+| **Rataify** | Trust, risk, scam detection, and credibility workflows | Implemented | [Rataify](docs/ecosystem/case-studies/rataify.md) |
+| **Crevux** | AI-assisted creative production, asset workflows, and generation/editing surfaces | Implemented | [Crevux](docs/ecosystem/case-studies/crevux.md) |
 
-## Quick Navigation
+The core ecosystem is intentionally limited to these six products. Other repositories in the account are separate projects or experiments and are not part of this architecture narrative.
 
-- [Central ecosystem docs hub](docs/ecosystem/README.md)
-- [Product map](docs/ecosystem/product-map.md)
+## System View
+
+```text
+                        ┌──────────────────────┐
+                        │        XFlow         │
+                        │  Control Plane / API │
+                        │ Orchestration / RBAC │
+                        └──────────┬───────────┘
+                                   │
+             ┌─────────────────────┼─────────────────────┐
+             │                     │                     │
+             ▼                     ▼                     ▼
+      ┌─────────────┐       ┌─────────────┐       ┌─────────────┐
+      │  WordGeni   │       │   AudAiX    │       │   Crevux    │
+      │ AI Runtime  │       │ Audit/Proof │       │ Creative AI │
+      │ Retrieval   │       │ Workers     │       │ Workflows   │
+      └──────┬──────┘       └──────┬──────┘       └──────┬──────┘
+             │                     │                     │
+             └──────────────┬──────┴──────────────┬──────┘
+                            │                     │
+                            ▼                     ▼
+                     ┌─────────────┐       ┌─────────────┐
+                     │   Verixet   │       │   Rataify   │
+                     │ Validation  │       │ Trust/Risk  │
+                     │ Entitlement │       │ Signals     │
+                     └─────────────┘       └─────────────┘
+```
+
+The exact deployment topology varies by product, but the architectural pattern is consistent: clear service boundaries, explicit contracts, database-backed state, verification gates, and observable handoffs between systems.
+
+## What To Inspect
+
+For engineering review, the strongest proof is in the implementation and verification paths rather than screenshots alone:
+
+- API and provider contracts
+- Auth and RBAC enforcement
+- Agent runtime and retrieval boundaries
+- MCP/tool-facing integration paths
+- PostgreSQL schemas and workspace isolation
+- Worker/background-job design
+- Route and contract verification
+- CI, smoke, environment, and release gates
+- Security and secret-management documentation
+- Production verification notes that distinguish implemented code from unverified live state
+
+## Architecture and Governance
+
 - [Architecture map](docs/ecosystem/architecture.md)
-- [Release model](docs/ecosystem/release-model.md)
+- [Product map](docs/ecosystem/product-map.md)
 - [Security model](docs/ecosystem/security-model.md)
+- [Release model](docs/ecosystem/release-model.md)
 - [Professional readiness checklist](docs/ecosystem/checklists/professional-readiness.md)
 - [Recruiter brief](docs/ecosystem/recruiter-brief.md)
-- [Six-app case studies](docs/ecosystem/case-studies/README.md)
+- [Case studies](docs/ecosystem/case-studies/README.md)
 
-## Portfolio Framing
+## Verification Philosophy
 
-The workspace is intended for recruiter, investor, and developer review. The strongest signal is not a single app surface; it is the consistent operating model across apps: canonical naming, clear product roles, governance files, private security reporting, changelog baselines, issue/PR templates, and documented verification boundaries.
+A recurring theme across the ecosystem is separating **implemented behavior** from **verified production behavior**.
 
-For a one-page overview, start with the [recruiter brief](docs/ecosystem/recruiter-brief.md). For product-by-product proof, use the [six-app case-study index](docs/ecosystem/case-studies/README.md).
+The repositories use linting, type checks, unit/integration tests, route checks, RBAC matrices, environment validation, smoke tests, and release gates where appropriate. Production claims remain explicitly bounded when live evidence has not been collected.
 
-## Verification Summary
+That distinction is deliberate: portfolio documentation should make system capability easy to inspect without presenting local or staged behavior as proof of a production deployment.
+
+## Current Portfolio Readiness
 
 | Area | Status |
 | --- | --- |
-| App README professionalization | implemented |
-| Governance and release templates | implemented |
-| Central ecosystem docs hub | implemented |
-| Local link strategy | implemented |
-| Production deployment proof across the six core apps | needs verification |
-| Public docs URL | needs verification |
-| Unified cross-app demo script | planned |
+| Core product architecture documented | Implemented |
+| Recruiter-facing case studies | Implemented |
+| Security and release models | Implemented |
+| App-level verification commands | Implemented |
+| Cross-app operating model | Implemented |
+| Production deployment proof across every core app | Needs current verification |
+| Unified public demo flow | In progress |
 
-Do not treat this root README as proof that every core app is publicly deployed. Deployment and public availability are intentionally marked needs verification unless current release evidence is present.
+## Why This Repository Exists
+
+This repository is the portfolio index for the XFlow ecosystem. It is designed to answer three questions quickly:
+
+1. **Can I build full products end-to-end?** — The six applications span UI, APIs, workers, data, auth, billing, AI, audit, and operational tooling.
+2. **Can I build AI systems beyond a single model call?** — The portfolio includes agent runtimes, retrieval, prompt/safety layers, tool/MCP workflows, context handling, model routing, and review boundaries.
+3. **Can I operate software with engineering discipline?** — The ecosystem includes release gates, verification matrices, security boundaries, observability, documentation, and explicit production-proof requirements.
+
+For hiring review, begin with the [Recruiter Brief](docs/ecosystem/recruiter-brief.md), then inspect XFlow, WordGeni, and AudAiX for the strongest examples of system architecture and implementation depth.
