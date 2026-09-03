@@ -2,17 +2,22 @@
 
 A six-product full-stack and AI systems portfolio focused on orchestration, agent workflows, verification, trust, audit evidence, creative tooling, and research-backed content.
 
-This workspace is the best starting point for reviewing how I design and operate connected software systems across product UI, APIs, workers, PostgreSQL-backed services, AI runtimes, security boundaries, observability, and release verification.
+This workspace is the public engineering showcase for the ecosystem. The underlying product repositories remain private; this repository exposes architecture, recruiter case studies, security/release models, and sanitized technical proof without publishing proprietary implementation code.
 
 ## Start Here
 
-If you are reviewing this portfolio for a software or AI engineering role, start with these three areas:
+If you are reviewing this portfolio for a software or AI engineering role:
 
-1. **XFlow** — control plane, workflow orchestration, API contracts, RBAC, auditability, provider integrations, and agent/MCP-facing workflows.
-2. **WordGeni** — AI runtime, retrieval, provenance, prompts, safety, model routing, source ingestion, and human review.
-3. **AudAiX** — evidence-driven audit automation using browser tooling, workers, security/accessibility checks, and production-readiness workflows.
+1. Read the **[Public Showcase](docs/ecosystem/public-showcase.md)** for the six-product map and review path.
+2. Read the **[Recruiter Brief](docs/ecosystem/recruiter-brief.md)** for a concise overview.
+3. Review **[Public Technical Proof](docs/ecosystem/public-technical-proof.md)** for sanitized examples of authorization, tenancy, idempotency, AI review boundaries, and release gates.
+4. Use the **[case-study index](docs/ecosystem/case-studies/README.md)** for product-by-product depth.
 
-For a concise overview, see the [Recruiter Brief](docs/ecosystem/recruiter-brief.md). For deeper implementation evidence, use the [case-study index](docs/ecosystem/case-studies/README.md).
+The strongest engineering examples are:
+
+- **XFlow** — control plane, workflow orchestration, API contracts, RBAC, auditability, provider integrations, and agent/MCP-facing workflows.
+- **WordGeni** — AI runtime, retrieval, provenance, prompts, safety, model routing, source ingestion, and human review.
+- **AudAiX** — evidence-driven audit automation using browser tooling, workers, security/accessibility checks, and production-readiness workflows.
 
 ## Engineering Profile
 
@@ -40,39 +45,47 @@ The goal is not to present disconnected demos. The portfolio shows how multiple 
 
 The core ecosystem is intentionally limited to these six products. Other repositories in the account are separate projects or experiments and are not part of this architecture narrative.
 
-## System View
+## Architecture
 
-```text
-                        ┌──────────────────────┐
-                        │        XFlow         │
-                        │  Control Plane / API │
-                        │ Orchestration / RBAC │
-                        └──────────┬───────────┘
-                                   │
-             ┌─────────────────────┼─────────────────────┐
-             │                     │                     │
-             ▼                     ▼                     ▼
-      ┌─────────────┐       ┌─────────────┐       ┌─────────────┐
-      │  WordGeni   │       │   AudAiX    │       │   Crevux    │
-      │ AI Runtime  │       │ Audit/Proof │       │ Creative AI │
-      │ Retrieval   │       │ Workers     │       │ Workflows   │
-      └──────┬──────┘       └──────┬──────┘       └──────┬──────┘
-             │                     │                     │
-             └──────────────┬──────┴──────────────┬──────┘
-                            │                     │
-                            ▼                     ▼
-                     ┌─────────────┐       ┌─────────────┐
-                     │   Verixet   │       │   Rataify   │
-                     │ Validation  │       │ Trust/Risk  │
-                     │ Entitlement │       │ Signals     │
-                     └─────────────┘       └─────────────┘
+```mermaid
+flowchart TD
+    X[XFlow\nControl Plane + Orchestration]
+    W[WordGeni\nAgent Runtime + Retrieval]
+    A[AudAiX\nAudit + Evidence Automation]
+    C[Crevux\nAI Media Workflows]
+    V[Verixet\nValidation + Release Gates]
+    R[Rataify\nTrust + Risk Intelligence]
+
+    X --> W
+    X --> A
+    X --> C
+    W --> V
+    A --> V
+    C --> V
+    A --> R
+    X --> R
 ```
 
-The exact deployment topology varies by product, but the architectural pattern is consistent: clear service boundaries, explicit contracts, database-backed state, verification gates, and observable handoffs between systems.
+The exact deployment topology varies by product. This public diagram communicates the authority and workflow model without exposing private service topology or deployment secrets.
+
+## Technical Proof Without Publishing Private Source
+
+The public portfolio includes representative, sanitized examples of the engineering patterns used across the private product repositories:
+
+- authenticated tool boundaries
+- workspace-scoped authorization
+- database-backed tenancy
+- idempotent background execution
+- model-output review boundaries
+- audit trails
+- release verification gates
+- failure-mode thinking around retries, timeouts, invalid output, migration drift, and cross-user access
+
+See **[Public Technical Proof](docs/ecosystem/public-technical-proof.md)** for the examples.
 
 ## What To Inspect
 
-For engineering review, the strongest proof is in the implementation and verification paths rather than screenshots alone:
+For engineering review, the strongest proof is in the implementation model and verification discipline rather than screenshots alone:
 
 - API and provider contracts
 - Auth and RBAC enforcement
@@ -87,6 +100,8 @@ For engineering review, the strongest proof is in the implementation and verific
 
 ## Architecture and Governance
 
+- [Public showcase](docs/ecosystem/public-showcase.md)
+- [Public technical proof](docs/ecosystem/public-technical-proof.md)
 - [Architecture map](docs/ecosystem/architecture.md)
 - [Product map](docs/ecosystem/product-map.md)
 - [Security model](docs/ecosystem/security-model.md)
@@ -109,6 +124,7 @@ That distinction is deliberate: portfolio documentation should make system capab
 | --- | --- |
 | Core product architecture documented | Implemented |
 | Recruiter-facing case studies | Implemented |
+| Public sanitized technical proof | Implemented |
 | Security and release models | Implemented |
 | App-level verification commands | Implemented |
 | Cross-app operating model | Implemented |
@@ -117,10 +133,10 @@ That distinction is deliberate: portfolio documentation should make system capab
 
 ## Why This Repository Exists
 
-This repository is the portfolio index for the XFlow ecosystem. It is designed to answer three questions quickly:
+This repository is the public portfolio index for the XFlow ecosystem. It is designed to answer three questions quickly:
 
 1. **Can I build full products end-to-end?** — The six applications span UI, APIs, workers, data, auth, billing, AI, audit, and operational tooling.
 2. **Can I build AI systems beyond a single model call?** — The portfolio includes agent runtimes, retrieval, prompt/safety layers, tool/MCP workflows, context handling, model routing, and review boundaries.
 3. **Can I operate software with engineering discipline?** — The ecosystem includes release gates, verification matrices, security boundaries, observability, documentation, and explicit production-proof requirements.
 
-For hiring review, begin with the [Recruiter Brief](docs/ecosystem/recruiter-brief.md), then inspect XFlow, WordGeni, and AudAiX for the strongest examples of system architecture and implementation depth.
+For hiring review, begin with the [Public Showcase](docs/ecosystem/public-showcase.md), then inspect the [Recruiter Brief](docs/ecosystem/recruiter-brief.md), [Public Technical Proof](docs/ecosystem/public-technical-proof.md), and the product case studies.
