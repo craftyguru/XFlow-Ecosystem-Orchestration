@@ -12,10 +12,11 @@ This workspace is the public engineering showcase for the ecosystem. The underly
 
 If you are reviewing this portfolio for a software or AI engineering role:
 
-1. Read the **[Public Showcase](docs/ecosystem/public-showcase.md)** for the six-product map and review path.
-2. Read the **[Recruiter Brief](docs/ecosystem/recruiter-brief.md)** for a concise overview.
-3. Review **[Public Technical Proof](docs/ecosystem/public-technical-proof.md)** for sanitized examples of authorization, tenancy, idempotency, AI review boundaries, and release gates.
-4. Use the **[case-study index](docs/ecosystem/case-studies/README.md)** for product-by-product depth.
+1. **[Open the Reviewer Engineering Packet](https://xflowx.com/for-reviewers)** — fastest guided review of the six-product ecosystem, architecture, engineering evidence, role fit, and ownership boundaries.
+2. Read the **[Public Showcase](docs/ecosystem/public-showcase.md)** for the six-product map and review path.
+3. Read the **[Recruiter Brief](docs/ecosystem/recruiter-brief.md)** for a concise overview.
+4. Review **[Public Technical Proof](docs/ecosystem/public-technical-proof.md)** for sanitized examples of authorization, tenancy, idempotency, AI review boundaries, and release gates.
+5. Use the **[case-study index](docs/ecosystem/case-studies/README.md)** for product-by-product depth.
 
 The strongest engineering examples are:
 
@@ -104,6 +105,7 @@ For engineering review, the strongest proof is in the implementation model and v
 
 ## Architecture and Governance
 
+- [Reviewer Engineering Packet](https://xflowx.com/for-reviewers)
 - [Public showcase](docs/ecosystem/public-showcase.md)
 - [Public technical proof](docs/ecosystem/public-technical-proof.md)
 - [Architecture map](docs/ecosystem/architecture.md)
@@ -143,4 +145,4 @@ This repository is the public portfolio index for the XFlow ecosystem. It is des
 2. **Can I build AI systems beyond a single model call?** — The portfolio includes agent runtimes, retrieval, prompt/safety layers, tool/MCP workflows, context handling, model routing, and review boundaries.
 3. **Can I operate software with engineering discipline?** — The ecosystem includes release gates, verification matrices, security boundaries, observability, documentation, and explicit production-proof requirements.
 
-For hiring review, begin with the [Public Showcase](docs/ecosystem/public-showcase.md), then inspect the [Recruiter Brief](docs/ecosystem/recruiter-brief.md), [Public Technical Proof](docs/ecosystem/public-technical-proof.md), and the product case studies.
+For hiring review, begin with the **[Reviewer Engineering Packet](https://xflowx.com/for-reviewers)**, then inspect the [Public Showcase](docs/ecosystem/public-showcase.md), [Recruiter Brief](docs/ecosystem/recruiter-brief.md), [Public Technical Proof](docs/ecosystem/public-technical-proof.md), and the product case studies.
