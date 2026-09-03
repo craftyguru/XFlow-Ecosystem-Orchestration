@@ -4,6 +4,10 @@ A six-product full-stack and AI systems portfolio focused on orchestration, agen
 
 This workspace is the public engineering showcase for the ecosystem. The underlying product repositories remain private; this repository exposes architecture, recruiter case studies, security/release models, and sanitized technical proof without publishing proprietary implementation code.
 
+![XFlow ecosystem six-product showcase](docs/ecosystem/assets/product-showcase-strip.svg)
+
+> The visual above is a public portfolio graphic summarizing the six products and their engineering roles. It is not a screenshot of the private applications.
+
 ## Start Here
 
 If you are reviewing this portfolio for a software or AI engineering role:
