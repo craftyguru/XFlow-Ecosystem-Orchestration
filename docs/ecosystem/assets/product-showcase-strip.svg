@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="760" viewBox="0 0 1800 760" role="img" aria-labelledby="title desc">
+  <title id="title">XFlow ecosystem product showcase</title>
+  <desc id="desc">Six public-safe portfolio cards for XFlow, WordGeni, AudAiX, Crevux, Verixet, and Rataify.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1020"/>
+      <stop offset="1" stop-color="#171f33"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000" flood-opacity="0.28"/>
+    </filter>
+    <style>
+      .title{font:700 38px system-ui,-apple-system,Segoe UI,sans-serif;fill:#f8fafc}
+      .sub{font:400 18px system-ui,-apple-system,Segoe UI,sans-serif;fill:#aeb8c8}
+      .cardTitle{font:700 28px system-ui,-apple-system,Segoe UI,sans-serif;fill:#f8fafc}
+      .role{font:600 16px system-ui,-apple-system,Segoe UI,sans-serif;fill:#cbd5e1}
+      .body{font:400 15px system-ui,-apple-system,Segoe UI,sans-serif;fill:#9fb0c4}
+      .pill{font:600 13px system-ui,-apple-system,Segoe UI,sans-serif;fill:#dbeafe}
+    </style>
+  </defs>
+  <rect width="1800" height="760" rx="28" fill="url(#bg)"/>
+  <text x="70" y="78" class="title">XFlow Ecosystem — Six Product Engineering Portfolio</text>
+  <text x="70" y="112" class="sub">Public showcase graphic. Product source repositories remain private.</text>
+
+  <g transform="translate(70 160)" filter="url(#shadow)">
+    <rect width="510" height="240" rx="22" fill="#111827" stroke="#334155"/>
+    <rect x="24" y="24" width="54" height="54" rx="14" fill="#2563eb"/><text x="97" y="58" class="cardTitle">XFlow</text>
+    <text x="28" y="102" class="role">Control Plane · MCP · RBAC · Orchestration</text>
+    <text x="28" y="136" class="body">Identity, provider contracts, audit events,</text>
+    <text x="28" y="160" class="body">agent/tool access and release verification.</text>
+    <rect x="28" y="188" width="98" height="28" rx="14" fill="#172554"/><text x="47" y="207" class="pill">PostgreSQL</text>
+    <rect x="136" y="188" width="72" height="28" rx="14" fill="#172554"/><text x="156" y="207" class="pill">MCP</text>
+    <rect x="218" y="188" width="88" height="28" rx="14" fill="#172554"/><text x="236" y="207" class="pill">Next.js</text>
+  </g>
+
+  <g transform="translate(645 160)" filter="url(#shadow)">
+    <rect width="510" height="240" rx="22" fill="#111827" stroke="#334155"/>
+    <rect x="24" y="24" width="54" height="54" rx="14" fill="#7c3aed"/><text x="97" y="58" class="cardTitle">WordGeni</text>
+    <text x="28" y="102" class="role">Agent Runtime · Retrieval · Provenance</text>
+    <text x="28" y="136" class="body">Source-backed generation, model routing,</text>
+    <text x="28" y="160" class="body">safety layers and background ingestion.</text>
+    <rect x="28" y="188" width="92" height="28" rx="14" fill="#2e1065"/><text x="47" y="207" class="pill">Agents</text>
+    <rect x="130" y="188" width="98" height="28" rx="14" fill="#2e1065"/><text x="149" y="207" class="pill">Retrieval</text>
+    <rect x="238" y="188" width="96" height="28" rx="14" fill="#2e1065"/><text x="254" y="207" class="pill">Temporal</text>
+  </g>
+
+  <g transform="translate(1220 160)" filter="url(#shadow)">
+    <rect width="510" height="240" rx="22" fill="#111827" stroke="#334155"/>
+    <rect x="24" y="24" width="54" height="54" rx="14" fill="#0891b2"/><text x="97" y="58" class="cardTitle">AudAiX</text>
+    <text x="28" y="102" class="role">Automation · Browser Evidence · Workers</text>
+    <text x="28" y="136" class="body">Playwright, Lighthouse and accessibility</text>
+    <text x="28" y="160" class="body">evidence turned into review workflows.</text>
+    <rect x="28" y="188" width="98" height="28" rx="14" fill="#083344"/><text x="42" y="207" class="pill">Playwright</text>
+    <rect x="136" y="188" width="94" height="28" rx="14" fill="#083344"/><text x="153" y="207" class="pill">Workers</text>
+    <rect x="240" y="188" width="88" height="28" rx="14" fill="#083344"/><text x="258" y="207" class="pill">React</text>
+  </g>
+
+  <g transform="translate(70 455)" filter="url(#shadow)">
+    <rect width="510" height="240" rx="22" fill="#111827" stroke="#334155"/>
+    <rect x="24" y="24" width="54" height="54" rx="14" fill="#db2777"/><text x="97" y="58" class="cardTitle">Crevux</text>
+    <text x="28" y="102" class="role">Creative AI · Entitlements · Secure Export</text>
+    <text x="28" y="136" class="body">Generation workflows, project state, credits,</text>
+    <text x="28" y="160" class="body">signed media and cross-user isolation.</text>
+    <rect x="28" y="188" width="88" height="28" rx="14" fill="#500724"/><text x="47" y="207" class="pill">AI Media</text>
+    <rect x="126" y="188" width="90" height="28" rx="14" fill="#500724"/><text x="143" y="207" class="pill">Credits</text>
+    <rect x="226" y="188" width="102" height="28" rx="14" fill="#500724"/><text x="243" y="207" class="pill">PostgreSQL</text>
+  </g>
+
+  <g transform="translate(645 455)" filter="url(#shadow)">
+    <rect width="510" height="240" rx="22" fill="#111827" stroke="#334155"/>
+    <rect x="24" y="24" width="54" height="54" rx="14" fill="#ea580c"/><text x="97" y="58" class="cardTitle">Verixet</text>
+    <text x="28" y="102" class="role">Validation · API Contracts · Release Gates</text>
+    <text x="28" y="136" class="body">Policy, request correlation, metering,</text>
+    <text x="28" y="160" class="body">OpenAPI and repeatable deployment evidence.</text>
+    <rect x="28" y="188" width="84" height="28" rx="14" fill="#431407"/><text x="48" y="207" class="pill">OpenAPI</text>
+    <rect x="122" y="188" width="82" height="28" rx="14" fill="#431407"/><text x="142" y="207" class="pill">CI Gates</text>
+    <rect x="214" y="188" width="98" height="28" rx="14" fill="#431407"/><text x="232" y="207" class="pill">Drizzle</text>
+  </g>
+
+  <g transform="translate(1220 455)" filter="url(#shadow)">
+    <rect width="510" height="240" rx="22" fill="#111827" stroke="#334155"/>
+    <rect x="24" y="24" width="54" height="54" rx="14" fill="#16a34a"/><text x="97" y="58" class="cardTitle">Rataify</text>
+    <text x="28" y="102" class="role">Trust Intelligence · Risk · Remediation</text>
+    <text x="28" y="136" class="body">Browser checks, queued work and evidence</text>
+    <text x="28" y="160" class="body">converted into prioritized trust findings.</text>
+    <rect x="28" y="188" width="90" height="28" rx="14" fill="#052e16"/><text x="47" y="207" class="pill">Redis</text>
+    <rect x="128" y="188" width="84" height="28" rx="14" fill="#052e16"/><text x="150" y="207" class="pill">Bull</text>
+    <rect x="222" y="188" width="98" height="28" rx="14" fill="#052e16"/><text x="237" y="207" class="pill">Playwright</text>
+  </g>
+</svg>
