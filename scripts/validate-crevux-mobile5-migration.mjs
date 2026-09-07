@@ -5,6 +5,10 @@ const migrationPath = path.resolve(
   "supabase/migrations/20260907140000_crevux_mobile5_revision_families.sql",
 );
 const sql = fs.readFileSync(migrationPath, "utf8").toLowerCase();
+const projectionMigrationPath = path.resolve(
+  "supabase/migrations/20260907215602_crevux_mobile5_revision_projection_events.sql",
+);
+const projectionSql = fs.readFileSync(projectionMigrationPath, "utf8").toLowerCase();
 const failures = [];
 
 for (const table of [
@@ -32,6 +36,20 @@ for (const fragment of [
 
 if (/create policy[^;]+to\s+(anon|authenticated)/s.test(sql)) {
   failures.push("revision tables must not grant direct anon/authenticated policies");
+}
+
+for (const fragment of [
+  "create table if not exists crevux.revision_projection_events",
+  "event_key text primary key",
+  "captured_family_state_version integer",
+  "alter table crevux.revision_projection_events enable row level security",
+  "core.is_service_role()",
+  "revoke all on crevux.revision_projection_events from anon, authenticated",
+]) {
+  if (!projectionSql.includes(fragment)) failures.push(`missing projection contract: ${fragment}`);
+}
+if (/\b(drop\s+(schema|table)|truncate|delete\s+from)\b/.test(projectionSql.replace(/--[^\n]*/g, ""))) {
+  failures.push("projection migration must remain additive-only");
 }
 
 if (failures.length) {
