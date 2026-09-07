@@ -36,7 +36,7 @@ create table if not exists crevux.revision_restore_events (
   unique (workspace_id, actor_user_id, idempotency_key)
 );
 
--- Existing TEST families are assigned only by the application bootstrap after
+-- Existing TEST families are assigned only by mobile5:bootstrap-revision-families after
 -- the same bounded lineage validator used by the API accepts the entire family.
 -- The migration deliberately does not legitimize raw JSON metadata by itself.
 
