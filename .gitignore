@@ -12,6 +12,11 @@ node_modules/
 .env.*
 **/.env
 **/.env.*
+# Explicit shared-local protections required by supabase:validate.
+.env.shared.local
+.env.*.local
+# Track only the empty shared configuration contract, never local values.
+!/.env.shared.example
 *.pem
 *.key
 *.p12
