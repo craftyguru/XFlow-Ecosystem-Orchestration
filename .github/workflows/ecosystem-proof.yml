@@ -40,6 +40,71 @@ jobs:
       - name: Install root dependencies
         run: npm ci --ignore-scripts
 
+      # Nested apps are independent private repositories, ignored by the root.
+      # The unchanged static proof needs their source, not builds or live access.
+      - name: Require existing read-only app checkout token
+        env:
+          ECOSYSTEM_APP_REPO_READ_TOKEN: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
+        run: |
+          if [ -z "${ECOSYSTEM_APP_REPO_READ_TOKEN:-}" ]; then
+            echo "::error::Missing existing read-only app source token"
+            exit 1
+          fi
+
+      - name: Checkout pinned XFlow proof source
+        uses: actions/checkout@v4
+        with:
+          repository: craftyguru/xflowx
+          ref: 7990e5cd2c271fb79aaeebc0887b62b776c10f0e
+          path: apps/XFlow
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
+          persist-credentials: false
+
+      - name: Checkout pinned Verixet proof source
+        uses: actions/checkout@v4
+        with:
+          repository: craftyguru/verixet
+          ref: 884bb79352f248810679ad62943c97c8076e19fc
+          path: apps/Verixet
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
+          persist-credentials: false
+
+      - name: Checkout pinned RatAiFy proof source
+        uses: actions/checkout@v4
+        with:
+          repository: craftyguru/rataify
+          ref: 9078e28ec3e19563fbf3754955d733083f8a2e82
+          path: apps/RatAiFy
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
+          persist-credentials: false
+
+      - name: Checkout pinned AudAiX proof source
+        uses: actions/checkout@v4
+        with:
+          repository: craftyguru/audaix
+          ref: de6bd52b4522a52cca4173737c71e7bb1c2c9d1b
+          path: apps/AudAiX
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
+          persist-credentials: false
+
+      - name: Checkout pinned WordGeni proof source
+        uses: actions/checkout@v4
+        with:
+          repository: craftyguru/wordgeni
+          ref: d11fd9f24fcde91820fc343dc2319f046a7e8291
+          path: apps/WordGeni
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
+          persist-credentials: false
+
+      - name: Checkout pinned Crevux proof source
+        uses: actions/checkout@v4
+        with:
+          repository: craftyguru/Crevux
+          ref: 7b0a87ce6e360b9ee8142c028cea691be2095a46
+          path: apps/Crevux
+          token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
+          persist-credentials: false
+
       - name: Run proof helper tests
         run: npm run test:proof-scanner
 
