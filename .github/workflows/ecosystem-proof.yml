@@ -55,7 +55,7 @@ jobs:
         run: |
           import json, os, urllib.error, urllib.request
 
-          PINS = [('craftyguru/xflowx', '7990e5cd2c271fb79aaeebc0887b62b776c10f0e'), ('craftyguru/verixet', 'af04f8a8af89f7e1df9ddd9db239ea2bcd1aeb28'), ('craftyguru/Rataify', '9078e28ec3e19563fbf3754955d733083f8a2e82'), ('craftyguru/AudAiX', '0c07ac6ecd8ba52172a6ce71a4a6f6d1e621f5a0'), ('craftyguru/WordGeni', 'd7ced489a249500d10f6e0b1a5bf988b39d8c05f'), ('craftyguru/Crevux', '7b0a87ce6e360b9ee8142c028cea691be2095a46')]
+          PINS = [('craftyguru/xflowx', '7990e5cd2c271fb79aaeebc0887b62b776c10f0e'), ('craftyguru/verixet', 'af04f8a8af89f7e1df9ddd9db239ea2bcd1aeb28'), ('craftyguru/Rataify', '9078e28ec3e19563fbf3754955d733083f8a2e82'), ('craftyguru/AudAiX', '0c07ac6ecd8ba52172a6ce71a4a6f6d1e621f5a0'), ('craftyguru/WordGeni', 'd7ced489a249500d10f6e0b1a5bf988b39d8c05f'), ('craftyguru/Crevux', 'b7c34ea9417bf7b3d92b5177bbaca5dcd708e6dd')]
 
           class NoRedirect(urllib.request.HTTPRedirectHandler):
               def redirect_request(self, req, fp, code, msg, headers, newurl):
@@ -162,7 +162,7 @@ jobs:
         timeout-minutes: 3
         with:
           repository: craftyguru/Crevux
-          ref: 7b0a87ce6e360b9ee8142c028cea691be2095a46
+          ref: b7c34ea9417bf7b3d92b5177bbaca5dcd708e6dd
           path: apps/Crevux
           token: ${{ secrets.ECOSYSTEM_APP_REPO_READ_TOKEN }}
           persist-credentials: false
