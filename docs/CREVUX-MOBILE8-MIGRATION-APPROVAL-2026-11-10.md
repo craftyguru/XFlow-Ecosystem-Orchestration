@@ -1,22 +1,22 @@
 # Crevux Mobile8 production migration approval packet
 
-Status: **LOCALLY QUALIFIED; RESTORE DRILL NOT PERFORMED; NOT AUTHORIZED FOR PRODUCTION**
+Status: **PRODUCTION MIGRATION APPLIED AND VERIFIED; RESTORE DRILL NOT PERFORMED; STUDIO/DEPLOYMENT REMAIN HELD**
 
 Prepared: 2026-11-10 (America/Chicago)
 
 Canonical repository baseline: `craftyguru/XFlow-Ecosystem-Orchestration` `main` at `5b7cc028dcec07c495c42cd1aa58841d7c4b8334`
 
-Production project inspected read-only: `mjfzoikkoykszxzuebdf` (`Xflow-Ecosystem`, PostgreSQL 17.6)
+Production project: `mjfzoikkoykszxzuebdf` (`Xflow-Ecosystem`, PostgreSQL 17.6)
 
 Latest production migration before this proposal: `20261102045558`
 
-## Proposed migration
+## Reviewed migration
 
 - File: `supabase/migrations/20261111020115_crevux_mobile8_import_ledger.sql`
 - SHA-256: `b19167d7eeabc1980ead7f18023d0793ef5354878cf75c7258c5f2990db2d5df`
 - Size: 12,825 bytes; 305 lines
 - Transactional qualification: passed with `lock_timeout = '5s'` and `statement_timeout = '60s'`
-- Production execution: not performed
+- Production execution: applied once and verified at 2026-11-11T03:44Z
 
 The migration is additive and creates only:
 
@@ -149,8 +149,40 @@ No rollback SQL is executed or registered by this packet.
 7. Run health and existing single-image smoke checks without submitting a provider job.
 8. Keep Studio, billing, and provider-dispatch flags disabled pending separate deployment and acceptance approval.
 
-## Approval boundaries and smallest next action
+## Production application record
 
-This packet is not deployment authorization. The single next authorization boundary is explicit approval to apply only migration `20261111020115_crevux_mobile8_import_ledger.sql`, SHA-256 `b19167d7eeabc1980ead7f18023d0793ef5354878cf75c7258c5f2990db2d5df`, to production project `mjfzoikkoykszxzuebdf` using the sequence above, while accepting that the restoration drill was not performed.
+The owner approved the bounded production migration while explicitly accepting that the restore drill was not performed and PITR was not enabled. The migration was applied once through the linked Supabase CLI. It was not retried.
 
-Railway deployment, Android changes, Studio activation, billing changes, provider execution, hosted test resources, and local test-environment cleanup remain out of scope and held.
+Preflight evidence immediately before DDL:
+
+- Project ref/name/status: `mjfzoikkoykszxzuebdf`, `Xflow-Ecosystem`, `ACTIVE_HEALTHY`; PostgreSQL `17.6`.
+- Latest visible completed physical backup: `2026-11-10 05:09:22 UTC`; seven daily backups remained visible.
+- Source SHA-256: `b19167d7eeabc1980ead7f18023d0793ef5354878cf75c7258c5f2990db2d5df`.
+- Linked migration ledger matched the canonical checkout through `20261102045558`.
+- `supabase db push --linked --dry-run` listed only `20261111020115_crevux_mobile8_import_ledger.sql`.
+- All seven UUID prerequisites, `service_role`, schema usage, and `gen_random_uuid()` were present.
+- All three target tables and both target composite indexes were absent; duplicate-scope checks were zero; there were no conflicting DDL/lock sessions.
+- Railway production had no staged/applying work. All Studio project/library/quote/submit, Studio accounting, and Studio provider flags were absent and therefore fail-closed. Diagnostic dispatch and paid reservation were `false`; reusable execution was `false`.
+
+Application result:
+
+- `supabase db push --linked` returned `Applying migration 20261111020115_crevux_mobile8_import_ledger.sql...` followed by `Finished supabase db push.` with exit code `0`.
+- The authoritative ledger now contains one entry for version `20261111020115`, name `crevux_mobile8_import_ledger`.
+- A post-application linked dry-run returned `Remote database is up to date`.
+
+Post-migration verification:
+
+- All three tables exist under owner `postgres`; all three have RLS enabled and FORCE RLS enabled.
+- Both composite ownership indexes and all seven table-specific indexes are valid and ready.
+- All primary, unique, check, and ten foreign-key constraints are validated; no target constraint or index is invalid.
+- All three timestamp triggers are enabled. `crevux.mobile8_set_updated_at()` remains `SECURITY INVOKER`, has `search_path=pg_catalog`, and is executable only by `service_role`.
+- Exactly three `ALL` policies exist, each restricted to `service_role` with `USING (true)` and `WITH CHECK (true)`.
+- PUBLIC, `anon`, and `authenticated` have no table CRUD privileges. Direct read-only probes as `anon` and `authenticated` returned permission denied. A read-only probe as `service_role` succeeded and confirmed all three new tables were empty.
+- Supabase health advisors returned no health lint. No security-advisor finding referenced a new Mobile8 table or trigger function.
+- Production `/health` returned HTTP 200. `/ready` remained intentionally HTTP 503/degraded because bounded qualification, provider configuration, pricing authority, and public upload security remain held; its database and schema-authority checks both returned `ok`.
+- Existing single-image compatibility remains PASS using the retained 35/35 qualification evidence plus the post-change liveness/database/schema smoke. No generation, upload, billing, or provider request was submitted.
+- The Railway deployment and Android v22 were unchanged.
+
+## Remaining approval boundaries
+
+The database migration is complete. Railway deployment, Android changes, Studio activation, billing changes, provider execution, hosted test resources, and local test-environment cleanup remain out of scope and held pending separate approval.
