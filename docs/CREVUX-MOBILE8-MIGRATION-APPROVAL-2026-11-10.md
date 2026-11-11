@@ -34,7 +34,7 @@ It does not change an existing column, data row, API route, feature flag, billin
 
 ## Migration-history reconciliation
 
-The production migration ledger contains 22 applied timestamped entries that were absent from this checkout. Their recorded `statements[]` bodies were recovered through authorized read-only ledger inspection and restored locally as versioned files from `20260910095713` through `20261102045558`. Each recovered file records the MD5 of the production ledger's statement join for independent comparison.
+The production migration ledger contains 24 applied timestamped entries that were absent from this checkout. Their recorded `statements[]` bodies were recovered through authorized read-only ledger inspection and restored locally as versioned files from `20260910070010` through `20261102045558`. Each recovered file records the MD5 of the production ledger's statement join for independent comparison.
 
 The original byte-for-byte files were not recoverable from retained Git objects or remotes. In particular, historical Mobile8C commit `98ae1e67...` and blob `15b15e8...` are unreachable, and that migration is not in the production ledger. The restored files therefore preserve the exact ledger statement bodies but add provenance headers and statement terminators; they must not be represented as byte-identical originals.
 
