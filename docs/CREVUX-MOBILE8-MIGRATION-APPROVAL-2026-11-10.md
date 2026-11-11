@@ -38,7 +38,9 @@ The production migration ledger contains 24 applied timestamped entries that wer
 
 The original byte-for-byte files were not recoverable from retained Git objects or remotes. In particular, historical Mobile8C commit `98ae1e67...` and blob `15b15e8...` are unreachable, and that migration is not in the production ledger. The restored files therefore preserve the exact ledger statement bodies but add provenance headers and statement terminators; they must not be represented as byte-identical originals.
 
-Two local June hardening files (`20260611063431` and `20260611081601`) have effects visible in production but are not represented as matching entries in the inspected ledger. This makes a full filename-ordered rebuild from the repository historically non-authoritative: migration `064` depends on a helper supplied by the hardening sequence, while the hardening sequence itself depends on a later numbered object. The provenance/order defect should be repaired separately, but it does not block this forward migration because its dependencies and target absence were independently checked against the production catalog and reproduced in a dependency-complete clone. No production ledger row was invented or rewritten.
+The two June hardening files (`20260611063431` and `20260611081601`) and `20261030055853` were already present locally and match entries in the inspected ledger. A full filename-ordered rebuild is nevertheless historically non-authoritative: migration `064` depends on a helper whose retained source is ordered later, while that hardening sequence itself depends on a later numbered object. The provenance/order defect should be repaired separately, but it does not block this forward migration because its dependencies and target absence were independently checked against the production catalog and reproduced in a dependency-complete clone. No production ledger row was invented or rewritten.
+
+The complete timestamped inventory now matches production exactly: 27 version/name pairs through `20261102045558`, with MD5 `6532cc1b55f027b0c962766763344aba` on both the production ledger and local filename inventory.
 
 ## Production catalog comparison
 
@@ -66,6 +68,8 @@ FORCE RLS is retained. The tables are private server ledgers and are not a clien
 | Gate | Evidence | Result |
 | --- | --- | --- |
 | Fresh transactional application | Two independently rebuilt PostgreSQL 16.15 clones | PASS |
+| PostgreSQL 17 production compatibility | Production 17.6 catalog reports every required UUID dependency, role, and target-absence precondition; the migration uses syntax supported by 16.15 and 17 | PASS (catalog/static) |
+| Exact recovered ledger inventory | 27/27 timestamped version/name pairs; matching MD5 `6532cc1b55f027b0c962766763344aba` | PASS |
 | Repeatability/catalog drift | Both clones produced 155 target catalog records with MD5 `3b5f4e5e0b12844f6af7ef088e18a9e3` | PASS |
 | Crevux schema verifier | `pnpm run db:verify:mobile8-schema` | PASS |
 | Scanner/import PostgreSQL suite | `service.pg.test.ts`: 25/25 | PASS |
@@ -78,6 +82,8 @@ FORCE RLS is retained. The tables are private server ledgers and are not a clien
 
 The timestamp trigger was corrected during qualification. It updates `updated_at` on ordinary changes, but preserves an explicitly supplied timestamp so bounded stale-operation reconciliation can test and record recovery age. The corrected migration passed all 25 scanner/import cases from a fresh clone.
 
+The trigger is `SECURITY INVOKER`, not `SECURITY DEFINER`. PUBLIC, `anon`, and `authenticated` cannot execute it and have no UPDATE privilege or RLS policy on the tables. Only `service_role` has function execution and table CRUD. Therefore an untrusted client cannot supply or override reconciliation timestamps; an explicit timestamp is available only to the trusted server role or the database owner. This boundary was verified from the cloned function ACL and table grants.
+
 ## Lock and operational risk
 
 - The migration takes normal PostgreSQL DDL locks while creating the three tables, their constraints, triggers, policies, and grants.
@@ -88,11 +94,34 @@ The timestamp trigger was corrected during qualification. It updates `updated_at
 
 ## Backup and restoration gate
 
-Production project health is `ACTIVE_HEALTHY`, but this inspection did not expose independently verifiable backup/PITR status or perform a restoration drill. Therefore:
+Production project health is `ACTIVE_HEALTHY`. The authenticated Supabase Dashboard showed seven completed daily physical backups:
 
-- **Backup existence and restoration readiness: BLOCKED pending operator verification.**
-- Before migration approval, record the latest successful platform backup/PITR timestamp and confirm the documented restore procedure is available to the operator.
-- Do not create a paid branch, restore production, or change backup settings as part of this packet.
+- 2026-11-10 05:09:22 UTC (latest; `COMPLETED`)
+- 2026-11-09 05:08:36 UTC
+- 2026-11-08 05:08:38 UTC
+- 2026-11-07 05:09:50 UTC
+- 2026-11-06 05:08:34 UTC
+- 2026-11-05 05:08:37 UTC
+- 2026-11-04 05:08:40 UTC
+
+PITR is **not enabled**; the Dashboard offers it only as a paid add-on. The latest available recovery point is therefore the latest completed daily backup, not an arbitrary pre-migration timestamp. The Dashboard also exposes `Restore to new project` for each completed backup. Supabase documents this as a database-only, independent project clone that incurs additional project cost and does not copy Storage objects/settings, Edge Functions, Auth settings/API keys, Realtime settings, or all project configuration.
+
+The non-final restore review for the latest backup quoted **$10.18 additional monthly cost**: $9.68 compute plus $0.50 disk. It would remain in `craftyguru's Org`, region `us-east-1`, use the same compute size, and allocate a disk 1.5 times larger for restore headroom. The dialog was cancelled; no project was created and no restore began.
+
+Backup availability and platform restore support are **PASS**. An actual restore drill is **NOT RUN / APPROVAL REQUIRED**: creating the isolated destination is billable, copies production database contents including Auth records, and was not authorized. Backup existence alone is not represented as successful restoration.
+
+Read-only production checks found no `pg_cron`, `pg_net`, `wrappers`, or `http` extensions, no subscriptions, and no non-Realtime replication slots. That reduces—but does not eliminate—the risk of a restored project performing outbound work.
+
+### Bounded restore-verification procedure
+
+1. Obtain explicit approval for the quoted $10.18 additional monthly cost and for copying the production database into an isolated Supabase project in the same organization and region.
+2. Select the latest completed physical backup and use `Restore to new project`; never restore over production.
+3. Keep the clone disconnected from Railway, public domains, provider credentials, billing webhooks, and application traffic. Do not copy Storage objects or production environment secrets.
+4. Immediately confirm no outbound-capable extensions, cron jobs, subscriptions, non-Realtime replication slots, Edge Functions, or external consumers are active.
+5. Verify PostgreSQL version, schema ownership, all 27 timestamped ledger entries through `20261102045558`, catalog fingerprints, representative metadata-only object counts, roles, grants, and RLS. Do not export customer rows.
+6. Apply the proposed migration only to that isolated clone, rerun the catalog/RLS checks, and confirm the three new tables remain empty.
+7. Record restore start/completion times and all validation results. Treat the drill as failed if any expected schema, role, grant, migration entry, or constraint is missing.
+8. Retire the billable clone only under explicit deletion approval after evidence is preserved.
 
 ## Rollback strategy
 
@@ -117,4 +146,9 @@ No rollback SQL is executed or registered by this packet.
 
 ## Approval boundaries and smallest next action
 
-This packet is not deployment authorization. The smallest safe next action is for the production operator to verify and record backup/PITR restoration readiness, then review the migration checksum and FORCE RLS decision. Only after a separate explicit approval should the exact migration be applied to production. Railway deployment, Android changes, Studio activation, billing changes, and provider execution remain out of scope and held.
+This packet is not deployment authorization. The next authorization boundary is one of:
+
+1. **Preferred:** approve up to $10.18 additional monthly cost and controlled creation of one isolated restore-to-new-project clone from backup `2026-11-10 05:09:22 UTC`, followed by the bounded restore drill above. Clone deletion remains a separately confirmed destructive action.
+2. **Risk acceptance:** explicitly waive the restore drill based on seven completed physical backups and documented restore-to-new-project support, then separately authorize applying only migration `20261111020115` with SHA-256 `b19167d7eeabc1980ead7f18023d0793ef5354878cf75c7258c5f2990db2d5df` during a quiet window.
+
+Railway deployment, Android changes, Studio activation, billing changes, and provider execution remain out of scope and held.
