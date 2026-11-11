@@ -1,6 +1,6 @@
 # Crevux Mobile8 production migration approval packet
 
-Status: **READY FOR REVIEW; NOT AUTHORIZED FOR PRODUCTION**
+Status: **LOCALLY QUALIFIED; RESTORE DRILL NOT PERFORMED; NOT AUTHORIZED FOR PRODUCTION**
 
 Prepared: 2026-11-10 (America/Chicago)
 
@@ -108,20 +108,25 @@ PITR is **not enabled**; the Dashboard offers it only as a paid add-on. The late
 
 The non-final restore review for the latest backup quoted **$10.18 additional monthly cost**: $9.68 compute plus $0.50 disk. It would remain in `craftyguru's Org`, region `us-east-1`, use the same compute size, and allocate a disk 1.5 times larger for restore headroom. The dialog was cancelled; no project was created and no restore began.
 
-Backup availability and platform restore support are **PASS**. An actual restore drill is **NOT RUN / APPROVAL REQUIRED**: creating the isolated destination is billable, copies production database contents including Auth records, and was not authorized. Backup existence alone is not represented as successful restoration.
+Backup availability and platform restore support are **PASS**. An actual restore drill is **NOT PERFORMED**. Authorization for the proposed paid clone was withdrawn before a project name or database password was submitted. The restore form was cancelled, the browser tab was closed, and a subsequent project inventory confirmed that no new Supabase project exists. Backup existence alone is not represented as successful restoration.
 
 Read-only production checks found no `pg_cron`, `pg_net`, `wrappers`, or `http` extensions, no subscriptions, and no non-Realtime replication slots. That reduces—but does not eliminate—the risk of a restored project performing outbound work.
 
-### Bounded restore-verification procedure
+No hosted clone, Supabase branch, additional database, or other paid resource is permitted for this change. The accepted isolation evidence is the existing loopback-only PostgreSQL 16 environment and the completed focused qualification already recorded above. Its cleanup is deferred until Crevux release qualification is complete and separately authorized.
 
-1. Obtain explicit approval for the quoted $10.18 additional monthly cost and for copying the production database into an isolated Supabase project in the same organization and region.
-2. Select the latest completed physical backup and use `Restore to new project`; never restore over production.
-3. Keep the clone disconnected from Railway, public domains, provider credentials, billing webhooks, and application traffic. Do not copy Storage objects or production environment secrets.
-4. Immediately confirm no outbound-capable extensions, cron jobs, subscriptions, non-Realtime replication slots, Edge Functions, or external consumers are active.
-5. Verify PostgreSQL version, schema ownership, all 27 timestamped ledger entries through `20261102045558`, catalog fingerprints, representative metadata-only object counts, roles, grants, and RLS. Do not export customer rows.
-6. Apply the proposed migration only to that isolated clone, rerun the catalog/RLS checks, and confirm the three new tables remain empty.
-7. Record restore start/completion times and all validation results. Treat the drill as failed if any expected schema, role, grant, migration entry, or constraint is missing.
-8. Retire the billable clone only under explicit deletion approval after evidence is preserved.
+## Exact production migration sequence
+
+All steps remain held until one explicit production-migration approval names the exact migration and checksum.
+
+1. Confirm production project `mjfzoikkoykszxzuebdf` is `ACTIVE_HEALTHY`, the latest successful daily physical backup is still visible, and no incident or unrelated migration is active.
+2. Re-hash `supabase/migrations/20261111020115_crevux_mobile8_import_ledger.sql` and require SHA-256 `b19167d7eeabc1980ead7f18023d0793ef5354878cf75c7258c5f2990db2d5df`.
+3. Run `supabase migration list --linked` from the canonical XFlow checkout and require exact alignment through production version `20261102045558`.
+4. Run `supabase db push --linked --dry-run` and require that the only pending migration is `20261111020115_crevux_mobile8_import_ledger.sql`. Do not use `--include-all`, roles, or seed data.
+5. Repeat the metadata-only prerequisite query: PostgreSQL 17, all seven required UUID columns present, the three target tables absent, the two target indexes absent, and `service_role` present with `USAGE` on schema `crevux`.
+6. Keep every Crevux Studio, provider-dispatch, billing, and Android release flag unchanged and disabled. Select a quiet write window and monitor database locks.
+7. After explicit approval, run `supabase db push --linked` once from the reviewed checkout. Abort on checksum, ledger, preflight, lock-timeout, or statement-timeout mismatch; do not retry blindly.
+8. Perform the post-migration checks below before any application deployment or feature activation.
+9. Record the applied ledger version, catalog fingerprint, operator, timestamps, and outcome. This database change does not authorize Railway deployment or feature enablement.
 
 ## Rollback strategy
 
@@ -146,9 +151,6 @@ No rollback SQL is executed or registered by this packet.
 
 ## Approval boundaries and smallest next action
 
-This packet is not deployment authorization. The next authorization boundary is one of:
+This packet is not deployment authorization. The single next authorization boundary is explicit approval to apply only migration `20261111020115_crevux_mobile8_import_ledger.sql`, SHA-256 `b19167d7eeabc1980ead7f18023d0793ef5354878cf75c7258c5f2990db2d5df`, to production project `mjfzoikkoykszxzuebdf` using the sequence above, while accepting that the restoration drill was not performed.
 
-1. **Preferred:** approve up to $10.18 additional monthly cost and controlled creation of one isolated restore-to-new-project clone from backup `2026-11-10 05:09:22 UTC`, followed by the bounded restore drill above. Clone deletion remains a separately confirmed destructive action.
-2. **Risk acceptance:** explicitly waive the restore drill based on seven completed physical backups and documented restore-to-new-project support, then separately authorize applying only migration `20261111020115` with SHA-256 `b19167d7eeabc1980ead7f18023d0793ef5354878cf75c7258c5f2990db2d5df` during a quiet window.
-
-Railway deployment, Android changes, Studio activation, billing changes, and provider execution remain out of scope and held.
+Railway deployment, Android changes, Studio activation, billing changes, provider execution, hosted test resources, and local test-environment cleanup remain out of scope and held.
